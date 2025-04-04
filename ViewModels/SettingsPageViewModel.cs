@@ -7,13 +7,13 @@ using System.Threading.Tasks;
 
 namespace UltrawideOverlays.ViewModels
 {
-    public partial class OverlaysPageViewModel : PageViewModel
+    public partial class SettingsPageViewModel : PageViewModel
     {
         [ObservableProperty]
-        private string _overlaysPageName = "Overlays Page";
-        public OverlaysPageViewModel()
+        private string _settingsPageName = "Settings Page";
+        public SettingsPageViewModel()
         {
-            PageName = Enums.ApplicationPageViews.OverlaysPage;
+            PageName = Enums.ApplicationPageViews.SettingsPage;
         }
     }
 }

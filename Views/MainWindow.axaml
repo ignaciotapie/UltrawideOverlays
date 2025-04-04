@@ -16,6 +16,7 @@
              to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
         <vm:MainWindowViewModel/>
     </Design.DataContext>
+    
     <Grid ColumnDefinitions="200, *" Background="{DynamicResource SecondaryColor}">
         <!-- Page Views -->
         <ContentControl Grid.Column="1" Content="{Binding CurrentPage}"/>
@@ -65,7 +66,7 @@
                     </Button.Content>
                 </Button>
                 
-                <Button Background="Transparent" VerticalAlignment="Bottom">
+                <Button Background="Transparent" VerticalAlignment="Bottom" Command="{Binding NavigateToSettingsPageCommand}">
                     <Button.Content>
                         <StackPanel Orientation="Horizontal" Spacing="10">
                             <Image Classes="TabIcon">

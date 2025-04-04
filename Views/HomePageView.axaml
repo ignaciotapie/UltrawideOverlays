@@ -11,5 +11,5 @@
         <vm:HomePageViewModel/>
     </Design.DataContext>
     
-    <Label Content="{Binding HomePageTitle}"/>
+    <Label Content="{Binding HomePageName}"/>
 </UserControl>

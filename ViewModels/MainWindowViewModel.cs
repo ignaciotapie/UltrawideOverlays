@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using UltrawideOverlays.Factories;
 using UltrawideOverlays.Views;
 
 namespace UltrawideOverlays.ViewModels
@@ -14,39 +15,47 @@ namespace UltrawideOverlays.ViewModels
         private string _thirdListItem = "Overlays";
         [ObservableProperty]
         private string _settingsTxt = "Settings";
-
         [ObservableProperty]
-        private ViewModelBase _currentPage;
+        private PageViewModel _currentPage;
 
+        private readonly PageFactory factory;
+
+        /// <summary>
+        /// Design-time only constructor
+        /// </summary>
         public MainWindowViewModel()
         {
-            _homePageViewModel = new HomePageViewModel();
-            _gamesPageViewModel = new GamesPageViewModel();
-            _overlaysPageViewModel = new OverlaysPageViewModel();
-
-            CurrentPage = _homePageViewModel;
+            CurrentPage = new HomePageViewModel();
         }
 
-        private readonly HomePageViewModel _homePageViewModel;
-        private readonly GamesPageViewModel _gamesPageViewModel;
-        private readonly OverlaysPageViewModel _overlaysPageViewModel;
+        public MainWindowViewModel(PageFactory PFactory)
+        {
+           factory = PFactory;
+           NavigateToHomePage();
+        }
 
         [RelayCommand]
         private void NavigateToHomePage()
         {
-            CurrentPage = _homePageViewModel;
+            CurrentPage = factory.GetPageViewModel(Enums.ApplicationPageViews.HomePage);
         }
 
         [RelayCommand]
         private void NavigateToGamesPage()
         {
-            CurrentPage = _gamesPageViewModel;
+            CurrentPage = factory.GetPageViewModel(Enums.ApplicationPageViews.GamesPage);
         }
 
         [RelayCommand]
         private void NavigateToOverlaysPage()
         {
-            CurrentPage = _overlaysPageViewModel;
+            CurrentPage = factory.GetPageViewModel(Enums.ApplicationPageViews.OverlaysPage);
+        }
+
+        [RelayCommand]
+        private void NavigateToSettingsPage()
+        {
+            CurrentPage = factory.GetPageViewModel(Enums.ApplicationPageViews.SettingsPage);
         }
     }
 }

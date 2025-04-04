@@ -7,9 +7,13 @@ using System.Threading.Tasks;
 
 namespace UltrawideOverlays.ViewModels
 {
-    public partial class GamesPageViewModel : ViewModelBase
+    public partial class GamesPageViewModel : PageViewModel
     {
         [ObservableProperty]
         private string _gamesPageTitle = "Games Page";
+        public GamesPageViewModel()
+        {
+            PageName = Enums.ApplicationPageViews.GamesPage;
+        }
     }
 }

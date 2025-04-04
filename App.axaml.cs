@@ -6,6 +6,9 @@ using Avalonia.Markup.Xaml;
 using System.Linq;
 using UltrawideOverlays.ViewModels;
 using UltrawideOverlays.Views;
+using Microsoft.Extensions.DependencyInjection;
+using System;
+using UltrawideOverlays.Factories;
 
 namespace UltrawideOverlays
 {
@@ -23,9 +26,33 @@ namespace UltrawideOverlays
                 // Avoid duplicate validations from both Avalonia and the CommunityToolkit. 
                 // More info: https://docs.avaloniaui.net/docs/guides/development-guides/data-validation#manage-validationplugins
                 DisableAvaloniaDataAnnotationValidation();
+
+                ServiceCollection collection = new ServiceCollection();
+
+                //Factory
+                collection.AddSingleton<PageFactory>();
+                collection.AddSingleton<Func<Enums.ApplicationPageViews, PageViewModel>>(x => pageName => pageName switch
+                {
+                    Enums.ApplicationPageViews.HomePage => x.GetRequiredService<HomePageViewModel>(),
+                    Enums.ApplicationPageViews.OverlaysPage => x.GetRequiredService<OverlaysPageViewModel>(),
+                    Enums.ApplicationPageViews.GamesPage => x.GetRequiredService<GamesPageViewModel>(),
+                    Enums.ApplicationPageViews.SettingsPage => x.GetRequiredService<SettingsPageViewModel>(),
+                    _ => throw new InvalidOperationException($"No ViewModel found for {pageName}")
+                });
+
+                //Main Window
+                collection.AddSingleton<MainWindowViewModel>();
+                //PageViewModels
+                collection.AddTransient<HomePageViewModel>();
+                collection.AddTransient<OverlaysPageViewModel>();
+                collection.AddTransient<GamesPageViewModel>();
+                collection.AddTransient<SettingsPageViewModel>();
+
+                ServiceProvider services = collection.BuildServiceProvider();
+
                 desktop.MainWindow = new MainWindow
                 {
-                    DataContext = new MainWindowViewModel(),
+                    DataContext = services.GetRequiredService<MainWindowViewModel>()
                 };
             }
 
