@@ -1,0 +1,33 @@
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="UltrawideOverlays.App"
+             xmlns:local="using:UltrawideOverlays"
+             xmlns:vm="using:UltrawideOverlays.ViewModels"
+             RequestedThemeVariant="Default">
+             <!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
+
+    <Application.DataTemplates>
+        <local:ViewLocator/>
+    </Application.DataTemplates>
+
+    <Application.Resources>
+        <!--  Color Definition  -->
+        <SolidColorBrush x:Key="PrimaryColor">#1e1e1e</SolidColorBrush>
+        <SolidColorBrush x:Key="PrimaryHoverColor">#2f62a1</SolidColorBrush>
+        <SolidColorBrush x:Key="PrimaryFontColor">#CFCFCF</SolidColorBrush>
+        <SolidColorBrush x:Key="SecondaryColor">#444444</SolidColorBrush>
+        <SolidColorBrush x:Key="PrimaryAccent">#e57228</SolidColorBrush>
+
+         <!-- Images and Icons-->
+        <SvgSource x:Key="TvLogo">/Assets/Images/tv-icon-white.svg</SvgSource>
+        <SvgSource x:Key="SettingLogo">/Assets/Images/settings-icon.svg</SvgSource>
+        <SvgSource x:Key="HomeLogo">/Assets/Images/home-logo.svg</SvgSource>
+        <SvgSource x:Key="OverlayLogo">/Assets/Images/overlay-logo.svg</SvgSource>
+        <SvgSource x:Key="GamesLogo">/Assets/Images/joystick-logo.svg</SvgSource>
+    </Application.Resources>
+  
+    <Application.Styles>
+        <FluentTheme />
+        <StyleInclude Source="/Styles/MainWindowStyle.axaml"/>
+    </Application.Styles>
+</Application>

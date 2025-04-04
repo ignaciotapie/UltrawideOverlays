@@ -1,0 +1,40 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    
+  <Design.PreviewWith>
+    <Border Padding="20" Background="{DynamicResource PrimaryColor}">
+      <!-- Add Controls for Previewer Here -->
+         <Button Content="Hello, World!" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="24"/>
+    </Border>
+  </Design.PreviewWith>
+
+  <!-- Add Styles Here -->
+    <Style Selector="Button">
+        <Setter Property="Opacity" Value="1"></Setter>
+        <Setter Property="FontSize" Value="20"></Setter>
+        <Setter Property="Foreground" Value="{DynamicResource PrimaryFontColor}"></Setter>
+        <Setter Property="Background" Value="Transparent"></Setter>
+        <Setter Property="Padding" Value="10"></Setter>
+    </Style>
+
+    <Style Selector="Button:pointerover /template/ContentPresenter">
+        <Setter Property="Background" Value="Transparent"></Setter>
+        <Setter Property="Foreground" Value="#FFFFFF"></Setter>
+        <Setter Property="RenderTransform">
+            <Setter.Value>
+                <ScaleTransform ScaleX="1.2" ScaleY="1.2"></ScaleTransform>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style Selector="Button:pressed /template/ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource PrimaryAccent}" />
+    </Style>
+
+    <Style Selector="Image" x:Class="TabIcon">
+        <Setter Property="Width" Value="42"/>
+        <Setter Property="Height" Value="42"/>
+        <Setter Property="HorizontalAlignment" Value="Left"/>
+        <Setter Property="VerticalAlignment" Value="Bottom"/>
+    </Style>
+</Styles>
