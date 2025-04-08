@@ -9,6 +9,10 @@ using UltrawideOverlays.Views;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using UltrawideOverlays.Factories;
+using CommunityToolkit.Mvvm.ComponentModel;
+using UltrawideOverlays.Models;
+using System.Collections.Generic;
+using Avalonia.Controls;
 
 namespace UltrawideOverlays
 {
@@ -17,6 +21,24 @@ namespace UltrawideOverlays
         public override void Initialize()
         {
             AvaloniaXamlLoader.Load(this);
+        }
+
+        public Window CreateWindow(IServiceProvider provider, Enums.WindowViews windowEnum)
+        {
+            if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
+            {
+                switch (windowEnum)
+                {
+                    case Enums.WindowViews.OverlayEditorWindow:
+                        return new OverlayEditorWindowView
+                        {
+                            DataContext = provider.GetRequiredService<OverlayEditorWindowViewModel>()
+                        };
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(windowEnum), windowEnum, null);
+                }
+            }
+            return null;
         }
 
         public override void OnFrameworkInitializationCompleted()
@@ -31,6 +53,7 @@ namespace UltrawideOverlays
 
                 //Factory
                 collection.AddSingleton<PageFactory>();
+                collection.AddSingleton<WindowFactory>();
                 collection.AddSingleton<Func<Enums.ApplicationPageViews, PageViewModel>>(x => pageName => pageName switch
                 {
                     Enums.ApplicationPageViews.HomePage => x.GetRequiredService<HomePageViewModel>(),
@@ -40,6 +63,8 @@ namespace UltrawideOverlays
                     _ => throw new InvalidOperationException($"No ViewModel found for {pageName}")
                 });
 
+                collection.AddSingleton<Func<Enums.WindowViews, Window>>(x => windowEnum => CreateWindow(x, windowEnum));
+
                 //Main Window
                 collection.AddSingleton<MainWindowViewModel>();
                 //PageViewModels
@@ -47,6 +72,7 @@ namespace UltrawideOverlays
                 collection.AddTransient<OverlaysPageViewModel>();
                 collection.AddTransient<GamesPageViewModel>();
                 collection.AddTransient<SettingsPageViewModel>();
+                collection.AddTransient<OverlayEditorWindowViewModel>();
 
                 ServiceProvider services = collection.BuildServiceProvider();
 

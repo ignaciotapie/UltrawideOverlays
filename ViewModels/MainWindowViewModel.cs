@@ -25,7 +25,7 @@ namespace UltrawideOverlays.ViewModels
         /// </summary>
         public MainWindowViewModel()
         {
-            CurrentPage = new HomePageViewModel();
+            CurrentPage = new SettingsPageViewModel();
         }
 
         public MainWindowViewModel(PageFactory PFactory)

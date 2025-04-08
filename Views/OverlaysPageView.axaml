@@ -4,11 +4,37 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="using:UltrawideOverlays.ViewModels"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             Background="{DynamicResource SecondaryColor}"
              x:DataType="vm:OverlaysPageViewModel"
              x:Class="UltrawideOverlays.Views.OverlaysPageView">
     <Design.DataContext>
         <vm:OverlaysPageViewModel/>
     </Design.DataContext>
-    
-    <Label Content="{Binding OverlaysPageName}"/>
+
+    <Grid ColumnDefinitions="*, *" RowDefinitions="100, *, *">
+        <!-- Banner-->
+        <Border Grid.Row="0" Grid.ColumnSpan="2" Background="{DynamicResource PrimaryColor}">
+            <Label VerticalAlignment="Center" HorizontalAlignment="Center">Overlays</Label>
+        </Border>
+
+        <!-- Content-->
+        <StackPanel Grid.Row="1" Margin="10" >
+            <Label> Existing Overlays</Label>
+            <Border Background="{DynamicResource PrimaryBackground}">
+                <ListBox ItemsSource="{Binding Overlays}">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal">
+                                <Label Content="{Binding Name}"/>
+                                <Label Content="{Binding Path}"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </Border>
+        </StackPanel>
+
+        <Button Grid.Row="1" Grid.Column="1" Content="Add New +" VerticalAlignment="Top" Command="{Binding AddNewButtonCommand}"></Button>
+
+    </Grid>
 </UserControl>

@@ -3,7 +3,7 @@
              x:Class="UltrawideOverlays.App"
              xmlns:local="using:UltrawideOverlays"
              xmlns:vm="using:UltrawideOverlays.ViewModels"
-             RequestedThemeVariant="Default">
+             RequestedThemeVariant="Dark">
              <!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
 
     <Application.DataTemplates>
@@ -11,11 +11,12 @@
     </Application.DataTemplates>
 
     <Application.Resources>
+
         <!--  Color Definition  -->
         <SolidColorBrush x:Key="PrimaryColor">#1e1e1e</SolidColorBrush>
+        <SolidColorBrush x:Key="SecondaryColor">#444444</SolidColorBrush>
         <SolidColorBrush x:Key="PrimaryHoverColor">#2f62a1</SolidColorBrush>
         <SolidColorBrush x:Key="PrimaryFontColor">#CFCFCF</SolidColorBrush>
-        <SolidColorBrush x:Key="SecondaryColor">#444444</SolidColorBrush>
         <SolidColorBrush x:Key="PrimaryAccent">#e57228</SolidColorBrush>
 
          <!-- Images and Icons-->
@@ -29,5 +30,6 @@
     <Application.Styles>
         <FluentTheme />
         <StyleInclude Source="/Styles/MainWindowStyle.axaml"/>
+        <StyleInclude Source="avares://Avalonia.Controls.ColorPicker/Themes/Fluent/Fluent.xaml" />
     </Application.Styles>
 </Application>

@@ -1,0 +1,50 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="1920" d:DesignHeight="1080"
+        xmlns:converter="using:UltrawideOverlays.Converters"
+        xmlns:vm="using:UltrawideOverlays.ViewModels"
+        x:Class="UltrawideOverlays.Views.OverlayEditorWindowView"
+        x:DataType="vm:OverlayEditorWindowViewModel"
+        Background="{DynamicResource SecondaryColor}"
+        Title="OverlayEditorWindowView">
+    
+    <Design.DataContext><vm:OverlayEditorWindowViewModel/></Design.DataContext>
+
+    <Window.Resources>
+        <converter:PathToBitmapConverter x:Key="PathToBitmapConverter"/>
+    </Window.Resources>
+
+    <Grid ColumnDefinitions="*, 3.5*, *" RowDefinitions="*, *">
+        <!-- Tools-->
+        <Border Grid.Row="0" Background="{DynamicResource PrimaryColor}">
+            <Label VerticalAlignment="Center" HorizontalAlignment="Center">Tools</Label>
+        </Border>
+        
+        <!-- Images-->
+        <StackPanel Grid.Row="1" Background="{DynamicResource PrimaryColor}">
+            <Label VerticalAlignment="Center" HorizontalAlignment="Left">Images</Label>
+            <ListBox ItemsSource="{Binding Images}">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Horizontal">
+                            <Image Source="{Binding ImagePath, Converter={StaticResource PathToBitmapConverter}}"/>
+                            <Label Content="{Binding ImageName}"/>
+                        </StackPanel>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+        </StackPanel>
+
+        <!-- Preview-->
+        <Border Grid.Column="1" Grid.RowSpan="2" Background="DarkGray">
+            <Label VerticalAlignment="Center" HorizontalAlignment="Center">Preview</Label>
+        </Border>
+
+        <!-- Properties-->
+        <Border Grid.Column="2" Grid.RowSpan="2" Background="DarkMagenta">
+            <Label VerticalAlignment="Center" HorizontalAlignment="Center">Properties</Label>
+        </Border>
+    </Grid>
+</Window>

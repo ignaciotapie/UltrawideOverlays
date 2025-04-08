@@ -8,7 +8,6 @@
         Width="1024" Height="768"
         x:Class="UltrawideOverlays.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
-        Background="{x:Null}"
         Title="UltrawideOverlays">
 
     <Design.DataContext>
@@ -17,19 +16,19 @@
         <vm:MainWindowViewModel/>
     </Design.DataContext>
     
-    <Grid ColumnDefinitions="200, *" Background="{DynamicResource SecondaryColor}">
+    <Grid ColumnDefinitions="200,*" Background="{DynamicResource SecondaryColor}">
         <!-- Page Views -->
-        <ContentControl Grid.Column="1" Content="{Binding CurrentPage}"/>
+        <ContentControl Grid.Column="2" Content="{Binding CurrentPage}"/>
 
         <!-- Tab Section-->
-        <Border Background="{DynamicResource PrimaryColor}" CornerRadius="0, 10, 10, 0" BoxShadow="5 0 8 0 #1c1c1c">
+        <Border Background="{DynamicResource PrimaryColor}">
             <StackPanel Margin="0, 20" Spacing="20" VerticalAlignment="Stretch" HorizontalAlignment="Center">
                 <Image Width="64" Height="64" HorizontalAlignment="Center" VerticalAlignment="Top">
                     <Image.Source>
                         <SvgImage Source="{StaticResource TvLogo}"/>
                     </Image.Source>
                 </Image>
-                <Button Background="Transparent" VerticalAlignment="Bottom" Command="{Binding NavigateToHomePageCommand}">
+                <Button Background="Transparent" HorizontalAlignment="Stretch" VerticalAlignment="Bottom" Command="{Binding NavigateToHomePageCommand}">
                     <Button.Content>
                         <StackPanel Orientation="Horizontal" Spacing="10">
                             <Image Classes="TabIcon">
@@ -41,7 +40,7 @@
                         </StackPanel>
                     </Button.Content>
                 </Button>
-                <Button Background="Transparent" VerticalAlignment="Bottom" Command="{Binding NavigateToGamesPageCommand}">
+                <Button Background="Transparent" HorizontalAlignment="Stretch" VerticalAlignment="Bottom" Command="{Binding NavigateToGamesPageCommand}">
                     <Button.Content>
                         <StackPanel Orientation="Horizontal" Spacing="10">
                             <Image Classes="TabIcon">
@@ -53,7 +52,7 @@
                         </StackPanel>
                     </Button.Content>
                 </Button>
-                <Button Background="Transparent" VerticalAlignment="Bottom" Command="{Binding NavigateToOverlaysPageCommand}">
+                <Button Background="Transparent" HorizontalAlignment="Stretch" VerticalAlignment="Bottom" Command="{Binding NavigateToOverlaysPageCommand}">
                     <Button.Content>
                         <StackPanel Orientation="Horizontal" Spacing="10">
                             <Image Classes="TabIcon">
@@ -66,7 +65,7 @@
                     </Button.Content>
                 </Button>
                 
-                <Button Background="Transparent" VerticalAlignment="Bottom" Command="{Binding NavigateToSettingsPageCommand}">
+                <Button Background="Transparent" HorizontalAlignment="Stretch" VerticalAlignment="Bottom" Command="{Binding NavigateToSettingsPageCommand}">
                     <Button.Content>
                         <StackPanel Orientation="Horizontal" Spacing="10">
                             <Image Classes="TabIcon">

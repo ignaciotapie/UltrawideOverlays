@@ -4,9 +4,9 @@ using Avalonia.Markup.Xaml;
 
 namespace UltrawideOverlays.Views;
 
-public partial class SettingsPageView : UserControl
+public partial class OverlayEditorWindowView : Window
 {
-    public SettingsPageView()
+    public OverlayEditorWindowView()
     {
         InitializeComponent();
     }
