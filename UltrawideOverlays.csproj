@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net8.0-windows</TargetFramework>
     <Nullable>enable</Nullable>
     <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
     <ApplicationManifest>app.manifest</ApplicationManifest>
@@ -10,7 +10,7 @@
     <UseWindowsForms>False</UseWindowsForms>
   </PropertyGroup>
   <PropertyGroup Label="Avalonia">
-    <AvaloniaNameGeneratorDefaultFieldModifier>Public</AvaloniaNameGeneratorDefaultFieldModifier>
+    <AvaloniaNameGeneratorDefaultFieldModifier>Internal</AvaloniaNameGeneratorDefaultFieldModifier>
   </PropertyGroup>
 
   <ItemGroup>
@@ -19,8 +19,8 @@
 
   <ItemGroup>
     <None Remove="Assets\Images\home-logo.svg" />
-    <None Remove="Assets\Images\pattern.png" />
     <None Remove="Assets\Images\settings-icon.svg" />
+    <None Remove="Assets\Images\test.png" />
     <None Remove="Assets\Images\tv-icon-white.svg" />
   </ItemGroup>
 
@@ -46,5 +46,9 @@
     <Compile Update="Views\OverlaysPageView.axaml.cs">
       <DependentUpon>OverlaysPageView.axaml</DependentUpon>
     </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Utils\" />
   </ItemGroup>
 </Project>

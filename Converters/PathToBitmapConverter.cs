@@ -1,6 +1,6 @@
 ﻿using Avalonia.Data.Converters;
+using Avalonia.Media.Imaging;
 using System;
-using UltrawideOverlays.Utils;
 
 namespace UltrawideOverlays.Converters
 {
@@ -10,7 +10,12 @@ namespace UltrawideOverlays.Converters
         {
             if (value is string path)
             {
-                return ImageHelper.LoadFromResource(ImageHelper.GetUriFromPath(path));
+                // Check if the path is a valid file path
+                if (System.IO.File.Exists(path))
+                {
+                    // Use the BitmapLoader to load the image
+                    return new Bitmap(path);
+                }
             }
             return null;
         }

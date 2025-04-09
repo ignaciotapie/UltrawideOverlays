@@ -5,15 +5,16 @@
         mc:Ignorable="d" d:DesignWidth="1920" d:DesignHeight="1080"
         xmlns:converter="using:UltrawideOverlays.Converters"
         xmlns:vm="using:UltrawideOverlays.ViewModels"
+        xmlns:cc="using:UltrawideOverlays.CustomControls"
         x:Class="UltrawideOverlays.Views.OverlayEditorWindowView"
         x:DataType="vm:OverlayEditorWindowViewModel"
         Background="{DynamicResource SecondaryColor}"
         Title="OverlayEditorWindowView">
     
     <Design.DataContext><vm:OverlayEditorWindowViewModel/></Design.DataContext>
-
+    
     <Window.Resources>
-        <converter:PathToBitmapConverter x:Key="PathToBitmapConverter"/>
+        <converter:PathToBitmapConverter x:Key="pathToBitmapConverter"/>
     </Window.Resources>
 
     <Grid ColumnDefinitions="*, 3.5*, *" RowDefinitions="*, *">
@@ -25,13 +26,15 @@
         <!-- Images-->
         <StackPanel Grid.Row="1" Background="{DynamicResource PrimaryColor}">
             <Label VerticalAlignment="Center" HorizontalAlignment="Left">Images</Label>
-            <ListBox ItemsSource="{Binding Images}">
+            <ListBox ItemsSource="{Binding Images}" Margin="20">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
-                        <StackPanel Orientation="Horizontal">
-                            <Image Source="{Binding ImagePath, Converter={StaticResource PathToBitmapConverter}}"/>
-                            <Label Content="{Binding ImageName}"/>
-                        </StackPanel>
+                        <RelativePanel>
+                            <Image x:Name="PreviewImage" VerticalAlignment="Center" RelativePanel.AlignLeftWithPanel="True" Source="{Binding ImagePath, Converter={StaticResource pathToBitmapConverter} }"/>
+                            <Label x:Name="IName" RelativePanel.RightOf="PreviewImage" RelativePanel.AlignVerticalCenterWith="PreviewImage" Margin="10,0,0,0" Content="{Binding ImageName}" />
+                            <Label x:Name="IResolution" RelativePanel.AlignRightWithPanel="True" HorizontalAlignment="Right" FontSize="12" VerticalContentAlignment="Bottom" Content="{Binding ImageResolution}" />
+                            <Label x:Name="IFormat" RelativePanel.AlignRightWithPanel="True" RelativePanel.AlignBottomWithPanel="True" HorizontalAlignment="Right" FontSize="12" VerticalContentAlignment="Bottom" Content="{Binding ImageFormat}" />
+                        </RelativePanel>
                     </DataTemplate>
                 </ListBox.ItemTemplate>
             </ListBox>
@@ -39,7 +42,11 @@
 
         <!-- Preview-->
         <Border Grid.Column="1" Grid.RowSpan="2" Background="DarkGray">
-            <Label VerticalAlignment="Center" HorizontalAlignment="Center">Preview</Label>
+            <StackPanel VerticalAlignment="Center">
+                <Border BorderBrush="{DynamicResource PrimaryAccent}" BorderThickness="10">
+                    <Rectangle HorizontalAlignment="Center" Width="1032" Height="432" Fill="DarkBlue"/>
+                </Border>
+            </StackPanel>
         </Border>
 
         <!-- Properties-->
