@@ -6,6 +6,7 @@
         xmlns:converter="using:UltrawideOverlays.Converters"
         xmlns:vm="using:UltrawideOverlays.ViewModels"
         xmlns:cc="using:UltrawideOverlays.CustomControls"
+        xmlns:locators="using:UltrawideOverlays.Locators"
         x:Class="UltrawideOverlays.Views.OverlayEditorWindowView"
         x:DataType="vm:OverlayEditorWindowViewModel"
         Background="{DynamicResource SecondaryColor}"
@@ -26,14 +27,12 @@
         <!-- Images-->
         <StackPanel Grid.Row="1" Background="{DynamicResource PrimaryColor}">
             <Label VerticalAlignment="Center" HorizontalAlignment="Left">Images</Label>
-            <ListBox ItemsSource="{Binding Images}" Margin="20">
+            <ListBox ItemsSource="{Binding Images}" Margin="20" Height="" ScrollViewer.VerticalScrollBarVisibility="Auto">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
                         <RelativePanel>
                             <Image x:Name="PreviewImage" VerticalAlignment="Center" RelativePanel.AlignLeftWithPanel="True" Source="{Binding ImagePath, Converter={StaticResource pathToBitmapConverter} }"/>
                             <Label x:Name="IName" RelativePanel.RightOf="PreviewImage" RelativePanel.AlignVerticalCenterWith="PreviewImage" Margin="10,0,0,0" Content="{Binding ImageName}" />
-                            <Label x:Name="IResolution" RelativePanel.AlignRightWithPanel="True" HorizontalAlignment="Right" FontSize="12" VerticalContentAlignment="Bottom" Content="{Binding ImageResolution}" />
-                            <Label x:Name="IFormat" RelativePanel.AlignRightWithPanel="True" RelativePanel.AlignBottomWithPanel="True" HorizontalAlignment="Right" FontSize="12" VerticalContentAlignment="Bottom" Content="{Binding ImageFormat}" />
                         </RelativePanel>
                     </DataTemplate>
                 </ListBox.ItemTemplate>
@@ -41,12 +40,19 @@
         </StackPanel>
 
         <!-- Preview-->
-        <Border Grid.Column="1" Grid.RowSpan="2" Background="DarkGray">
-            <StackPanel VerticalAlignment="Center">
-                <Border BorderBrush="{DynamicResource PrimaryAccent}" BorderThickness="10">
-                    <Rectangle HorizontalAlignment="Center" Width="1032" Height="432" Fill="DarkBlue"/>
-                </Border>
-            </StackPanel>
+        <Border x:Name="PreviewBorder" DragDrop.AllowDrop="True" Grid.Column="1" Grid.RowSpan="2" Background="DarkGray">
+            <Canvas x:Name="PreviewCanvas" VerticalAlignment="Center">
+                <StackPanel VerticalAlignment="Center">
+                    <Border BorderBrush="{DynamicResource PrimaryAccent}" BorderThickness="10">
+                        <Rectangle HorizontalAlignment="Center" Width="1032" Height="432" Fill="DarkBlue"/>
+                    </Border>
+                </StackPanel>
+                <ContentControl Content="{Binding Images}" >
+                    <ContentControl.DataTemplates>
+                        <locators:ImageLocator></locators:ImageLocator>
+                    </ContentControl.DataTemplates>
+                </ContentControl>
+            </Canvas>
         </Border>
 
         <!-- Properties-->

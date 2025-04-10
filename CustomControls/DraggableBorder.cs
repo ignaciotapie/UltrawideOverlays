@@ -11,9 +11,9 @@ using System.Threading.Tasks;
 namespace UltrawideOverlays.CustomControls
 {
     /// <summary>
-    /// Mostly a test of how custom controls work, it's a border that can be dragged around the screen.
+    /// Mostly a test of how custom controls work, it's a panel that can be dragged around the screen.
     /// </summary>
-    public class DraggableBorder : Border
+    public class DraggablePanel : Panel
     {
         private bool _isPressed;
         private Point _positionInBlock;

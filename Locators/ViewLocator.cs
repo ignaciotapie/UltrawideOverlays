@@ -3,7 +3,7 @@ using Avalonia.Controls.Templates;
 using System;
 using UltrawideOverlays.ViewModels;
 
-namespace UltrawideOverlays
+namespace UltrawideOverlays.Locators
 {
     public class ViewLocator : IDataTemplate
     {

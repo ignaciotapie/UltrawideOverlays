@@ -10,17 +10,11 @@ namespace UltrawideOverlays.Models
     {
         public string ImagePath { get; set; }
         public string ImageName { get; set; }
-        public string ImageCategory { get; set; }
-        public string ImageResolution { get; set; }
-        public string ImageFormat { get; set; }
 
-        public ImageModel(string imagePath, string imageName, string imageDescription, string imageCategory, string imageResolution, string imageFormat)
+        public ImageModel(string imagePath, string imageName)
         {
             ImagePath = imagePath;
             ImageName = imageName;
-            ImageCategory = imageCategory;
-            ImageResolution = imageResolution;
-            ImageFormat = imageFormat;
         }
     }
 }

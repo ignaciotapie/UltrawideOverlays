@@ -2,12 +2,13 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="UltrawideOverlays.App"
              xmlns:local="using:UltrawideOverlays"
+             xmlns:locators="using:UltrawideOverlays.Locators"
              xmlns:vm="using:UltrawideOverlays.ViewModels"
              RequestedThemeVariant="Dark">
              <!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
 
     <Application.DataTemplates>
-        <local:ViewLocator/>
+        <locators:ViewLocator/>
     </Application.DataTemplates>
 
     <Application.Resources>
