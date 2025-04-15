@@ -2,62 +2,42 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        mc:Ignorable="d" d:DesignWidth="1920" d:DesignHeight="1080"
+        mc:Ignorable="d" d:DesignWidth="3440" d:DesignHeight="1440"
+        Background="{x:Null}"
+        Topmost="True"
+        ExtendClientAreaToDecorationsHint="True"
+        xmlns:local="using:UltrawideOverlays"
         xmlns:converter="using:UltrawideOverlays.Converters"
         xmlns:vm="using:UltrawideOverlays.ViewModels"
         xmlns:cc="using:UltrawideOverlays.CustomControls"
         xmlns:locators="using:UltrawideOverlays.Locators"
         x:Class="UltrawideOverlays.Views.OverlayEditorWindowView"
         x:DataType="vm:OverlayEditorWindowViewModel"
-        Background="{DynamicResource SecondaryColor}"
         Title="OverlayEditorWindowView">
     
     <Design.DataContext><vm:OverlayEditorWindowViewModel/></Design.DataContext>
+    <Window.Styles>
+        <Style Selector="Grid">
+            <Setter Property="Background" Value="{DynamicResource SecondaryColor}"/>
+            <Setter Property="Width" Value="800"/>
+            <Setter Property="Height" Value="600"/>
+            <Setter Property="Canvas.Left" Value="1320"/>
+            <Setter Property="Canvas.Top" Value="420"/>
+        </Style>
+    </Window.Styles>
     
     <Window.Resources>
         <converter:PathToBitmapConverter x:Key="pathToBitmapConverter"/>
     </Window.Resources>
 
-    <Grid ColumnDefinitions="*, 3.5*, *" RowDefinitions="*, *">
-        <!-- Tools-->
-        <Border Grid.Row="0" Background="{DynamicResource PrimaryColor}">
-            <Label VerticalAlignment="Center" HorizontalAlignment="Center">Tools</Label>
-        </Border>
-        
-        <!-- Images-->
-        <StackPanel Grid.Row="1" Background="{DynamicResource PrimaryColor}">
-            <Label VerticalAlignment="Center" HorizontalAlignment="Left">Images</Label>
-            <ListBox ItemsSource="{Binding Images}" Margin="20" Height="" ScrollViewer.VerticalScrollBarVisibility="Auto">
-                <ListBox.ItemTemplate>
-                    <DataTemplate>
-                        <RelativePanel>
-                            <Image x:Name="PreviewImage" VerticalAlignment="Center" RelativePanel.AlignLeftWithPanel="True" Source="{Binding ImagePath, Converter={StaticResource pathToBitmapConverter} }"/>
-                            <Label x:Name="IName" RelativePanel.RightOf="PreviewImage" RelativePanel.AlignVerticalCenterWith="PreviewImage" Margin="10,0,0,0" Content="{Binding ImageName}" />
-                        </RelativePanel>
-                    </DataTemplate>
-                </ListBox.ItemTemplate>
-            </ListBox>
-        </StackPanel>
-
-        <!-- Preview-->
-        <Border x:Name="PreviewBorder" DragDrop.AllowDrop="True" Grid.Column="1" Grid.RowSpan="2" Background="DarkGray">
-            <Canvas x:Name="PreviewCanvas" VerticalAlignment="Center">
-                <StackPanel VerticalAlignment="Center">
-                    <Border BorderBrush="{DynamicResource PrimaryAccent}" BorderThickness="10">
-                        <Rectangle HorizontalAlignment="Center" Width="1032" Height="432" Fill="DarkBlue"/>
-                    </Border>
+    <cc:DragGridControl Brush="Green" GridOpacity="0.5" x:Name="MainDragGrid">
+        <Grid ColumnDefinitions="*, *, *" cc:DragPanel.Position="1320,420">
+            <Border Grid.Column="0" Background="{DynamicResource PrimaryColor}">
+                <StackPanel>
+                    <Label VerticalAlignment="Center" HorizontalAlignment="Center">Images</Label>
                 </StackPanel>
-                <ContentControl Content="{Binding Images}" >
-                    <ContentControl.DataTemplates>
-                        <locators:ImageLocator></locators:ImageLocator>
-                    </ContentControl.DataTemplates>
-                </ContentControl>
-            </Canvas>
-        </Border>
+            </Border>
+        </Grid>
+    </cc:DragGridControl>
 
-        <!-- Properties-->
-        <Border Grid.Column="2" Grid.RowSpan="2" Background="DarkMagenta">
-            <Label VerticalAlignment="Center" HorizontalAlignment="Center">Properties</Label>
-        </Border>
-    </Grid>
 </Window>

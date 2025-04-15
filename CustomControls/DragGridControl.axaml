@@ -1,0 +1,15 @@
+<Panel xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:cc="using:UltrawideOverlays.CustomControls"
+             xmlns:local="using:UltrawideOverlays"
+             mc:Ignorable="d"
+             x:Class="UltrawideOverlays.CustomControls.DragGridControl"
+             d:DesignWidth="800" d:DesignHeight="450">
+
+    <cc:DragPanel x:Name="DragPanelLayout" SnappingGridSize="{Binding GridSize, RelativeSource={RelativeSource AncestorType=cc:DragGridControl}}">
+        <cc:VisualGrid x:Name="VisualGrid" GridSize="{Binding GridSize, RelativeSource={RelativeSource AncestorType=cc:DragGridControl}}" IsHitTestVisible="False"/>
+    </cc:DragPanel>
+    
+</Panel>

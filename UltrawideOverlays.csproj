@@ -43,6 +43,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Update="CustomControls\ResizableImage.axaml.cs">
+      <DependentUpon>ResizableImage.axaml</DependentUpon>
+    </Compile>
     <Compile Update="Views\OverlaysPageView.axaml.cs">
       <DependentUpon>OverlaysPageView.axaml</DependentUpon>
     </Compile>
