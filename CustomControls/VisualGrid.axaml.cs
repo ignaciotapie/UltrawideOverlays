@@ -1,11 +1,7 @@
 using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Markup.Xaml;
-using Avalonia.Platform;
 using Avalonia.Media;
 using System;
-using System.Linq;
-using Avalonia.Media.Imaging;
 
 namespace UltrawideOverlays.CustomControls;
 
@@ -59,7 +55,7 @@ public partial class VisualGrid : UserControl
 
     public sealed override void Render(DrawingContext context)
     {
-        if (GridSize != null && Preview) 
+        if (GridSize != null && Preview)
         {
             var renderSize = Bounds.Size;
             var pen = new Pen(Brush, 1);

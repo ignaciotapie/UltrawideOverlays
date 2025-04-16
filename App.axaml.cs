@@ -1,18 +1,14 @@
 using Avalonia;
+using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
-using Avalonia.Data.Core;
 using Avalonia.Data.Core.Plugins;
 using Avalonia.Markup.Xaml;
-using System.Linq;
-using UltrawideOverlays.ViewModels;
-using UltrawideOverlays.Views;
 using Microsoft.Extensions.DependencyInjection;
 using System;
+using System.Linq;
 using UltrawideOverlays.Factories;
-using CommunityToolkit.Mvvm.ComponentModel;
-using UltrawideOverlays.Models;
-using System.Collections.Generic;
-using Avalonia.Controls;
+using UltrawideOverlays.ViewModels;
+using UltrawideOverlays.Views;
 
 namespace UltrawideOverlays
 {

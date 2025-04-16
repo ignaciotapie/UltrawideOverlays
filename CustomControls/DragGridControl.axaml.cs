@@ -1,9 +1,6 @@
 ﻿using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Controls.Presenters;
-using Avalonia.Markup.Xaml;
 using Avalonia.Media;
-using Avalonia.Metadata;
 using ExCSS;
 using System;
 using System.Collections.Specialized;

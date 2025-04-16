@@ -1,26 +1,24 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace UltrawideOverlays.Utils
 {
     public static class FileHandlerUtil
     {
-        private static readonly string[] _validImageExtensions = [".jpg", ".jpeg", ".png", ".bmp", ".webp"];
+        private static readonly HashSet<string> _validImageExtensions = [".jpg", ".jpeg", ".png", ".bmp"];
 
         /// <summary>
         /// Returns file name without extension.
         /// </summary>
         /// <param name="filePath"></param>
         /// <returns>string FileName</returns>
-        public static string GetFileName(string filePath) 
+        public static string GetFileName(string filePath)
         {
             return System.IO.Path.GetFileNameWithoutExtension(filePath);
         }
 
-        internal static string GetFileName(Uri uri)
+        public static string GetFileName(Uri uri)
         {
             return System.IO.Path.GetFileNameWithoutExtension(uri.ToString());
         }
@@ -52,14 +50,14 @@ namespace UltrawideOverlays.Utils
         /// <returns></returns>
         public static bool IsValidImage(string filePath)
         {
-            string fileExtension = GetFileExtension(filePath).ToLower();
+            string fileExtension = GetFileExtension(filePath);
 
             return _validImageExtensions.Contains(fileExtension);
         }
 
         public static bool IsValidImage(Uri uri)
         {
-            string fileExtension = GetFileExtension(uri.ToString()).ToLower();
+            string fileExtension = GetFileExtension(uri.ToString());
 
             return _validImageExtensions.Contains(fileExtension);
         }

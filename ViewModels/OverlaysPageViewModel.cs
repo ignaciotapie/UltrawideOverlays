@@ -1,12 +1,8 @@
 ﻿using Avalonia.Controls;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UltrawideOverlays.Factories;
 using UltrawideOverlays.Models;
 
@@ -19,7 +15,7 @@ namespace UltrawideOverlays.ViewModels
 
         private readonly WindowFactory factory;
 
-        public ObservableCollection<OverlayDataModel>? Overlays { get;}
+        public ObservableCollection<OverlayDataModel>? Overlays { get; }
 
         /// <summary>
         /// Design-only constructor
@@ -44,7 +40,7 @@ namespace UltrawideOverlays.ViewModels
         }
 
         [RelayCommand]
-        private void AddNewButton() 
+        private void AddNewButton()
         {
             var window = factory.CreateWindow(Enums.WindowViews.OverlayEditorWindow);
             window.Show();

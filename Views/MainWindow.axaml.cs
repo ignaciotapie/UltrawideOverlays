@@ -1,5 +1,4 @@
 using Avalonia.Controls;
-using System.Windows;
 
 namespace UltrawideOverlays.Views
 {
@@ -15,7 +14,7 @@ namespace UltrawideOverlays.Views
         //TODO: Change this to VM
         private void Button_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
         {
-            if (window != null) 
+            if (window != null)
             {
                 window.Close();
                 window = null;

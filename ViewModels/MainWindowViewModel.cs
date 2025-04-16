@@ -1,7 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using UltrawideOverlays.Factories;
-using UltrawideOverlays.Views;
 
 namespace UltrawideOverlays.ViewModels
 {
@@ -30,8 +29,8 @@ namespace UltrawideOverlays.ViewModels
 
         public MainWindowViewModel(PageFactory PFactory)
         {
-           factory = PFactory;
-           NavigateToHomePage();
+            factory = PFactory;
+            NavigateToHomePage();
         }
 
         [RelayCommand]

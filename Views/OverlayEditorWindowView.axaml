@@ -13,16 +13,14 @@
         xmlns:locators="using:UltrawideOverlays.Locators"
         x:Class="UltrawideOverlays.Views.OverlayEditorWindowView"
         x:DataType="vm:OverlayEditorWindowViewModel"
+        DragDrop.AllowDrop="True"
+        WindowState="Maximized"
         Title="OverlayEditorWindowView">
     
     <Design.DataContext><vm:OverlayEditorWindowViewModel/></Design.DataContext>
     <Window.Styles>
         <Style Selector="Grid">
             <Setter Property="Background" Value="{DynamicResource SecondaryColor}"/>
-            <Setter Property="Width" Value="800"/>
-            <Setter Property="Height" Value="600"/>
-            <Setter Property="Canvas.Left" Value="1320"/>
-            <Setter Property="Canvas.Top" Value="420"/>
         </Style>
     </Window.Styles>
     
@@ -31,11 +29,21 @@
     </Window.Resources>
 
     <cc:DragGridControl Brush="Green" GridOpacity="0.5" x:Name="MainDragGrid">
-        <Grid ColumnDefinitions="*, *, *" cc:DragPanel.Position="1320,420">
+        <Grid ColumnDefinitions="*, *, *" cc:DragPanel.Position="1320,420" Width="800" Height="600">
             <Border Grid.Column="0" Background="{DynamicResource PrimaryColor}">
-                <StackPanel>
-                    <Label VerticalAlignment="Center" HorizontalAlignment="Center">Images</Label>
-                </StackPanel>
+                <DockPanel>
+                    <Label DockPanel.Dock="Top" VerticalAlignment="Center" HorizontalAlignment="Center">Images</Label>
+                    <ListBox ItemsSource="{Binding Images}" Background="White" BorderBrush="Black" BorderThickness="1">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal">
+                                    <Image Source="{Binding ImagePath, Converter={StaticResource pathToBitmapConverter}}"/>
+                                    <TextBlock Text="{Binding ImageName}" Margin="5,0,0,0"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </DockPanel>
             </Border>
         </Grid>
     </cc:DragGridControl>

@@ -1,14 +1,8 @@
 ﻿using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Controls.Presenters;
 using Avalonia.Input;
-using Avalonia.Media;
-using Avalonia.Metadata;
-using Avalonia.VisualTree;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 
 namespace UltrawideOverlays.CustomControls
 {
@@ -21,12 +15,12 @@ namespace UltrawideOverlays.CustomControls
         /// STYLED PROPERTIES
         ///////////////////////////////////////////
         private static readonly AttachedProperty<Point> PositionProperty =
-            AvaloniaProperty.RegisterAttached<DragPanel, Control, Point>("Position", new Point(0,0));
+            AvaloniaProperty.RegisterAttached<DragPanel, Control, Point>("Position", new Point(0, 0));
 
         public static Point GetPosition(Control control) => control.GetValue(PositionProperty);
         public static void SetPosition(Control control, Point value)
         {
-            Debug.WriteLine($"Setting position of {control} to {value}"); 
+            Debug.WriteLine($"Setting position of {control} to {value}");
             control.SetValue(PositionProperty, value);
         }
 
