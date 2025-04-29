@@ -3,7 +3,8 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d" d:DesignWidth="3440" d:DesignHeight="1440"
-        Background="{x:Null}"
+        x:DataType="vm:OverlayEditorWindowViewModel"
+        Background="Transparent"
         Topmost="True"
         ExtendClientAreaToDecorationsHint="True"
         xmlns:local="using:UltrawideOverlays"
@@ -12,40 +13,109 @@
         xmlns:cc="using:UltrawideOverlays.CustomControls"
         xmlns:locators="using:UltrawideOverlays.Locators"
         x:Class="UltrawideOverlays.Views.OverlayEditorWindowView"
-        x:DataType="vm:OverlayEditorWindowViewModel"
         DragDrop.AllowDrop="True"
         WindowState="Maximized"
         Title="OverlayEditorWindowView">
     
     <Design.DataContext><vm:OverlayEditorWindowViewModel/></Design.DataContext>
-    <Window.Styles>
-        <Style Selector="Grid">
-            <Setter Property="Background" Value="{DynamicResource SecondaryColor}"/>
-        </Style>
-    </Window.Styles>
-    
     <Window.Resources>
-        <converter:PathToBitmapConverter x:Key="pathToBitmapConverter"/>
+        <converter:NumberToStringConverter x:Key="numberToStringConverter"/>
     </Window.Resources>
 
-    <cc:DragGridControl Brush="Green" GridOpacity="0.5" x:Name="MainDragGrid">
-        <Grid ColumnDefinitions="*, *, *" cc:DragPanel.Position="1320,420" Width="800" Height="600">
-            <Border Grid.Column="0" Background="{DynamicResource PrimaryColor}">
-                <DockPanel>
-                    <Label DockPanel.Dock="Top" VerticalAlignment="Center" HorizontalAlignment="Center">Images</Label>
-                    <ListBox ItemsSource="{Binding Images}" Background="White" BorderBrush="Black" BorderThickness="1">
-                        <ListBox.ItemTemplate>
-                            <DataTemplate>
-                                <StackPanel Orientation="Horizontal">
-                                    <Image Source="{Binding ImagePath, Converter={StaticResource pathToBitmapConverter}}"/>
-                                    <TextBlock Text="{Binding ImageName}" Margin="5,0,0,0"/>
-                                </StackPanel>
-                            </DataTemplate>
-                        </ListBox.ItemTemplate>
-                    </ListBox>
-                </DockPanel>
-            </Border>
-        </Grid>
+    <Window.Styles>
+        <Style Selector="Label">
+            <Setter Property="Foreground" Value="{DynamicResource PrimaryFontColor}"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="FontSize" Value="18"/>
+        </Style>
+        <Style Selector="StackPanel">
+            <Setter Property="Spacing" Value="10"/>
+        </Style>
+    </Window.Styles>
+
+    <cc:DragGridControl Color="{Binding PreviewColor}" Preview="{Binding PreviewEnabled}" GridOpacity="{Binding PreviewOpacity}" GridSize="{Binding PreviewSize}" x:Name="MainDragGrid">
+        <Border ZIndex="99" cc:DragPanel.Position="1320,420" BorderThickness="0, 20, 0, 0" Margin="0, -10, 0 ,0" Background="{DynamicResource PrimaryAccent}">
+            <Grid ColumnDefinitions="*, *, *" RowDefinitions="50, *" Width="800" Height="600" Background="{DynamicResource SecondaryColor}">
+
+                <!-- Column 0: Images-->
+                <Label DockPanel.Dock="Top" VerticalAlignment="Center" HorizontalAlignment="Center">Images</Label>
+                <ListBox x:Name="Images_ListBox" Background="Transparent" Grid.Row="1" ItemsSource="{Binding Images}" BorderBrush="Black" BorderThickness="1,1,1,0" SelectionChanged="ListBox_SelectionChanged">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal">
+                                <Image RenderOptions.BitmapInterpolationMode="LowQuality" Source="{Binding ImagePath, Converter={x:Static converter:PathToBitmapConverter.Converter}}"/>
+                                <TextBlock Text="{Binding ImageName}" Margin="5,0,0,0"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+
+                <!-- Column 1: Grid Properties-->
+                <Label Grid.Column="1" DockPanel.Dock="Top" VerticalAlignment="Center" HorizontalAlignment="Center">Grid Properties</Label>
+                <StackPanel Grid.Row="1" Grid.Column="1" Spacing="10" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+                    <StackPanel Orientation="Horizontal">
+                        <Label>Visible Grid</Label>
+                        <CheckBox x:Name="GridVisible_CheckBox" IsChecked="{Binding PreviewEnabled, Mode=TwoWay}" VerticalAlignment="Center" VerticalContentAlignment="Center"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <Label>Color</Label>
+                        <ColorPicker x:Name="GridColor_ColorPicker" Color="{Binding PreviewColor, Mode=TwoWay}"></ColorPicker>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <Label>Size</Label>
+                        <TextBox x:Name="GridSize_TextBox" HorizontalContentAlignment="Center" Watermark="50" Text="{Binding PreviewSize, Converter={StaticResource numberToStringConverter}, Mode=TwoWay}"></TextBox>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <Label>Opacity</Label>
+                        <Slider x:Name="GridOpacity_Slider" HorizontalAlignment="Stretch" Width="100" Minimum="0" Maximum="1" Value="{Binding PreviewOpacity, Mode=TwoWay}"/>
+                        <Label Content="{Binding PreviewOpacity, Converter={x:Static converter:RoundedNumberToStringConverter.Converter}}"></Label>
+                    </StackPanel>
+                </StackPanel>
+
+                <!-- Column 2: Image Properties-->
+                <Label Grid.Column="2" DockPanel.Dock="Top" VerticalAlignment="Center" HorizontalAlignment="Center">Properties</Label>
+                <StackPanel Grid.Row="1" Grid.Column="2" Spacing="10" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+                    <StackPanel Orientation="Horizontal">
+                        <Label>Position</Label>
+                        <TextBox Text="{Binding Selected.ImageProperties.PositionX, Converter={StaticResource numberToStringConverter}, Mode=TwoWay}"></TextBox>
+                        <Label>,</Label>
+                        <TextBox Text="{Binding Selected.ImageProperties.PositionY, Converter={StaticResource numberToStringConverter}, Mode=TwoWay}"></TextBox>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <Label>Size</Label>
+                        <TextBox Text="{Binding Selected.ImageProperties.Width, Converter={StaticResource numberToStringConverter}, Mode=TwoWay}"></TextBox>
+                        <Label>x</Label>
+                        <TextBox Text="{Binding Selected.ImageProperties.Height, Converter={StaticResource numberToStringConverter}, Mode=TwoWay}"></TextBox>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <Label>Scale</Label>
+                        <TextBox Text="{Binding Selected.ImageProperties.Scale, Converter={StaticResource numberToStringConverter}, Mode=TwoWay}"></TextBox>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <Label>H-Mirrored</Label>
+                        <CheckBox IsChecked="{Binding Selected.ImageProperties.IsHMirrored, Mode=TwoWay}"></CheckBox>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <Label>V-Mirrored</Label>
+                        <CheckBox IsChecked="{Binding Selected.ImageProperties.IsVMirrored, Mode=TwoWay}"></CheckBox>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <Label>Opacity</Label>
+                        <Slider x:Name="ImageOpacity_Slider" Value="{Binding Selected.ImageProperties.Opacity, Mode=TwoWay}" HorizontalAlignment="Stretch" Width="100" Minimum="0" Maximum="1" />
+                        <Label Content="{Binding Selected.ImageProperties.Opacity, Converter={x:Static converter:RoundedNumberToStringConverter.Converter}}"></Label>
+                    </StackPanel>
+                    <Label HorizontalAlignment="Center">Extra</Label>
+                    <StackPanel Orientation="Horizontal">
+                        <Label>Visible</Label>
+                        <CheckBox IsChecked="{Binding Selected.ImageProperties.IsVisible, Mode=TwoWay}"></CheckBox>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <Label>Draggable</Label>
+                        <CheckBox IsChecked="{Binding Selected.ImageProperties.IsDraggable, Mode=TwoWay}"></CheckBox>
+                    </StackPanel>
+                </StackPanel>
+            </Grid>
+        </Border>
     </cc:DragGridControl>
 
 </Window>

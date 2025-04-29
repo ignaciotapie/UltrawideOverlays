@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace UltrawideOverlays.Utils
 {
@@ -48,14 +47,14 @@ namespace UltrawideOverlays.Utils
         /// </summary>
         /// <param name="filePath"></param>
         /// <returns></returns>
-        public static bool IsValidImage(string filePath)
+        public static bool IsValidImagePath(string filePath)
         {
             string fileExtension = GetFileExtension(filePath);
 
             return _validImageExtensions.Contains(fileExtension);
         }
 
-        public static bool IsValidImage(Uri uri)
+        public static bool IsValidImagePath(Uri uri)
         {
             string fileExtension = GetFileExtension(uri.ToString());
 

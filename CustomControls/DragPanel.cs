@@ -2,6 +2,7 @@
 using Avalonia.Controls;
 using Avalonia.Input;
 using System;
+using System.Collections.Specialized;
 using System.Diagnostics;
 
 namespace UltrawideOverlays.CustomControls
@@ -14,7 +15,7 @@ namespace UltrawideOverlays.CustomControls
         ///////////////////////////////////////////
         /// STYLED PROPERTIES
         ///////////////////////////////////////////
-        private static readonly AttachedProperty<Point> PositionProperty =
+        public static readonly AttachedProperty<Point> PositionProperty =
             AvaloniaProperty.RegisterAttached<DragPanel, Control, Point>("Position", new Point(0, 0));
 
         public static Point GetPosition(Control control) => control.GetValue(PositionProperty);
@@ -40,11 +41,22 @@ namespace UltrawideOverlays.CustomControls
             PointerPressed += OnPointerPressed;
             PointerMoved += OnPointerMoved;
             PointerReleased += OnPointerReleased;
+            Children.CollectionChanged += OnChildrenChanged;
         }
 
         ///////////////////////////////////////////
         /// OVERRIDE FUNCTIONS
         ///////////////////////////////////////////
+
+        protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
+        {
+            PointerPressed -= OnPointerPressed;
+            PointerMoved -= OnPointerMoved;
+            PointerReleased -= OnPointerReleased;
+            Children.CollectionChanged -= OnChildrenChanged;
+
+            base.OnDetachedFromVisualTree(e);
+        }
 
         protected override Size ArrangeOverride(Size finalSize)
         {
@@ -52,7 +64,9 @@ namespace UltrawideOverlays.CustomControls
             {
                 var child = Children[i];
                 var pos = GetPosition(child);
-                child.Arrange(new Rect(pos, child.DesiredSize));
+                var size = child.DesiredSize;
+
+                child.Arrange(new Rect(pos, size));
             }
             return finalSize;
         }
@@ -60,9 +74,33 @@ namespace UltrawideOverlays.CustomControls
         ///////////////////////////////////////////
         /// PRIVATE FUNCTIONS
         ///////////////////////////////////////////
+
+        private void OnChildrenChanged(object? arg1, NotifyCollectionChangedEventArgs args)
+        {
+            if (args.Action == NotifyCollectionChangedAction.Add)
+            {
+                foreach (var newItem in args.NewItems)
+                {
+                    if (newItem is Control control)
+                    {
+                        control.PropertyChanged += OnChildPropertyChanged;
+                    }
+                }
+            }
+        }
+
+        private void OnChildPropertyChanged(object? sender, AvaloniaPropertyChangedEventArgs e)
+        {
+            if (e.Property == PositionProperty)
+            {
+                InvalidateArrange();
+            }
+        }
+
         private void OnPointerPressed(object? sender, PointerPressedEventArgs e)
         {
             var control = e.Source as Control;
+            Debug.WriteLine($"Pointer pressed on {control}");
             if (control != null)
             {
                 _draggedControl = control;
@@ -82,7 +120,6 @@ namespace UltrawideOverlays.CustomControls
                 var pointerPos = e.GetPosition(this);
                 var newPos = pointerPos - _dragOffset;
                 SetPosition(_draggedControl, newPos);
-                InvalidateArrange();
             }
         }
 
@@ -90,8 +127,11 @@ namespace UltrawideOverlays.CustomControls
         {
             if (_draggedControl != null)
             {
-                //Snap to grid
-                SnapToGrid(_draggedControl);
+                if (!Children.Contains(_draggedControl))
+                {
+                    SetPosition(_draggedControl, new Point(0, 0));
+                }
+                else SnapToGrid(_draggedControl);
 
                 _draggedControl = null;
                 e.Pointer.Capture(null);

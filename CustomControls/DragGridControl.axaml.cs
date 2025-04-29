@@ -1,10 +1,10 @@
 ﻿using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Media;
 using ExCSS;
 using System;
 using System.Collections.Specialized;
 using System.Linq;
+using Color = Avalonia.Media.Color;
 
 namespace UltrawideOverlays.CustomControls
 {
@@ -17,11 +17,15 @@ namespace UltrawideOverlays.CustomControls
     /// </remarks>
     public partial class DragGridControl : Panel
     {
+        ///////////////////////////////////////////
+        /// STYLED PROPERTIES
+        ///////////////////////////////////////////
+
         /// <summary>
         /// Grid-size Styled Property
         /// </summary>
         public static readonly StyledProperty<int> GridSizeProperty =
-            AvaloniaProperty.Register<DragGridControl, int>(nameof(GridSize), 50);
+            AvaloniaProperty.Register<DragGridControl, int>(nameof(GridSize));
 
         public int GridSize
         {
@@ -30,35 +34,76 @@ namespace UltrawideOverlays.CustomControls
         }
 
         public static readonly StyledProperty<Boolean> PreviewProperty =
-            AvaloniaProperty.Register<DragGridControl, Boolean>(nameof(Preview), true);
+            AvaloniaProperty.Register<DragGridControl, Boolean>(nameof(Preview));
 
         public bool Preview
         {
-            get => VisualGrid.Preview;
-            set => VisualGrid.Preview = value;
+            get => this.GetValue(PreviewProperty);
+            set => SetValue(PreviewProperty, value);
         }
 
-        public static readonly StyledProperty<IBrush?> BrushProperty =
-            AvaloniaProperty.Register<DragGridControl, IBrush?>("Brush", defaultValue: Brushes.Gray, validate: (brush) => brush is not null);
+        public static readonly StyledProperty<Color?> ColorProperty =
+            AvaloniaProperty.Register<DragGridControl, Color?>(nameof(Color));
 
-        public IBrush? Brush
+        public Color? Color
         {
-            get => VisualGrid.Brush;
-            set => VisualGrid.Brush = value;
+            get => this.GetValue(ColorProperty);
+            set => SetValue(ColorProperty, value);
         }
 
         public static readonly StyledProperty<double> GridOpacityProperty =
-            AvaloniaProperty.Register<DragGridControl, double>(nameof(GridOpacity), 0.5);
+            AvaloniaProperty.Register<DragGridControl, double>(nameof(GridOpacity));
 
         public double GridOpacity
         {
-            get => VisualGrid.Opacity;
-            set => VisualGrid.Opacity = value;
+            get => this.GetValue(GridOpacityProperty);
+            set => SetValue(GridOpacityProperty, value);
         }
+
+        ///////////////////////////////////////////
+        /// CONSTRUCTOR
+        ///////////////////////////////////////////
 
         public DragGridControl()
         {
             InitializeComponent();
+        }
+
+        ///////////////////////////////////////////
+        /// OVERRIDE FUNCTIONS
+        ///////////////////////////////////////////
+
+        protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
+        {
+            if (change.Property == GridSizeProperty)
+            {
+                UpdateGridSize((int)change.NewValue); // Update the grid size of the DragPanelLayout
+            }
+            else if (change.Property == GridOpacityProperty)
+            {
+                // Update the grid opacity of the DragPanelLayout
+                if (DragPanelLayout != null)
+                {
+                    VisualGrid.Opacity = (double)change.NewValue;
+                }
+            }
+            else if (change.Property == ColorProperty)
+            {
+                // Update the grid brush of the DragPanelLayout
+                if (VisualGrid != null)
+                {
+                    VisualGrid.Color = (Color)change.NewValue;
+                }
+            }
+            else if (change.Property == PreviewProperty)
+            {
+                // Update the grid preview of the DragPanelLayout
+                if (VisualGrid != null)
+                {
+                    VisualGrid.Preview = (bool)change.NewValue;
+                }
+            }
+            base.OnPropertyChanged(change);
         }
 
         protected override Size ArrangeOverride(Size finalSize)
@@ -90,8 +135,11 @@ namespace UltrawideOverlays.CustomControls
             }
         }
 
-
-        //Rebase the children as children of DragPanel
+        /// <summary>
+        /// Rebase the children as children of DragPanel
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         protected override void ChildrenChanged(object? sender, NotifyCollectionChangedEventArgs e)
         {
             base.ChildrenChanged(sender, e);
@@ -109,6 +157,23 @@ namespace UltrawideOverlays.CustomControls
             {
                 this.Children.Remove(control);
                 DragPanelLayout.Children.Add(control);
+            }
+        }
+
+        ///////////////////////////////////////////
+        /// PRIVATE FUNCTIONS
+        ///////////////////////////////////////////
+
+        private void UpdateGridSize(int value)
+        {
+            // Update the grid size of the DragPanelLayout
+            if (DragPanelLayout != null)
+            {
+                DragPanelLayout.SnappingGridSize = value;
+            }
+            if (VisualGrid != null)
+            {
+                VisualGrid.GridSize = value;
             }
         }
     }

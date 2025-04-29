@@ -11,7 +11,7 @@ public partial class VisualGrid : UserControl
     /// STYLED PROPERTIES
     ///////////////////////////////////////////
     public static readonly StyledProperty<int?> GridSizeProperty =
-        AvaloniaProperty.Register<VisualGrid, int?>("GridSize", defaultValue: 5, validate: (value) => value is int);
+        AvaloniaProperty.Register<VisualGrid, int?>("GridSize");
 
     public int? GridSize
     {
@@ -19,13 +19,13 @@ public partial class VisualGrid : UserControl
         set => SetValue(GridSizeProperty, value);
     }
 
-    public static readonly StyledProperty<IBrush?> BrushProperty =
-        AvaloniaProperty.Register<VisualGrid, IBrush?>("Brush", defaultValue: Brushes.Gray, validate: (brush) => brush is not null);
+    public static readonly StyledProperty<Color?> ColorProperty =
+        AvaloniaProperty.Register<VisualGrid, Color?>("Color");
 
-    public IBrush? Brush
+    public Color? Color
     {
-        get => GetValue(BrushProperty);
-        set => SetValue(BrushProperty, value);
+        get => GetValue(ColorProperty);
+        set => SetValue(ColorProperty, value);
     }
 
     public static readonly StyledProperty<Boolean> PreviewProperty =
@@ -33,7 +33,7 @@ public partial class VisualGrid : UserControl
 
     public bool Preview
     {
-        get => this.GetValue(PreviewProperty);
+        get => GetValue(PreviewProperty);
         set => SetValue(PreviewProperty, value);
     }
 
@@ -48,6 +48,24 @@ public partial class VisualGrid : UserControl
     ///////////////////////////////////////////
     /// OVERRIDE FUNCTIONS
     ///////////////////////////////////////////
+    protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
+    {
+        base.OnPropertyChanged(change);
+
+        if (change.Property == GridSizeProperty)
+        {
+            InvalidateVisual();
+        }
+        else if (change.Property == ColorProperty)
+        {
+            InvalidateVisual();
+        }
+        else if (change.Property == PreviewProperty)
+        {
+            InvalidateVisual();
+        }
+    }
+
     protected override Size MeasureOverride(Size finalSize)
     {
         return finalSize;
@@ -57,15 +75,19 @@ public partial class VisualGrid : UserControl
     {
         if (GridSize != null && Preview)
         {
-            var renderSize = Bounds.Size;
-            var pen = new Pen(Brush, 1);
-            for (int i = 0; i < renderSize.Width; i += GridSize.Value)
+            //Else this causes an infinite loop
+            if (GridSize.Value <= 0)
             {
-                context.DrawLine(pen, new Point(i, 0), new Point(i, renderSize.Height));
+                return;
             }
-            for (int i = 0; i < renderSize.Height; i += GridSize.Value)
+            var pen = new Pen(Color.GetValueOrDefault().ToUInt32(), 1);
+            for (int i = 0; i < DesiredSize.Width; i += GridSize.Value)
             {
-                context.DrawLine(pen, new Point(0, i), new Point(renderSize.Width, i));
+                context.DrawLine(pen, new Point(i, 0), new Point(i, DesiredSize.Height));
+            }
+            for (int i = 0; i < DesiredSize.Height; i += GridSize.Value)
+            {
+                context.DrawLine(pen, new Point(0, i), new Point(DesiredSize.Width, i));
             }
         }
 

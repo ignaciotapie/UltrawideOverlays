@@ -20,7 +20,6 @@
   <ItemGroup>
     <None Remove="Assets\Images\home-logo.svg" />
     <None Remove="Assets\Images\settings-icon.svg" />
-    <None Remove="Assets\Images\test.png" />
     <None Remove="Assets\Images\tv-icon-white.svg" />
   </ItemGroup>
 

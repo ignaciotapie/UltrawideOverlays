@@ -6,10 +6,10 @@
              xmlns:local="using:UltrawideOverlays"
              mc:Ignorable="d"
              x:Class="UltrawideOverlays.CustomControls.DragGridControl"
-             d:DesignWidth="800" d:DesignHeight="450">
+             d:DesignWidth="800" d:DesignHeight="450" Background="Transparent">
 
-    <cc:DragPanel x:Name="DragPanelLayout" SnappingGridSize="{Binding GridSize, RelativeSource={RelativeSource AncestorType=cc:DragGridControl}}">
-        <cc:VisualGrid x:Name="VisualGrid" GridSize="{Binding GridSize, RelativeSource={RelativeSource AncestorType=cc:DragGridControl}}" IsHitTestVisible="False"/>
+    <cc:DragPanel x:Name="DragPanelLayout">
+        <cc:VisualGrid x:Name="VisualGrid" IsHitTestVisible="False"/>
     </cc:DragPanel>
     
 </Panel>

@@ -1,28 +1,27 @@
 ﻿using Avalonia.Data.Converters;
 using Avalonia.Media.Imaging;
-using System;
+using UltrawideOverlays.Utils;
 
 namespace UltrawideOverlays.Converters
 {
-    public class PathToBitmapConverter : IValueConverter
+    static public class PathToBitmapConverter
     {
-        public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
-        {
-            if (value is string path)
+        /// <summary>
+        /// Gets a Converter that takes a number as input and converts it into a text representation
+        /// </summary>
+        public static FuncValueConverter<string?, Bitmap> Converter { get; } =
+            new FuncValueConverter<string?, Bitmap>(filePath =>
             {
+                if (filePath == null)
+                    return null;
+
                 // Check if the path is a valid file path
-                if (System.IO.File.Exists(path))
+                if (FileHandlerUtil.IsValidImagePath(filePath))
                 {
                     // Use the BitmapLoader to load the image
-                    return new Bitmap(path);
+                    return new Bitmap(filePath);
                 }
-            }
-            return null;
-        }
-
-        public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
-        {
-            throw new NotImplementedException();
-        }
+                return null;
+            });
     }
 }

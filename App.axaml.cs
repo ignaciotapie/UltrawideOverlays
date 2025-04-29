@@ -50,7 +50,7 @@ namespace UltrawideOverlays
                 //Factory
                 collection.AddSingleton<PageFactory>();
                 collection.AddSingleton<WindowFactory>();
-                collection.AddSingleton<Func<Enums.ApplicationPageViews, PageViewModel>>(x => pageName => pageName switch
+                collection.AddTransient<Func<Enums.ApplicationPageViews, PageViewModel>>(x => pageName => pageName switch
                 {
                     Enums.ApplicationPageViews.HomePage => x.GetRequiredService<HomePageViewModel>(),
                     Enums.ApplicationPageViews.OverlaysPage => x.GetRequiredService<OverlaysPageViewModel>(),
@@ -59,7 +59,7 @@ namespace UltrawideOverlays
                     _ => throw new InvalidOperationException($"No ViewModel found for {pageName}")
                 });
 
-                collection.AddSingleton<Func<Enums.WindowViews, Window>>(x => windowEnum => CreateWindow(x, windowEnum));
+                collection.AddTransient<Func<Enums.WindowViews, Window>>(x => windowEnum => CreateWindow(x, windowEnum));
 
                 //Main Window
                 collection.AddSingleton<MainWindowViewModel>();

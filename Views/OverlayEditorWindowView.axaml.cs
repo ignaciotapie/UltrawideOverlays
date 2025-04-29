@@ -3,6 +3,7 @@ using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Media;
 using Avalonia.Platform.Storage;
+using CommunityToolkit.Mvvm.ComponentModel;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -16,14 +17,13 @@ namespace UltrawideOverlays.Views;
 
 public partial class OverlayEditorWindowView : Window
 {
-    public OverlayEditorWindowViewModel OverlayEditorWindowViewModel
-    {
-        get => (OverlayEditorWindowViewModel)DataContext;
-        set => DataContext = value;
-    }
-
-    private Dictionary<ImageModel, Image> modelImageDictionary;
     private DragGridControl dragGridControl;
+    private Dictionary<ImageModel, SelectableImage> modelImageDictionary;
+    private SelectableImage selected;
+
+    ///////////////////////////////////////////
+    /// CONSTRUCTOR
+    ///////////////////////////////////////////
 
     public OverlayEditorWindowView()
     {
@@ -31,55 +31,25 @@ public partial class OverlayEditorWindowView : Window
 
         AddHandler(DragDrop.DropEvent, Drop);
         AddHandler(DragDrop.DragOverEvent, DragOver);
-        modelImageDictionary = new Dictionary<ImageModel, Image>();
-        dragGridControl = this.FindControl<DragGridControl>("MainDragGrid");
+        dragGridControl = MainDragGrid;
+        modelImageDictionary = new Dictionary<ImageModel, SelectableImage>();
 
         Loaded += OnLoaded;
+        Unloaded += OnUnloaded;
     }
 
-    private void OnLoaded(object? sender, RoutedEventArgs e)
+    private void OnUnloaded(object? sender, RoutedEventArgs e)
     {
-        OverlayEditorWindowViewModel.Images.CollectionChanged += ImageCollectionChanged;
-        GenerateImages(OverlayEditorWindowViewModel.Images);
-    }
-
-    private void ImageCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
-    {
-        if (e.Action == NotifyCollectionChangedAction.Add)
+        var dataContext = DataContext as OverlayEditorWindowViewModel;
+        if (dataContext != null)
         {
-            GenerateImages(e.NewItems);
-        }
-        else if (e.Action == NotifyCollectionChangedAction.Remove)
-        {
-            RemoveImages(e.OldItems);
-        }
-    }
-    private void GenerateImages(IList? images)
-    {
-        foreach (ImageModel im in images)
-        {
-            var bitmap = new Avalonia.Media.Imaging.Bitmap(im.ImagePath);
-            var image = new Image
-            {
-                Source = bitmap,
-                Name = im.ImageName,
-                Stretch = Stretch.None,
-                Width = bitmap.PixelSize.Width,
-                Height = bitmap.PixelSize.Height
-            };
-            dragGridControl.Children.Add(image);
-            modelImageDictionary.Add(im, image);
+            dataContext.Images.CollectionChanged -= ImageCollectionChanged;
         }
     }
 
-    private void RemoveImages(IList? images)
-    {
-        foreach (ImageModel im in images)
-        {
-            dragGridControl.Children.Remove(modelImageDictionary[im]);
-            modelImageDictionary.Remove(im);
-        }
-    }
+    ///////////////////////////////////////////
+    /// DRAG-AND-DROP
+    ///////////////////////////////////////////
 
     private void DragOver(object? sender, DragEventArgs e)
     {
@@ -100,6 +70,88 @@ public partial class OverlayEditorWindowView : Window
         e.Handled = true;
     }
 
+
+    ///////////////////////////////////////////
+    /// PRIVATE FUNCTIONS
+    ///////////////////////////////////////////
+    private void OnLoaded(object? sender, RoutedEventArgs e)
+    {
+        var dataContext = DataContext as OverlayEditorWindowViewModel;
+
+        dataContext.Images.CollectionChanged += ImageCollectionChanged;
+        GenerateImages(dataContext.Images);
+    }
+
+    private void ImageCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    {
+        if (e.Action == NotifyCollectionChangedAction.Add)
+        {
+            GenerateImages(e.NewItems);
+        }
+        else if (e.Action == NotifyCollectionChangedAction.Remove)
+        {
+            RemoveImages(e.OldItems);
+        }
+    }
+
+    private void RemoveImages(IList? images)
+    {
+        if (images != null)
+        {
+            foreach (ImageModel im in images)
+            {
+                var image = modelImageDictionary[im];
+                image.ImageSelected -= OnSelectableImageSelected;
+                dragGridControl.Children.Remove(image);
+                modelImageDictionary.Remove(im);
+            }
+        }
+    }
+
+    private void GenerateImages(IList? images)
+    {
+        foreach (ImageModel im in images)
+        {
+            var image = new SelectableImage(im);
+
+            modelImageDictionary.Add(im, image);
+
+            image.ImageSelected += OnSelectableImageSelected;
+
+            dragGridControl.Children.Add(image);
+        }
+    }
+
+    private void OnSelectableImageSelected(object? sender, ImageModel e)
+    {
+        if (DataContext is OverlayEditorWindowViewModel viewModel && viewModel.SelectImageCommand.CanExecute(e))
+        {
+            viewModel.SelectImageCommand.Execute(e);
+            var image = sender as SelectableImage;
+            if (image != null)
+            {
+                if (selected != null)
+                {
+                    selected.IsSelected = false;
+                }
+                selected = image;
+                image.IsSelected = true;
+            }
+            Images_ListBox.SelectedItem = e;
+        }
+    }
+    private void ListBox_SelectionChanged(object? sender, Avalonia.Controls.SelectionChangedEventArgs e)
+    {
+        if (e.AddedItems.Count > 0)
+        {
+            var selectedItem = e.AddedItems[0] as ImageModel;
+            if (selectedItem != null && modelImageDictionary.TryGetValue(selectedItem, out var image))
+            {
+                image.SelectImage();
+            }
+        }
+    }
+
     private void AnalyzeIfValidImage(IEnumerable<IStorageItem>? storageItems)
     {
         if (storageItems != null)
@@ -107,7 +159,7 @@ public partial class OverlayEditorWindowView : Window
             var imageFilePaths = new List<Uri>();
             foreach (var item in storageItems)
             {
-                if (FileHandlerUtil.IsValidImage(item.Path.ToString()))
+                if (FileHandlerUtil.IsValidImagePath(item.Path.ToString()))
                 {
                     imageFilePaths.Add(item.Path);
                 }
@@ -122,9 +174,9 @@ public partial class OverlayEditorWindowView : Window
     private void AddImagesToViewModel(IEnumerable<Uri> imageFilePaths)
     {
         var viewModel = (DataContext as OverlayEditorWindowViewModel);
-        if (viewModel != null && viewModel.AddImageCommand.CanExecute(null))
+        if (viewModel != null && viewModel.AddImageModelCommand.CanExecute(null))
         {
-            viewModel.AddImageCommand.Execute(imageFilePaths);
+            viewModel.AddImageModelCommand.Execute(imageFilePaths);
         }
     }
 }
