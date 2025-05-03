@@ -18,6 +18,12 @@ namespace UltrawideOverlays.CustomControls
         public static readonly AttachedProperty<Point> PositionProperty =
             AvaloniaProperty.RegisterAttached<DragPanel, Control, Point>("Position", new Point(0, 0));
 
+        public static readonly AttachedProperty<Boolean> SnapToGridProperty =
+        AvaloniaProperty.RegisterAttached<DragPanel, Control, Boolean>("SnapToGrid", true);
+
+        public static void SetSnapToGrid(Control control, bool value) => control.SetValue(SnapToGridProperty, value);
+        public static bool GetSnapToGrid(Control control) => control.GetValue(SnapToGridProperty);
+
         public static Point GetPosition(Control control) => control.GetValue(PositionProperty);
         public static void SetPosition(Control control, Point value)
         {
@@ -55,6 +61,14 @@ namespace UltrawideOverlays.CustomControls
             PointerReleased -= OnPointerReleased;
             Children.CollectionChanged -= OnChildrenChanged;
 
+            foreach (var newItem in Children)
+            {
+                if (newItem is Control control)
+                {
+                    control.PropertyChanged -= OnChildPropertyChanged;
+                }
+            }
+
             base.OnDetachedFromVisualTree(e);
         }
 
@@ -79,7 +93,7 @@ namespace UltrawideOverlays.CustomControls
         {
             if (args.Action == NotifyCollectionChangedAction.Add)
             {
-                foreach (var newItem in args.NewItems)
+                foreach (var newItem in args.NewItems!)
                 {
                     if (newItem is Control control)
                     {
@@ -139,7 +153,7 @@ namespace UltrawideOverlays.CustomControls
         }
         private void SnapToGrid(Control control)
         {
-            if (SnappingGridSize != null)
+            if (SnappingGridSize != null && GetSnapToGrid(control))
             {
                 var gridSize = SnappingGridSize.Value;
                 var pos = GetPosition(control);

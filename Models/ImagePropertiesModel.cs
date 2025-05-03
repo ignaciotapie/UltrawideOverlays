@@ -3,7 +3,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace UltrawideOverlays.Models
 {
-    public partial class ImagePropertiesModel : ObservableObject
+    public partial class ImagePropertiesModel : ModelBase
     {
         private Point _position;
         public Point Position
@@ -72,5 +72,21 @@ namespace UltrawideOverlays.Models
 
         [ObservableProperty]
         private bool _isDraggable = true;
+
+        public override ImagePropertiesModel Clone()
+        {
+            return new ImagePropertiesModel
+            {
+                Position = Position,
+                Width = Width,
+                Height = Height,
+                Scale = Scale,
+                IsHMirrored = IsHMirrored,
+                IsVMirrored = IsVMirrored,
+                Opacity = Opacity,
+                IsVisible = IsVisible,
+                IsDraggable = IsDraggable
+            };
+        }
     }
 }

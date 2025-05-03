@@ -30,25 +30,22 @@ namespace UltrawideOverlays.ViewModels
         [ObservableProperty]
         private ImageModel? _selected = null;
 
+        [ObservableProperty]
+        private string? _overlayName = null;
+
         ///////////////////////////////////////////
         /// CONSTRUCTOR
         ///////////////////////////////////////////
 
+        ///Design-only constructor
         public OverlayEditorWindowViewModel()
         {
-            Images =
-            [
-                //Tried again and again to not use this hardcoded path, but it always throws an error... Ehhh. The real app will use absolute paths, so this is not a problem.
-                
-                new ImageModel("C:\\Users\\Nacho\\Downloads\\overlay.png", "overlay")
-            ];
+            Images = [];
+        }
 
-            PreviewEnabled = true;
-            PreviewSize = 50;
-            PreviewOpacity = 0.5;
-            PreviewColor = Colors.AliceBlue;
-
-            Selected = Images[0];
+        public OverlayEditorWindowViewModel(IList<ImageModel>? images = null)
+        {
+            Images = new ObservableCollection<ImageModel>(images ?? new List<ImageModel>());
         }
         ///////////////////////////////////////////
         /// COMMANDS
@@ -77,6 +74,29 @@ namespace UltrawideOverlays.ViewModels
         public void SelectImage(ImageModel im)
         {
             Selected = im;
+        }
+
+        [RelayCommand]
+        public void DuplicateImageModel(ImageModel imageModel)
+        {
+            if (imageModel != null)
+            {
+                var newImage = imageModel.Clone();
+                Images.Add(newImage);
+            }
+        }
+
+        [RelayCommand]
+        public void CreateOverlay(PixelSize pixelSize)
+        {
+            var bitmap = Utils.ImageRenderer.RenderImagesToBitmap(Images, pixelSize);
+            String? name = (OverlayName != null) ? FileHandlerUtil.AddImageFileExtension(OverlayName, ImageExtensions.PNG) : "Overlay.png";
+            // Save the bitmap to a file or use it as needed
+            var filePath = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), name!);
+            using (var fileStream = new System.IO.FileStream(filePath, System.IO.FileMode.Create))
+            {
+                bitmap.Save(fileStream);
+            }
         }
     }
 }

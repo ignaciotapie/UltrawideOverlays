@@ -26,6 +26,8 @@
         <SvgSource x:Key="HomeLogo">/Assets/Images/home-logo.svg</SvgSource>
         <SvgSource x:Key="OverlayLogo">/Assets/Images/overlay-logo.svg</SvgSource>
         <SvgSource x:Key="GamesLogo">/Assets/Images/joystick-logo.svg</SvgSource>
+        <SvgSource x:Key="CopyIcon">/Assets/Images/copy-icon.svg</SvgSource>
+        <SvgSource x:Key="DeleteIcon">/Assets/Images/delete-icon.svg</SvgSource>
     </Application.Resources>
   
     <Application.Styles>

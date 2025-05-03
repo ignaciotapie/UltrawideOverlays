@@ -15,9 +15,9 @@ namespace UltrawideOverlays.ViewModels
         [ObservableProperty]
         private string _settingsTxt = "Settings";
         [ObservableProperty]
-        private PageViewModel _currentPage;
+        private PageViewModel? _currentPage;
 
-        private readonly PageFactory factory;
+        private readonly PageFactory? factory;
 
         /// <summary>
         /// Design-time only constructor
@@ -36,24 +36,40 @@ namespace UltrawideOverlays.ViewModels
         [RelayCommand]
         private void NavigateToHomePage()
         {
+            if (factory == null)
+            {
+                return;
+            }
             CurrentPage = factory.GetPageViewModel(Enums.ApplicationPageViews.HomePage);
         }
 
         [RelayCommand]
         private void NavigateToGamesPage()
         {
+            if (factory == null)
+            {
+                return;
+            }
             CurrentPage = factory.GetPageViewModel(Enums.ApplicationPageViews.GamesPage);
         }
 
         [RelayCommand]
         private void NavigateToOverlaysPage()
         {
+            if (factory == null)
+            {
+                return;
+            }
             CurrentPage = factory.GetPageViewModel(Enums.ApplicationPageViews.OverlaysPage);
         }
 
         [RelayCommand]
         private void NavigateToSettingsPage()
         {
+            if (factory == null)
+            {
+                return;
+            }
             CurrentPage = factory.GetPageViewModel(Enums.ApplicationPageViews.SettingsPage);
         }
     }

@@ -1,6 +1,7 @@
 ﻿using Avalonia.Controls;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using UltrawideOverlays.Factories;
@@ -13,7 +14,7 @@ namespace UltrawideOverlays.ViewModels
         [ObservableProperty]
         private string _overlaysPageName = "Overlays Page";
 
-        private readonly WindowFactory factory;
+        private readonly WindowFactory? factory;
 
         public ObservableCollection<OverlayDataModel>? Overlays { get; }
 
@@ -24,6 +25,7 @@ namespace UltrawideOverlays.ViewModels
         {
             PageName = Enums.ApplicationPageViews.OverlaysPage;
             Overlays = [];
+
             if (Design.IsDesignMode)
             {
                 Overlays.Add(new OverlayDataModel("Overlay 1", "Path 1"));
@@ -39,11 +41,39 @@ namespace UltrawideOverlays.ViewModels
             factory = WFactory;
         }
 
+
+        ///////////////////////////////////////////
+        /// COMMANDS
+        ///////////////////////////////////////////
+
         [RelayCommand]
         private void AddNewButton()
         {
+            if (factory == null)
+            {
+                return;
+            }
+
             var window = factory.CreateWindow(Enums.WindowViews.OverlayEditorWindow);
             window.Show();
+
+            window.Closed += OverlayWindowClosed;
+        }
+
+
+        ///////////////////////////////////////////
+        /// PRIVATE FUNCTIONS
+        ///////////////////////////////////////////
+        ///
+        private void OverlayWindowClosed(object? sender, EventArgs e)
+        {
+            if (sender is Window window)
+            {
+                window.Closed -= OverlayWindowClosed;
+
+                GC.Collect();
+                GC.WaitForPendingFinalizers();
+            }
         }
     }
 }

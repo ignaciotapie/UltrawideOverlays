@@ -18,6 +18,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="Assets\Images\copy-icon.svg" />
+    <None Remove="Assets\Images\delete-icon.svg" />
     <None Remove="Assets\Images\home-logo.svg" />
     <None Remove="Assets\Images\settings-icon.svg" />
     <None Remove="Assets\Images\tv-icon-white.svg" />

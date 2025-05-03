@@ -3,21 +3,15 @@ using Avalonia.Controls;
 using Avalonia.Data;
 using Avalonia.Input;
 using Avalonia.Media;
-using Avalonia.Media.Imaging;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.ComponentModel;
+using System.Diagnostics;
 using UltrawideOverlays.Converters;
 using UltrawideOverlays.Models;
-using UltrawideOverlays.CustomControls;
-using Svg;
-using Avalonia.Data.Converters;
 
 namespace UltrawideOverlays.CustomControls
 {
-    public class SelectableImage : Border
+    public class SelectableImage : Border, IDisposable
     {
         public static readonly StyledProperty<bool> IsSelectedProperty =
             AvaloniaProperty.Register<SelectableImage, bool>(nameof(IsSelected));
@@ -29,7 +23,8 @@ namespace UltrawideOverlays.CustomControls
         }
 
         public ImageModel? imageModel;
-        public Image image;
+        public Image? image;
+        private bool disposedValue;
 
         public event EventHandler<ImageModel>? ImageSelected;
 
@@ -42,16 +37,13 @@ namespace UltrawideOverlays.CustomControls
             BorderThickness = new Thickness(2);
             image = new Image
             {
-                [!Image.SourceProperty] = new Binding("ImagePath")
-                {
-                    Converter = PathToBitmapConverter.Converter
-                },
-                [!Image.WidthProperty] = new Binding("ImageProperties.Width", BindingMode.TwoWay),
-                [!Image.HeightProperty] = new Binding("ImageProperties.Height", BindingMode.TwoWay),
-                [!Image.OpacityProperty] = new Binding("ImageProperties.Opacity", BindingMode.TwoWay),
-                [!Image.IsVisibleProperty] = new Binding("ImageProperties.IsVisible", BindingMode.TwoWay),
                 IsHitTestVisible = false
             };
+            image.Bind(Image.SourceProperty, new Binding("ImagePath") { Converter = PathToBitmapConverter.Converter });
+            image.Bind(Image.WidthProperty, new Binding("ImageProperties.Width", BindingMode.TwoWay));
+            image.Bind(Image.HeightProperty, new Binding("ImageProperties.Height", BindingMode.TwoWay));
+            image.Bind(Image.OpacityProperty, new Binding("ImageProperties.Opacity", BindingMode.TwoWay));
+            image.Bind(Image.IsVisibleProperty, new Binding("ImageProperties.IsVisible", BindingMode.TwoWay));
 
             Bind(WidthProperty, new Binding("ImageProperties.Width", BindingMode.TwoWay));
             Bind(HeightProperty, new Binding("ImageProperties.Height", BindingMode.TwoWay));
@@ -59,24 +51,6 @@ namespace UltrawideOverlays.CustomControls
             Bind(DragPanel.PositionProperty, new Binding("ImageProperties.Position", BindingMode.TwoWay));
 
             Child = image;
-
-            PointerPressed += OnPointerPressed;
-
-            // Listen for mirror or scale changes
-            if (imageModel?.ImageProperties is ImagePropertiesModel props)
-            {
-                props.PropertyChanged += (s, e) =>
-                {
-                    if (e.PropertyName == nameof(ImagePropertiesModel.IsHMirrored) ||
-                        e.PropertyName == nameof(ImagePropertiesModel.IsVMirrored) ||
-                        e.PropertyName == nameof(ImagePropertiesModel.Scale))
-                    {
-                        UpdateTransform();
-                    }
-                };
-
-                UpdateTransform(); // Initial update
-            }
         }
 
         static SelectableImage()
@@ -87,12 +61,19 @@ namespace UltrawideOverlays.CustomControls
             });
         }
 
+        ~SelectableImage()
+        {
+            Debug.WriteLine("SelectableImage finalized");
+        }
+
 
         ///////////////////////////////////////////
         /// PUBLIC FUNCTIONS
         ///////////////////////////////////////////
-        public void SelectImage() 
+        public void SelectImage()
         {
+            if (imageModel == null)
+                return;
             ImageSelected?.Invoke(this, imageModel);
         }
 
@@ -106,14 +87,43 @@ namespace UltrawideOverlays.CustomControls
                 SelectImage();
             }
         }
-
+        private void ImageModelPropertyChange(object? sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(ImagePropertiesModel.IsHMirrored) ||
+                e.PropertyName == nameof(ImagePropertiesModel.IsVMirrored) ||
+                e.PropertyName == nameof(ImagePropertiesModel.Scale))
+            {
+                UpdateTransform();
+            };
+        }
 
         ///////////////////////////////////////////
         /// OVERRIDE FUNCTIONS
         ///////////////////////////////////////////
-        protected override Size MeasureOverride(Size availableSize)
+
+        protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
         {
-            return availableSize;
+            // Listen for mirror or scale changes
+            if (imageModel?.ImageProperties is ImagePropertiesModel props)
+            {
+                props.PropertyChanged += ImageModelPropertyChange;
+                UpdateTransform(); //Initial transform update
+            }
+
+            PointerPressed += OnPointerPressed;
+            base.OnAttachedToVisualTree(e);
+        }
+
+        protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
+        {
+            // Listen for mirror or scale changes
+            if (imageModel?.ImageProperties is ImagePropertiesModel props)
+            {
+                props.PropertyChanged -= ImageModelPropertyChange;
+            }
+
+            PointerPressed -= OnPointerPressed;
+            base.OnDetachedFromVisualTree(e);
         }
 
         ///////////////////////////////////////////
@@ -141,6 +151,28 @@ namespace UltrawideOverlays.CustomControls
                 ScaleX = scaleX,
                 ScaleY = scaleY
             };
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposedValue)
+            {
+                if (imageModel?.ImageProperties is ImagePropertiesModel props)
+                    props.PropertyChanged -= ImageModelPropertyChange;
+
+                PointerPressed -= OnPointerPressed;
+                ImageSelected = null;
+                imageModel = null;
+                image = null;
+
+                disposedValue = true;
+            }
+        }
+
+        public void Dispose()
+        {
+            Dispose(disposing: true);
+            GC.SuppressFinalize(this);
         }
     }
 }

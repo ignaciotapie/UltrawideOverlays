@@ -1,27 +1,61 @@
-﻿using Avalonia.Data.Converters;
+﻿using Avalonia;
+using Avalonia.Data.Converters;
 using Avalonia.Media.Imaging;
-using UltrawideOverlays.Utils;
+using System;
+using System.Collections.Concurrent;
+using System.Globalization;
+using System.IO;
 
 namespace UltrawideOverlays.Converters
 {
-    static public class PathToBitmapConverter
+    public class PathToBitmapConverter : IValueConverter, IDisposable
     {
-        /// <summary>
-        /// Gets a Converter that takes a number as input and converts it into a text representation
-        /// </summary>
-        public static FuncValueConverter<string?, Bitmap> Converter { get; } =
-            new FuncValueConverter<string?, Bitmap>(filePath =>
-            {
-                if (filePath == null)
-                    return null;
+        public static readonly PathToBitmapConverter Converter = new();
 
-                // Check if the path is a valid file path
-                if (FileHandlerUtil.IsValidImagePath(filePath))
+        // Cache loaded bitmaps with full path key
+        private readonly ConcurrentDictionary<string, Bitmap> _bitmapCache = new();
+
+        public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+        {
+            if (value is not string path || string.IsNullOrWhiteSpace(path))
+                return AvaloniaProperty.UnsetValue;
+
+            try
+            {
+                var fullPath = Path.GetFullPath(path);
+
+                // Return cached if already loaded
+                if (_bitmapCache.TryGetValue(fullPath, out var cached))
+                    return cached;
+
+                if (File.Exists(fullPath))
                 {
-                    // Use the BitmapLoader to load the image
-                    return new Bitmap(filePath);
+                    var bitmap = new Bitmap(fullPath);
+                    _bitmapCache[fullPath] = bitmap;
+                    return bitmap;
                 }
-                return null;
-            });
+            }
+            catch
+            {
+                // Fail silently, return unset
+            }
+
+            return AvaloniaProperty.UnsetValue;
+        }
+
+        public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Dispose()
+        {
+            foreach (var bmp in _bitmapCache.Values)
+            {
+                bmp.Dispose();
+            }
+
+            _bitmapCache.Clear();
+        }
     }
 }

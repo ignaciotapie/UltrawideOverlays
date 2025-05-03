@@ -77,14 +77,14 @@ namespace UltrawideOverlays.CustomControls
         {
             if (change.Property == GridSizeProperty)
             {
-                UpdateGridSize((int)change.NewValue); // Update the grid size of the DragPanelLayout
+                UpdateGridSize((int)change.NewValue!); // Update the grid size of the DragPanelLayout
             }
             else if (change.Property == GridOpacityProperty)
             {
                 // Update the grid opacity of the DragPanelLayout
                 if (DragPanelLayout != null)
                 {
-                    VisualGrid.Opacity = (double)change.NewValue;
+                    VisualGrid.Opacity = (double)change.NewValue!;
                 }
             }
             else if (change.Property == ColorProperty)
@@ -92,7 +92,7 @@ namespace UltrawideOverlays.CustomControls
                 // Update the grid brush of the DragPanelLayout
                 if (VisualGrid != null)
                 {
-                    VisualGrid.Color = (Color)change.NewValue;
+                    VisualGrid.Color = (Color)change.NewValue!;
                 }
             }
             else if (change.Property == PreviewProperty)
@@ -100,7 +100,7 @@ namespace UltrawideOverlays.CustomControls
                 // Update the grid preview of the DragPanelLayout
                 if (VisualGrid != null)
                 {
-                    VisualGrid.Preview = (bool)change.NewValue;
+                    VisualGrid.Preview = (bool)change.NewValue!;
                 }
             }
             base.OnPropertyChanged(change);
