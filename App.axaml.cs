@@ -8,6 +8,7 @@ using System;
 using System.Linq;
 using UltrawideOverlays.Factories;
 using UltrawideOverlays.Models;
+using UltrawideOverlays.Services;
 using UltrawideOverlays.ViewModels;
 using UltrawideOverlays.Views;
 
@@ -47,9 +48,6 @@ namespace UltrawideOverlays
                 DisableAvaloniaDataAnnotationValidation();
 
                 ServiceProvider services = ConfigureServices();
-                var db = services.GetRequiredService<Database>();
-                db.InitAsync().GetAwaiter().GetResult(); // Block loading until it's all set
-
                 desktop.MainWindow = new MainWindow
                 {
                     DataContext = services.GetRequiredService<MainWindowViewModel>()
@@ -63,10 +61,13 @@ namespace UltrawideOverlays
         {
             ServiceCollection collection = new ServiceCollection();
 
-            //Factory
+            //DB provider initialization (for async db initialization!)
+            collection.AddSingleton<DatabaseProvider>();
+            //Data services
+            collection.AddSingleton<OverlayDataService>();
+
             collection.AddSingleton<PageFactory>();
             collection.AddSingleton<WindowFactory>();
-            collection.AddSingleton<Database>();
             collection.AddTransient<Func<Enums.ApplicationPageViews, PageViewModel>>(x => pageName => pageName switch
             {
                 Enums.ApplicationPageViews.HomePage => x.GetRequiredService<HomePageViewModel>(),

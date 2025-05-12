@@ -64,10 +64,7 @@ namespace UltrawideOverlays.ViewModels
         [RelayCommand]
         public void RemoveImageModel(ImageModel imageModel)
         {
-            if (Images.Contains(imageModel))
-            {
-                Images.Remove(imageModel);
-            }
+            Images.Remove(imageModel);
         }
 
         [RelayCommand]
@@ -90,13 +87,7 @@ namespace UltrawideOverlays.ViewModels
         public void CreateOverlay(PixelSize pixelSize)
         {
             var bitmap = Utils.ImageRenderer.RenderImagesToBitmap(Images, pixelSize);
-            String? name = (OverlayName != null) ? FileHandlerUtil.AddImageFileExtension(OverlayName, ImageExtensions.PNG) : "Overlay.png";
-            // Save the bitmap to a file or use it as needed
-            var filePath = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), name!);
-            using (var fileStream = new System.IO.FileStream(filePath, System.IO.FileMode.Create))
-            {
-                bitmap.Save(fileStream);
-            }
+            String? name = (OverlayName != null) ? OverlayName : "Overlay";
         }
     }
 }

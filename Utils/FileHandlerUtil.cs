@@ -1,19 +1,35 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Threading.Tasks;
 
 namespace UltrawideOverlays.Utils
 {
-    public class ImageExtensions : Object
+    public sealed class ImageExtension
     {
-        public static readonly string PNG = ".png";
-        public static readonly string JPG = ".jpg";
-        public static readonly string JPEG = ".jpeg";
-        public static readonly string BMP = ".bmp";
+        public static readonly ImageExtension PNG = new ImageExtension(".png");
+        public static readonly ImageExtension JPG = new ImageExtension(".jpg");
+        public static readonly ImageExtension JPEG = new ImageExtension(".jpeg");
+        public static readonly ImageExtension BMP = new ImageExtension(".bmp");
+
+        public string Extension { get; }
+
+        private ImageExtension(string extension)
+        {
+            Extension = extension;
+        }
+
+        public override string ToString() => Extension;
+
+        public static implicit operator string(ImageExtension imageExtension)
+        {
+            return imageExtension.Extension;
+        }
     }
 
     public static class FileHandlerUtil
     {
-        private static readonly HashSet<string> _validImageExtensions = [ImageExtensions.PNG, ImageExtensions.BMP, ImageExtensions.JPG, ImageExtensions.JPEG];
+        private static readonly HashSet<string> _validImageExtensions = [ImageExtension.PNG, ImageExtension.BMP, ImageExtension.JPG, ImageExtension.JPEG];
 
         /// <summary>
         /// Returns file name without extension.
@@ -22,12 +38,12 @@ namespace UltrawideOverlays.Utils
         /// <returns>string FileName</returns>
         public static string GetFileName(string filePath)
         {
-            return System.IO.Path.GetFileNameWithoutExtension(filePath);
+            return Path.GetFileNameWithoutExtension(filePath);
         }
 
         public static string GetFileName(Uri uri)
         {
-            return System.IO.Path.GetFileNameWithoutExtension(uri.ToString());
+            return Path.GetFileNameWithoutExtension(uri.ToString());
         }
 
         /// <summary>
@@ -37,7 +53,7 @@ namespace UltrawideOverlays.Utils
         /// <returns></returns>
         public static string GetFileExtension(string filePath)
         {
-            return System.IO.Path.GetExtension(filePath);
+            return Path.GetExtension(filePath);
         }
 
         /// <summary>
@@ -47,7 +63,7 @@ namespace UltrawideOverlays.Utils
         /// <returns>string FileName.Extension</returns>
         public static string GetFileNameWithExtension(string filePath)
         {
-            return System.IO.Path.GetFileName(filePath);
+            return Path.GetFileName(filePath);
         }
 
         /// <summary>
@@ -69,7 +85,7 @@ namespace UltrawideOverlays.Utils
             return _validImageExtensions.Contains(fileExtension.ToLowerInvariant());
         }
 
-        public static string? AddImageFileExtension(string filePath, String fileExtension)
+        public static string? AddImageFileExtension(string filePath, ImageExtension fileExtension)
         {
             if (_validImageExtensions.Contains(fileExtension))
             {
@@ -79,7 +95,7 @@ namespace UltrawideOverlays.Utils
             return null;
         }
 
-        public static string AddJsonFileExtension(string filePath) 
+        public static string AddJSONFileExtension(string filePath) 
         {
             const string jsonExtension = ".json";
             if (filePath.EndsWith(jsonExtension, StringComparison.OrdinalIgnoreCase))
@@ -99,8 +115,26 @@ namespace UltrawideOverlays.Utils
 
             try
             {
-                var dirInfo = new System.IO.DirectoryInfo(path);
+                var dirInfo = new DirectoryInfo(path);
                 return dirInfo.Exists;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
+
+        public static bool IsValidFilePath(string path) 
+        {
+            if (string.IsNullOrWhiteSpace(path))
+            {
+                return false;
+            }
+
+            try
+            {
+                var fileInfo = new FileInfo(path);
+                return fileInfo.Exists;
             }
             catch (Exception)
             {
@@ -114,13 +148,25 @@ namespace UltrawideOverlays.Utils
             {
                 try
                 {
-                    System.IO.Directory.CreateDirectory(folderPath);
+                    Directory.CreateDirectory(folderPath);
                 }
                 catch (Exception ex)
                 {
                     Console.WriteLine($"Error creating directory: {ex.Message}");
                 }
             }
+        }
+
+        public static async Task WriteToJSON(string path, string json)
+        {
+            path = AddJSONFileExtension(path);
+            await File.WriteAllTextAsync(path, json);
+        }
+
+        public static async Task<string> ReadFromJSON(string path)
+        {
+            path = AddJSONFileExtension(path);
+            return await File.ReadAllTextAsync(path);
         }
     }
 }

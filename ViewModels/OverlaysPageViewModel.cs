@@ -4,8 +4,11 @@ using CommunityToolkit.Mvvm.Input;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
+using System.Threading.Tasks;
 using UltrawideOverlays.Factories;
 using UltrawideOverlays.Models;
+using UltrawideOverlays.Services;
 
 namespace UltrawideOverlays.ViewModels
 {
@@ -34,13 +37,34 @@ namespace UltrawideOverlays.ViewModels
             }
         }
 
-        public OverlaysPageViewModel(IEnumerable<OverlayDataModel> overlays, WindowFactory WFactory)
+        public OverlaysPageViewModel(OverlayDataService service, WindowFactory WFactory)
         {
             PageName = Enums.ApplicationPageViews.OverlaysPage;
-            Overlays = new ObservableCollection<OverlayDataModel>(overlays);
+            Overlays = new ObservableCollection<OverlayDataModel>();
             factory = WFactory;
+
+            LoadOverlaysAsync(service);
         }
 
+        private async void LoadOverlaysAsync(OverlayDataService service)
+        {
+            try
+            {
+                var overlays = await service.LoadAllOverlaysAsync();
+                if (overlays != null)
+                {
+                    foreach (var overlay in overlays)
+                    {
+                        Overlays.Add(overlay);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                // Log or handle error
+                System.Diagnostics.Debug.WriteLine($"Error loading overlays: {ex.Message}");
+            }
+        }
 
         ///////////////////////////////////////////
         /// COMMANDS
