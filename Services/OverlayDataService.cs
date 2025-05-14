@@ -1,10 +1,12 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UltrawideOverlays.Factories;
 using UltrawideOverlays.Models;
+using UltrawideOverlays.Utils;
 
 namespace UltrawideOverlays.Services
 {
@@ -15,7 +17,7 @@ namespace UltrawideOverlays.Services
         {
             _provider = db;
         }
-        public async Task<List<OverlayDataModel>> LoadAllOverlaysAsync()
+        public async Task<ICollection<OverlayDataModel>> LoadAllOverlaysAsync()
         {
             var db = await _provider.GetDatabaseAsync();
             return db.Overlays;
@@ -35,10 +37,18 @@ namespace UltrawideOverlays.Services
             }
         }
 
-        public async Task SaveOverlayAsync(OverlayDataModel overlay)
+        public async Task SaveOverlayAsync(OverlayDataModel overlay, bool createImage = true)
         {
             var db = await _provider.GetDatabaseAsync();
-            await db.SaveAsync(overlay, DatabaseFiles.Overlays);
+            var tasks = new List<Task>();
+            if (createImage) 
+            {
+                tasks.Add(db.SaveBitmapFromOverlayAsync(overlay));
+            }
+
+            tasks.Add(db.SaveAsync(overlay, DatabaseFiles.Overlays));
+
+            await Task.WhenAll(tasks);
         }
     }
 }

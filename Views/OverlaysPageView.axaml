@@ -18,10 +18,10 @@
         </Border>
 
         <!-- Content-->
-        <StackPanel Grid.Row="1" Margin="10" >
-            <Label> Existing Overlays</Label>
+        <StackPanel Grid.Row="1" Margin="10" Spacing="10">
+            <Label HorizontalAlignment="Center">Existing Overlays</Label>
             <Border Background="{DynamicResource PrimaryBackground}">
-                <ListBox ItemsSource="{Binding Overlays}">
+                <ListBox ItemsSource="{Binding Overlays}" SelectedIndex="{Binding SelectedOverlayIndex, Mode=OneWayToSource}">
                     <ListBox.ItemTemplate>
                         <DataTemplate>
                             <StackPanel Orientation="Horizontal">
@@ -34,7 +34,9 @@
             </Border>
         </StackPanel>
 
-        <Button Grid.Row="1" Grid.Column="1" Content="Add New +" VerticalAlignment="Top" Command="{Binding AddNewButtonCommand}"></Button>
-
+        <StackPanel Orientation="Vertical" Grid.Row="1" Grid.Column="1" VerticalAlignment="Center">
+            <Button Content="Add New +" VerticalAlignment="Top" Command="{Binding AddNewButtonCommand}"></Button>
+            <Button Grid.Column="1" Content="Edit" VerticalAlignment="Top" Command="{Binding EditButtonCommand}"></Button>
+        </StackPanel>
     </Grid>
 </UserControl>

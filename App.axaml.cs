@@ -21,16 +21,18 @@ namespace UltrawideOverlays
             AvaloniaXamlLoader.Load(this);
         }
 
-        public Window? CreateWindow(IServiceProvider provider, Enums.WindowViews windowEnum)
+        public Window? CreateWindow(IServiceProvider provider, Enums.WindowViews windowEnum, Object? args)
         {
             if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
             {
                 switch (windowEnum)
                 {
                     case Enums.WindowViews.OverlayEditorWindow:
+                        var overlayService = provider.GetRequiredService<OverlayDataService>();
                         return new OverlayEditorWindowView
                         {
-                            DataContext = provider.GetRequiredService<OverlayEditorWindowViewModel>()
+                            //This goes against DI principles, but making a whole new factory for just passing args to a single window is overkill
+                            DataContext = new OverlayEditorWindowViewModel(overlayService, args)
                         };
                     default:
                         throw new ArgumentOutOfRangeException(nameof(windowEnum), windowEnum, null);
@@ -61,8 +63,9 @@ namespace UltrawideOverlays
         {
             ServiceCollection collection = new ServiceCollection();
 
-            //DB provider initialization (for async db initialization!)
-            collection.AddSingleton<DatabaseProvider>();
+            //DB provider non-lazy initialization (for async db initialization!)
+            var dbProvider = new DatabaseProvider();
+            collection.AddSingleton(dbProvider);
             //Data services
             collection.AddSingleton<OverlayDataService>();
 
@@ -77,7 +80,7 @@ namespace UltrawideOverlays
                 _ => throw new InvalidOperationException($"No ViewModel found for {pageName}")
             });
 
-            collection.AddTransient<Func<Enums.WindowViews, Window>>(x => windowEnum => CreateWindow(x, windowEnum));
+            collection.AddTransient<Func<Enums.WindowViews, object?, Window>>(x => (windowEnum, args) => CreateWindow(x, windowEnum, args));
 
             //Main Window
             collection.AddSingleton<MainWindowViewModel>();

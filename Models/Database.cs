@@ -3,13 +3,16 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
+using UltrawideOverlays.Converters.Comparers;
+using UltrawideOverlays.Services;
 using UltrawideOverlays.Utils;
 
 namespace UltrawideOverlays.Models
 {
-    public enum DatabaseFiles 
+    public enum DatabaseFiles
     {
         Overlays,
         Settings,
@@ -29,7 +32,7 @@ namespace UltrawideOverlays.Models
     }
     public class Database
     {
-        public List<OverlayDataModel> Overlays { get; }
+        public HashSet<OverlayDataModel> Overlays { get; }
         public SettingsDataModel Settings { get; set; }
 
         bool isInitialized = false;
@@ -39,7 +42,8 @@ namespace UltrawideOverlays.Models
         ///////////////////////////////////////////
         private Database()
         {
-            Overlays = [];
+            Overlays = new HashSet<OverlayDataModel>(new OverlayDataModelComparer());
+
             Settings = new SettingsDataModel();
         }
         //Usable asynchronous constructor
@@ -58,15 +62,6 @@ namespace UltrawideOverlays.Models
 
             await Task.WhenAll([overlayTask, settingsTask]);
             isInitialized = true;
-        }
-
-        public async Task<bool> WaitUntilInitialized() 
-        {
-            while (!isInitialized)
-            {
-                await Task.Delay(100);
-            }
-            return true;
         }
 
         private async Task LoadSettings()
@@ -92,20 +87,15 @@ namespace UltrawideOverlays.Models
 
         private async Task LoadOverlays()
         {
-            await Task.Run(() => LoadOverlaysFromFiles());
-        }
-
-        private void LoadOverlaysFromFiles()
-        {
             var overlayFiles = Directory.GetFiles(DatabasePaths.OverlaysModelPath, "*.json");
             foreach (var file in overlayFiles)
             {
                 try
                 {
-                    var overlay = LoadAsync<OverlayDataModel>(file, DatabaseFiles.Overlays);
+                    var overlay = await LoadAsync<OverlayDataModel>(file, DatabaseFiles.Overlays);
                     if (overlay != null)
                     {
-                        Overlays.Add(overlay.Result);
+                        Overlays.Add(overlay);
                     }
                 }
                 catch (Exception ex)
@@ -132,6 +122,9 @@ namespace UltrawideOverlays.Models
             }
         }
 
+        ///////////////////////////////////////////
+        /// GENERIC
+        ///////////////////////////////////////////
         public async Task SaveAsync(object data, DatabaseFiles fileType)
         {
             string path = string.Empty;
@@ -149,6 +142,12 @@ namespace UltrawideOverlays.Models
                     }
                     path = Path.Combine(DatabasePaths.OverlaysModelPath, FileHandlerUtil.AddJSONFileExtension(name));
 
+                    // Check if the overlay already exists in the collection
+                    if (Overlays.Contains(overlay))
+                    {
+                        Overlays.Remove(overlay);
+                    }
+
                     Overlays.Add(overlay);
                     break;
                 case DatabaseFiles.Settings:
@@ -161,27 +160,25 @@ namespace UltrawideOverlays.Models
                     throw new ArgumentOutOfRangeException(nameof(fileType), fileType, null);
             }
 
-            var json = JsonSerializer.Serialize(data);
+            var serializerOptions = new JsonSerializerOptions
+            {
+                WriteIndented = true
+            };
+
+            var json = JsonSerializer.Serialize(data, typeof(Object), serializerOptions);
             await FileHandlerUtil.WriteToJSON(path, json);
         }
 
         public async Task<T> LoadAsync<T>(string fileName, DatabaseFiles fileType)
         {
             string path = string.Empty;
-            switch (fileType)
+            path = fileType switch
             {
-                case DatabaseFiles.Overlays:
-                    path = Path.Combine(DatabasePaths.OverlaysModelPath, FileHandlerUtil.AddJSONFileExtension(fileName));
-                    break;
-                case DatabaseFiles.Settings:
-                    path = Path.Combine(DatabasePaths.SettingsModelPath, FileHandlerUtil.AddJSONFileExtension(fileName));
-                    break;
-                case DatabaseFiles.Images:
-                    throw new InvalidOperationException("Cannot load images as JSON");
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(fileType), fileType, null);
-            }
-
+                DatabaseFiles.Overlays => Path.Combine(DatabasePaths.OverlaysModelPath, FileHandlerUtil.AddJSONFileExtension(fileName)),
+                DatabaseFiles.Settings => Path.Combine(DatabasePaths.SettingsModelPath, FileHandlerUtil.AddJSONFileExtension(fileName)),
+                DatabaseFiles.Images => throw new InvalidOperationException("Cannot load images as JSON"),
+                _ => throw new ArgumentOutOfRangeException(nameof(fileType), fileType, null),
+            };
             if (!FileHandlerUtil.IsValidFilePath(path))
             {
                 throw new FileNotFoundException("File not found", path);
@@ -191,6 +188,11 @@ namespace UltrawideOverlays.Models
             return await JsonSerializer.DeserializeAsync<T>(reader.BaseStream);
         }
 
+
+
+        ///////////////////////////////////////////
+        /// BITMAPS
+        ///////////////////////////////////////////
         public async Task<Bitmap> LoadBitmapAsync(string fileName)
         {
             string path = Path.Combine(DatabasePaths.ImagesPath, FileHandlerUtil.AddImageFileExtension(fileName, ImageExtension.PNG)!);
@@ -201,6 +203,24 @@ namespace UltrawideOverlays.Models
 
             //Load bitmap asynchronously
             return await Task.Run(() => new Bitmap(path));
+        }
+
+        public async Task SaveBitmapFromOverlayAsync(OverlayDataModel overlayData)
+        {
+            string path = Path.Combine(DatabasePaths.ImagesPath, FileHandlerUtil.AddImageFileExtension(overlayData.Name, ImageExtension.PNG)!);
+            overlayData.Path = path;
+
+            _ = Task.Run(() => SaveBitmap(overlayData, path));
+        }
+
+        private void SaveBitmap(OverlayDataModel overlayData, string path)
+        {
+            if (string.IsNullOrEmpty(path))
+                throw new ArgumentNullException(nameof(path));
+
+            // Save the bitmap to the specified path`
+            var bitmap = ImageRenderer.RenderImagesToBitmap(overlayData);
+            bitmap.Save(path);
         }
     }
 }

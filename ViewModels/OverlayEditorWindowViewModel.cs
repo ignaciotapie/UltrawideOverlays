@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using UltrawideOverlays.Models;
+using UltrawideOverlays.Services;
 using UltrawideOverlays.Utils;
 
 namespace UltrawideOverlays.ViewModels
@@ -33,6 +34,8 @@ namespace UltrawideOverlays.ViewModels
         [ObservableProperty]
         private string? _overlayName = null;
 
+        private readonly OverlayDataService _overlayDataService;
+
         ///////////////////////////////////////////
         /// CONSTRUCTOR
         ///////////////////////////////////////////
@@ -43,9 +46,19 @@ namespace UltrawideOverlays.ViewModels
             Images = [];
         }
 
-        public OverlayEditorWindowViewModel(IList<ImageModel>? images = null)
+        public OverlayEditorWindowViewModel(OverlayDataService service, Object? args)
         {
-            Images = new ObservableCollection<ImageModel>(images ?? new List<ImageModel>());
+            _overlayDataService = service;
+
+            if (args is OverlayDataModel existingModel)
+            {
+                OverlayName = existingModel.Name;
+                Images = new ObservableCollection<ImageModel>(existingModel.ImageModels);
+            }
+            else
+            {
+                Images = [];
+            }
         }
         ///////////////////////////////////////////
         /// COMMANDS
@@ -86,8 +99,15 @@ namespace UltrawideOverlays.ViewModels
         [RelayCommand]
         public void CreateOverlay(PixelSize pixelSize)
         {
-            var bitmap = Utils.ImageRenderer.RenderImagesToBitmap(Images, pixelSize);
             String? name = (OverlayName != null) ? OverlayName : "Overlay";
+
+            var overlay = new OverlayDataModel();
+            overlay.Name = name;
+            overlay.ImageModels = new List<ImageModel>(Images);
+            overlay.Width = pixelSize.Width;
+            overlay.Height = pixelSize.Height;
+
+            _ = _overlayDataService.SaveOverlayAsync(overlay);
         }
     }
 }

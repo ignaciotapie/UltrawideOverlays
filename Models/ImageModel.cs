@@ -1,4 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using System;
+using UltrawideOverlays.Utils;
 
 namespace UltrawideOverlays.Models
 {
@@ -17,11 +19,17 @@ namespace UltrawideOverlays.Models
             ImagePath = imagePath;
             ImageName = imageName;
             ImageProperties = imageProperties ?? new ImagePropertiesModel();
+            if (FileHandlerUtil.IsValidImagePath(imagePath) == false)
+            {
+                throw new ArgumentException($"Invalid image path: {imagePath}");
+            }
 
             //TODO: Is there not a better way to get the ImageWidth and Height
-            using var bitmap = new Avalonia.Media.Imaging.Bitmap(imagePath);
-            ImageProperties.Width = bitmap.PixelSize.Width;
-            ImageProperties.Height = bitmap.PixelSize.Height;
+            using (var bitmap = new Avalonia.Media.Imaging.Bitmap(imagePath))
+            {
+                ImageProperties.Width = bitmap.PixelSize.Width;
+                ImageProperties.Height = bitmap.PixelSize.Height;
+            }
         }
 
         public override ImageModel Clone()

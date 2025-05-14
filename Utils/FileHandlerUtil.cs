@@ -75,7 +75,7 @@ namespace UltrawideOverlays.Utils
         {
             string fileExtension = GetFileExtension(filePath);
 
-            return _validImageExtensions.Contains(fileExtension.ToLowerInvariant());
+            return IsValidFilePath(filePath) && _validImageExtensions.Contains(fileExtension.ToLowerInvariant());
         }
 
         public static bool IsValidImagePath(Uri uri)

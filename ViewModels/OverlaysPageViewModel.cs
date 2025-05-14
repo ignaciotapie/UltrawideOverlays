@@ -16,10 +16,13 @@ namespace UltrawideOverlays.ViewModels
     {
         [ObservableProperty]
         private string _overlaysPageName = "Overlays Page";
+        [ObservableProperty]
+        private int _selectedOverlayIndex;
 
         private readonly WindowFactory? factory;
+        private readonly OverlayDataService? overlayDataService;
 
-        public ObservableCollection<OverlayDataModel>? Overlays { get; }
+        public ObservableCollection<OverlayDataModel> Overlays { get; }
 
         /// <summary>
         /// Design-only constructor
@@ -42,17 +45,19 @@ namespace UltrawideOverlays.ViewModels
             PageName = Enums.ApplicationPageViews.OverlaysPage;
             Overlays = new ObservableCollection<OverlayDataModel>();
             factory = WFactory;
+            overlayDataService = service;
 
-            LoadOverlaysAsync(service);
+            LoadOverlaysAsync();
         }
 
-        private async void LoadOverlaysAsync(OverlayDataService service)
+        private async void LoadOverlaysAsync()
         {
             try
             {
-                var overlays = await service.LoadAllOverlaysAsync();
+                var overlays = await overlayDataService.LoadAllOverlaysAsync();
                 if (overlays != null)
                 {
+                    Overlays.Clear();
                     foreach (var overlay in overlays)
                     {
                         Overlays.Add(overlay);
@@ -84,6 +89,20 @@ namespace UltrawideOverlays.ViewModels
             window.Closed += OverlayWindowClosed;
         }
 
+        [RelayCommand]
+        private void EditButton()
+        {
+            if (factory == null) return;
+            if (SelectedOverlayIndex < 0 || SelectedOverlayIndex >= Overlays.Count)
+            {
+
+            }
+
+            var window = factory.CreateWindow(Enums.WindowViews.OverlayEditorWindow, Overlays[SelectedOverlayIndex]);
+            window.Show();
+
+            window.Closed += OverlayWindowClosed;
+        }
 
         ///////////////////////////////////////////
         /// PRIVATE FUNCTIONS
@@ -94,10 +113,9 @@ namespace UltrawideOverlays.ViewModels
             if (sender is Window window)
             {
                 window.Closed -= OverlayWindowClosed;
-
-                GC.Collect();
-                GC.WaitForPendingFinalizers();
             }
+
+            LoadOverlaysAsync();
         }
     }
 }

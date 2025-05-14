@@ -1,5 +1,6 @@
 ﻿using Avalonia;
 using Avalonia.Media.Imaging;
+using System;
 using System.Collections.Generic;
 using UltrawideOverlays.Models;
 
@@ -35,5 +36,10 @@ public static class ImageRenderer
         }
 
         return bitmap;
+    }
+
+    public static RenderTargetBitmap RenderImagesToBitmap(OverlayDataModel overlay)
+    {
+        return RenderImagesToBitmap(overlay.ImageModels, new PixelSize(overlay.Width, overlay.Height));
     }
 }

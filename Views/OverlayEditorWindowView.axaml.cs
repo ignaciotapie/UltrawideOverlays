@@ -7,6 +7,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Diagnostics;
 using UltrawideOverlays.CustomControls;
 using UltrawideOverlays.Models;
 using UltrawideOverlays.Utils;
@@ -50,6 +51,11 @@ public partial class OverlayEditorWindowView : Window
 
         AddHandler(KeyDownEvent, DeleteHandler);
 
+    }
+
+    ~OverlayEditorWindowView()
+    {
+        Debug.WriteLine("OverlayEditorWindowView destructor called");
     }
 
     private void PositionProperties()
@@ -315,6 +321,7 @@ public partial class OverlayEditorWindowView : Window
         if (viewModel != null && viewModel.CreateOverlayCommand.CanExecute(pixelSize))
         {
             viewModel.CreateOverlayCommand.Execute(pixelSize);
+            CloseWindow();
         }
     }
 
