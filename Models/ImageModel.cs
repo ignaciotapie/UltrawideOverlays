@@ -1,5 +1,7 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿using Avalonia.Media.Imaging;
+using CommunityToolkit.Mvvm.ComponentModel;
 using System;
+using System.IO;
 using UltrawideOverlays.Utils;
 
 namespace UltrawideOverlays.Models
@@ -24,11 +26,13 @@ namespace UltrawideOverlays.Models
                 throw new ArgumentException($"Invalid image path: {imagePath}");
             }
 
-            //TODO: Is there not a better way to get the ImageWidth and Height
-            using (var bitmap = new Avalonia.Media.Imaging.Bitmap(imagePath))
+            using (var fileStream = new FileStream(imagePath, FileMode.Open, FileAccess.Read, FileShare.Read))
             {
-                ImageProperties.Width = bitmap.PixelSize.Width;
-                ImageProperties.Height = bitmap.PixelSize.Height;
+                using (var image = new Bitmap(fileStream))
+                {
+                    ImageProperties.Width = image.PixelSize.Width;
+                    ImageProperties.Height = image.PixelSize.Height;
+                }
             }
         }
 

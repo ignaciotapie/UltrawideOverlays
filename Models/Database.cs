@@ -3,11 +3,9 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
 using UltrawideOverlays.Converters.Comparers;
-using UltrawideOverlays.Services;
 using UltrawideOverlays.Utils;
 
 namespace UltrawideOverlays.Models
@@ -35,7 +33,7 @@ namespace UltrawideOverlays.Models
         public HashSet<OverlayDataModel> Overlays { get; }
         public SettingsDataModel Settings { get; set; }
 
-        bool isInitialized = false;
+        public bool isInitialized = false;
 
         ///////////////////////////////////////////
         /// CONSTRUCTOR
@@ -210,7 +208,7 @@ namespace UltrawideOverlays.Models
             string path = Path.Combine(DatabasePaths.ImagesPath, FileHandlerUtil.AddImageFileExtension(overlayData.Name, ImageExtension.PNG)!);
             overlayData.Path = path;
 
-            _ = Task.Run(() => SaveBitmap(overlayData, path));
+            await Task.Run(() => SaveBitmap(overlayData, path));
         }
 
         private void SaveBitmap(OverlayDataModel overlayData, string path)
@@ -218,7 +216,9 @@ namespace UltrawideOverlays.Models
             if (string.IsNullOrEmpty(path))
                 throw new ArgumentNullException(nameof(path));
 
-            // Save the bitmap to the specified path`
+            // Save the bitmap to the specified path
+            if (overlayData.ImageModels == null || overlayData.ImageModels.Count == 0) throw new InvalidOperationException("No images to save");
+
             var bitmap = ImageRenderer.RenderImagesToBitmap(overlayData);
             bitmap.Save(path);
         }

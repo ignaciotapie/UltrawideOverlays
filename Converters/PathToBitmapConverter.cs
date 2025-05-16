@@ -8,7 +8,7 @@ using System.IO;
 
 namespace UltrawideOverlays.Converters
 {
-    public class PathToBitmapConverter : IValueConverter, IDisposable
+    public class PathToBitmapConverter : IValueConverter
     {
         public static readonly PathToBitmapConverter Converter = new();
 
@@ -48,7 +48,7 @@ namespace UltrawideOverlays.Converters
             throw new NotImplementedException();
         }
 
-        public void Dispose()
+        public void DisposeImage()
         {
             foreach (var bmp in _bitmapCache.Values)
             {

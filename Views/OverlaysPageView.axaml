@@ -21,7 +21,7 @@
         <StackPanel Grid.Row="1" Margin="10" Spacing="10">
             <Label HorizontalAlignment="Center">Existing Overlays</Label>
             <Border Background="{DynamicResource PrimaryBackground}">
-                <ListBox ItemsSource="{Binding Overlays}" SelectedIndex="{Binding SelectedOverlayIndex, Mode=OneWayToSource}">
+                <ListBox ItemsSource="{Binding Overlays}" SelectedIndex="{Binding SelectedOverlayIndex, Mode=TwoWay}">
                     <ListBox.ItemTemplate>
                         <DataTemplate>
                             <StackPanel Orientation="Horizontal">

@@ -10,6 +10,7 @@ namespace UltrawideOverlays.CustomControls
     public class DragPanel : Panel
     {
         private Control? _draggedControl;
+        private SelectableItemBase? _selectableControl;
         private Point _dragOffset;
 
         ///////////////////////////////////////////
@@ -122,6 +123,13 @@ namespace UltrawideOverlays.CustomControls
                 var controlPos = GetPosition(control);
                 _dragOffset = pointerPos - controlPos;
                 _draggedControl.Focus();
+
+                if (control is SelectableItemBase selectableItem && _selectableControl != selectableItem)
+                {
+                    if (_selectableControl != null) { _selectableControl.IsSelected = false; }
+                    _selectableControl = selectableItem;
+                    selectableItem.IsSelected = true;
+                }
 
                 e.Pointer.Capture(this);
             }

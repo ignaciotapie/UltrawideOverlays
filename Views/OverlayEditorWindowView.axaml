@@ -56,7 +56,7 @@
                     </Button>
                 </RelativePanel>
                 
-                <ListBox x:Name="Images_ListBox" Background="Transparent" Grid.Row="1" ItemsSource="{Binding Images}" BorderBrush="Black" BorderThickness="1,1,1,0" SelectionChanged="ListBox_SelectionChanged">
+                <ListBox x:Name="Images_ListBox" Background="Transparent" Grid.Row="1" ItemsSource="{Binding Images}" BorderBrush="Black" BorderThickness="1,1,1,0" SelectedItem="{Binding Selected}" AutoScrollToSelectedItem="True">
                     <ListBox.ItemTemplate>
                         <DataTemplate>
                             <StackPanel Orientation="Horizontal">
@@ -69,7 +69,7 @@
 
                 <!-- Column 1: Grid Properties-->
                 <Label Grid.Column="1" DockPanel.Dock="Top" VerticalAlignment="Center" HorizontalAlignment="Center">Grid Properties</Label>
-                <StackPanel Grid.Row="1" Grid.Column="1" Spacing="10" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+                <StackPanel Grid.Row="1" Grid.Column="1" Spacing="10" VerticalAlignment="Stretch" HorizontalAlignment="Center">
                     <StackPanel Orientation="Horizontal">
                         <Label>Visible Grid</Label>
                         <CheckBox x:Name="GridVisible_CheckBox" IsChecked="{Binding PreviewEnabled, Mode=TwoWay}" VerticalAlignment="Center" VerticalContentAlignment="Center"/>
@@ -87,6 +87,7 @@
                         <Slider x:Name="GridOpacity_Slider" HorizontalAlignment="Stretch" Width="100" Minimum="0" Maximum="1" Value="{Binding PreviewOpacity, Mode=TwoWay}"/>
                         <Label Content="{Binding PreviewOpacity, Converter={x:Static converter:RoundedNumberToStringConverter.Converter}}"></Label>
                     </StackPanel>
+                    <Button Click="AddClippingMaskButton_Click">Add Clipping Mask</Button>
                 </StackPanel>
 
                 <!-- Column 2: Image Properties-->

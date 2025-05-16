@@ -5,7 +5,7 @@ namespace UltrawideOverlays.Factories
 {
     public class WindowFactory
     {
-        private readonly Func<Enums.WindowViews,object?, Window> _windowFactory;
+        private readonly Func<Enums.WindowViews, object?, Window> _windowFactory;
 
         public WindowFactory(Func<Enums.WindowViews, object?, Window> windowFactory)
         {

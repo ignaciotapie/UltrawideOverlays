@@ -7,7 +7,6 @@ using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Linq;
 using UltrawideOverlays.Factories;
-using UltrawideOverlays.Models;
 using UltrawideOverlays.Services;
 using UltrawideOverlays.ViewModels;
 using UltrawideOverlays.Views;

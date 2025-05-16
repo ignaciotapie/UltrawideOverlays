@@ -11,6 +11,7 @@ namespace UltrawideOverlays.Utils
         public static readonly ImageExtension JPG = new ImageExtension(".jpg");
         public static readonly ImageExtension JPEG = new ImageExtension(".jpeg");
         public static readonly ImageExtension BMP = new ImageExtension(".bmp");
+        public static readonly ImageExtension GIF = new ImageExtension(".gif");
 
         public string Extension { get; }
 
@@ -29,7 +30,14 @@ namespace UltrawideOverlays.Utils
 
     public static class FileHandlerUtil
     {
-        private static readonly HashSet<string> _validImageExtensions = [ImageExtension.PNG, ImageExtension.BMP, ImageExtension.JPG, ImageExtension.JPEG];
+        private static readonly HashSet<string> _validImageExtensions = 
+            [
+            ImageExtension.PNG,
+            ImageExtension.BMP, 
+            ImageExtension.JPG, 
+            ImageExtension.JPEG,
+            ImageExtension.GIF
+            ];
 
         /// <summary>
         /// Returns file name without extension.
@@ -80,9 +88,7 @@ namespace UltrawideOverlays.Utils
 
         public static bool IsValidImagePath(Uri uri)
         {
-            string fileExtension = GetFileExtension(uri.ToString());
-
-            return _validImageExtensions.Contains(fileExtension.ToLowerInvariant());
+            return IsValidImagePath(uri.LocalPath);
         }
 
         public static string? AddImageFileExtension(string filePath, ImageExtension fileExtension)
@@ -95,7 +101,7 @@ namespace UltrawideOverlays.Utils
             return null;
         }
 
-        public static string AddJSONFileExtension(string filePath) 
+        public static string AddJSONFileExtension(string filePath)
         {
             const string jsonExtension = ".json";
             if (filePath.EndsWith(jsonExtension, StringComparison.OrdinalIgnoreCase))
@@ -124,7 +130,7 @@ namespace UltrawideOverlays.Utils
             }
         }
 
-        public static bool IsValidFilePath(string path) 
+        public static bool IsValidFilePath(string path)
         {
             if (string.IsNullOrWhiteSpace(path))
             {

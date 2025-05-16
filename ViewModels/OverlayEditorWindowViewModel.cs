@@ -5,6 +5,7 @@ using CommunityToolkit.Mvvm.Input;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using UltrawideOverlays.Models;
 using UltrawideOverlays.Services;
 using UltrawideOverlays.Utils;
@@ -34,6 +35,8 @@ namespace UltrawideOverlays.ViewModels
         [ObservableProperty]
         private string? _overlayName = null;
 
+        public ImageModel? oldSelected = null;
+
         private readonly OverlayDataService _overlayDataService;
 
         ///////////////////////////////////////////
@@ -60,6 +63,16 @@ namespace UltrawideOverlays.ViewModels
                 Images = [];
             }
         }
+
+        partial void OnSelectedChanged(ImageModel? oldValue, ImageModel? newValue)
+        {
+            Debug.WriteLine($"Image selected changed from {oldValue?.ImageName} to {newValue?.ImageName}");
+            if (oldValue != null)
+            {
+                oldSelected = oldValue;
+            }
+        }
+
         ///////////////////////////////////////////
         /// COMMANDS
         ///////////////////////////////////////////
@@ -75,9 +88,13 @@ namespace UltrawideOverlays.ViewModels
         }
 
         [RelayCommand]
-        public void RemoveImageModel(ImageModel imageModel)
+        public void RemoveImageModel()
         {
-            Images.Remove(imageModel);
+            if (Selected != null)
+            {
+                Images.Remove(Selected);
+                Selected = null;
+            }
         }
 
         [RelayCommand]
@@ -87,11 +104,11 @@ namespace UltrawideOverlays.ViewModels
         }
 
         [RelayCommand]
-        public void DuplicateImageModel(ImageModel imageModel)
+        public void DuplicateImageModel()
         {
-            if (imageModel != null)
+            if (Selected != null)
             {
-                var newImage = imageModel.Clone();
+                var newImage = Selected.Clone();
                 Images.Add(newImage);
             }
         }

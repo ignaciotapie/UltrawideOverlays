@@ -1,12 +1,9 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using UltrawideOverlays.Factories;
 using UltrawideOverlays.Models;
-using UltrawideOverlays.Utils;
 
 namespace UltrawideOverlays.Services
 {
@@ -41,7 +38,7 @@ namespace UltrawideOverlays.Services
         {
             var db = await _provider.GetDatabaseAsync();
             var tasks = new List<Task>();
-            if (createImage) 
+            if (createImage)
             {
                 tasks.Add(db.SaveBitmapFromOverlayAsync(overlay));
             }

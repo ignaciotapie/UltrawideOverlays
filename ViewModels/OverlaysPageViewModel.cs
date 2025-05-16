@@ -2,10 +2,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Threading.Tasks;
 using UltrawideOverlays.Factories;
 using UltrawideOverlays.Models;
 using UltrawideOverlays.Services;
@@ -62,6 +59,11 @@ namespace UltrawideOverlays.ViewModels
                     {
                         Overlays.Add(overlay);
                     }
+                    //Default to first overlay
+                    if (Overlays.Count > 0)
+                    {
+                        SelectedOverlayIndex = 0;
+                    }
                 }
             }
             catch (Exception ex)
@@ -95,7 +97,7 @@ namespace UltrawideOverlays.ViewModels
             if (factory == null) return;
             if (SelectedOverlayIndex < 0 || SelectedOverlayIndex >= Overlays.Count)
             {
-
+                return; // No overlay selected
             }
 
             var window = factory.CreateWindow(Enums.WindowViews.OverlayEditorWindow, Overlays[SelectedOverlayIndex]);
