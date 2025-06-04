@@ -18,11 +18,22 @@
   </ItemGroup>
 
   <ItemGroup>
+    <AvaloniaResource Remove="Assets\Images\clipping-mask.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="Assets\Images\clipping-mask.png" />
     <None Remove="Assets\Images\copy-icon.svg" />
     <None Remove="Assets\Images\delete-icon.svg" />
     <None Remove="Assets\Images\home-logo.svg" />
     <None Remove="Assets\Images\settings-icon.svg" />
     <None Remove="Assets\Images\tv-icon-white.svg" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Assets\Images\clipping-mask.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
   </ItemGroup>
 
   <ItemGroup>
@@ -40,6 +51,9 @@
     </PackageReference>
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
     <PackageReference Include="Interop.UIAutomationClient" Version="10.19041.0" />
+    <PackageReference Include="Magick.NET-Q16-x64" Version="14.6.0" />
+    <PackageReference Include="Magick.NET.AvaloniaMediaImaging" Version="1.1.1" />
+    <PackageReference Include="Magick.NET.Core" Version="14.6.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.3" />
     <PackageReference Include="System.Reactive" Version="6.0.1" />
   </ItemGroup>

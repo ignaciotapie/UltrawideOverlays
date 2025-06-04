@@ -141,6 +141,13 @@ namespace UltrawideOverlays.CustomControls
             {
                 var pointerPos = e.GetPosition(this);
                 var newPos = pointerPos - _dragOffset;
+
+                if (GetPosition(_draggedControl) == newPos)
+                {
+                    // No movement, no need to update position
+                    return;
+                }
+
                 SetPosition(_draggedControl, newPos);
             }
         }

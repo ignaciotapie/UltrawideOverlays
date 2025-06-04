@@ -35,8 +35,8 @@
 
     <cc:DragGridControl Color="{Binding PreviewColor}" Preview="{Binding PreviewEnabled}" GridOpacity="{Binding PreviewOpacity}" GridSize="{Binding PreviewSize}" x:Name="MainDragGrid">
         <Border x:Name="PropertiesBorder" cc:DragPanel.Position="1320, 420" cc:DragPanel.SnapToGrid="false" ZIndex="99" BorderThickness="0, 20, 0, 0" Margin="0, -10, 0 ,0" Background="{DynamicResource PrimaryAccent}">
-            <Grid ColumnDefinitions="*, *, *" RowDefinitions="50, *" Width="800" Height="600" Background="{DynamicResource SecondaryColor}">
-
+            <Grid ColumnDefinitions="*, *, *" RowDefinitions="50, *, 50" Width="800" Height="600" Background="{DynamicResource SecondaryColor}">
+    
                 <!-- Column 0: Images-->
                 <RelativePanel>
                     <Label x:Name="ImageLabel" RelativePanel.AlignVerticalCenterWithPanel="True" RelativePanel.AlignHorizontalCenterWithPanel="True" >Images</Label>
@@ -56,7 +56,7 @@
                     </Button>
                 </RelativePanel>
                 
-                <ListBox x:Name="Images_ListBox" Background="Transparent" Grid.Row="1" ItemsSource="{Binding Images}" BorderBrush="Black" BorderThickness="1,1,1,0" SelectedItem="{Binding Selected}" AutoScrollToSelectedItem="True">
+                <ListBox x:Name="Images_ListBox" Background="Transparent" Grid.Row="1" ItemsSource="{Binding Images}" BorderBrush="Black" BorderThickness="1" SelectedItem="{Binding Selected, Mode=TwoWay}" AutoScrollToSelectedItem="True">
                     <ListBox.ItemTemplate>
                         <DataTemplate>
                             <StackPanel Orientation="Horizontal">
@@ -134,7 +134,7 @@
                 </StackPanel>
 
                 <!-- Grid Decorations -->
-                <StackPanel Grid.ColumnSpan="2" Grid.Column="1" Grid.Row="1" Orientation="Horizontal" VerticalAlignment="Bottom" HorizontalAlignment="Right">
+                <StackPanel Grid.ColumnSpan="2" Grid.Column="1" Grid.Row="2" Orientation="Horizontal" VerticalAlignment="Bottom" HorizontalAlignment="Right">
                     <TextBox x:Name="OverlayNameBox" Height="20" Width="120" Watermark="Overlay Name" VerticalContentAlignment="Bottom" HorizontalContentAlignment="Right" Text="{Binding OverlayName, Mode=TwoWay}"></TextBox>
                     <Button x:Name="AcceptButton" Click="AcceptButton_Click">Accept</Button>
                     <Button x:Name="CancelButton" Click="CancelButton_Click">Cancel</Button>

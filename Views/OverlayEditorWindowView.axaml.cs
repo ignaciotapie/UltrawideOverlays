@@ -36,9 +36,9 @@ public partial class OverlayEditorWindowView : Window
         var screen = Screens.Primary;
         if (screen != null)
         {
-            this.Width = screen.Bounds.Width;
-            this.Height = screen.Bounds.Height;
-            this.Position = new PixelPoint(0, 0);
+            Width = screen.Bounds.Width;
+            Height = screen.Bounds.Height;
+            Position = new PixelPoint(0, 0);
         }
 
         dragGridControl = MainDragGrid;
@@ -130,6 +130,9 @@ public partial class OverlayEditorWindowView : Window
         }
     }
 
+    ///////////////////////////////////////////
+    /// PRIVATE FUNCTIONS
+    ///////////////////////////////////////////
     private void DataContext_PropertyChanging(object? sender, PropertyChangingEventArgs e)
     {
         if (e.PropertyName == nameof(OverlayEditorWindowViewModel.Selected))
@@ -147,6 +150,7 @@ public partial class OverlayEditorWindowView : Window
             modelImageDictionary[vmInstance.Selected].IsSelected = true;
         }
     }
+
 
     ///////////////////////////////////////////
     /// PRIVATE FUNCTIONS
@@ -248,7 +252,7 @@ public partial class OverlayEditorWindowView : Window
     private void OnSelectableImageSelected(object? sender, object e)
     {
         var image = sender as SelectableImage;
-        var im = image != null ? image.imageModel : null;
+        var im = image != null ? image.ImageModel : null;
 
         if (im == null) return;
 
@@ -311,8 +315,7 @@ public partial class OverlayEditorWindowView : Window
             return;
         }
 
-
-        var pixelSize = new PixelSize((int)this.Bounds.Width, (int)this.Bounds.Height);
+        var pixelSize = new PixelSize((int)Bounds.Width, (int)Bounds.Height);
         var overlayName = OverlayNameBox.Text;
 
         if (vmInstance != null && vmInstance.CreateOverlayCommand.CanExecute(pixelSize))
@@ -329,10 +332,15 @@ public partial class OverlayEditorWindowView : Window
 
     private void CloseWindow()
     {
+        ImageCache.ClearCache();
         this.Close();
     }
 
     private void AddClippingMaskButton_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
     {
+        if (vmInstance != null && vmInstance.AddClippingMaskCommand.CanExecute(null))
+        {
+            vmInstance.AddClippingMaskCommand.Execute(null);
+        }
     }
 }

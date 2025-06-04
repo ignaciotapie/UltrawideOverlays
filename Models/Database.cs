@@ -1,4 +1,5 @@
 ﻿using Avalonia.Media.Imaging;
+using Avalonia.Threading;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -208,7 +209,8 @@ namespace UltrawideOverlays.Models
             string path = Path.Combine(DatabasePaths.ImagesPath, FileHandlerUtil.AddImageFileExtension(overlayData.Name, ImageExtension.PNG)!);
             overlayData.Path = path;
 
-            await Task.Run(() => SaveBitmap(overlayData, path));
+            Dispatcher.UIThread.Post(() => SaveBitmap(overlayData, path));
+            await Task.CompletedTask;
         }
 
         private void SaveBitmap(OverlayDataModel overlayData, string path)
