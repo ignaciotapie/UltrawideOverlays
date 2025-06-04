@@ -1,8 +1,6 @@
 ﻿using Avalonia;
 using Avalonia.Controls;
 using System;
-using System.ComponentModel;
-using System.Reactive;
 using System.Reactive.Linq;
 
 namespace UltrawideOverlays.CustomControls

@@ -1,5 +1,6 @@
 ﻿using Avalonia;
 using CommunityToolkit.Mvvm.ComponentModel;
+using System;
 
 namespace UltrawideOverlays.Models
 {
@@ -49,14 +50,40 @@ namespace UltrawideOverlays.Models
             }
         }
 
-        [ObservableProperty]
-        private int _width;
+        private double _originalWidth;
+        private double _originalHeight;
+        public double OriginalWidth
+        {
+            get => _originalWidth;
+            set => _originalWidth = value;
+        }
+        public double OriginalHeight
+        {
+            get => _originalHeight;
+            set => _originalHeight = value;
+        }
 
         [ObservableProperty]
-        private int _height;
+        private double _width;
 
         [ObservableProperty]
+        private double _height;
+
         private double _scale = 1;
+
+        public double Scale
+        {
+            get => _scale;
+            set
+            {
+                if (SetProperty(ref _scale, value))
+                {
+                    Width = Math.Max(1, OriginalWidth * value);
+                    Height = Math.Max(1, OriginalHeight * value);
+                    _scale = value;
+                }
+            }
+        }
 
         [ObservableProperty]
         private bool _isHMirrored = false;
@@ -72,21 +99,5 @@ namespace UltrawideOverlays.Models
 
         [ObservableProperty]
         private bool _isDraggable = true;
-
-        public override ImagePropertiesModel Clone()
-        {
-            return new ImagePropertiesModel
-            {
-                Position = Position,
-                Width = Width,
-                Height = Height,
-                Scale = Scale,
-                IsHMirrored = IsHMirrored,
-                IsVMirrored = IsVMirrored,
-                Opacity = Opacity,
-                IsVisible = IsVisible,
-                IsDraggable = IsDraggable
-            };
-        }
     }
 }

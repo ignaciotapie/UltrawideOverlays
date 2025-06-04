@@ -28,6 +28,7 @@
         <SvgSource x:Key="GamesLogo">/Assets/Images/joystick-logo.svg</SvgSource>
         <SvgSource x:Key="CopyIcon">/Assets/Images/copy-icon.svg</SvgSource>
         <SvgSource x:Key="DeleteIcon">/Assets/Images/delete-icon.svg</SvgSource>
+        <Image x:Key="ClippingMask">/Assets/Images/clipping-mask.png</Image>
     </Application.Resources>
   
     <Application.Styles>

@@ -35,8 +35,6 @@ namespace UltrawideOverlays.ViewModels
         [ObservableProperty]
         private string? _overlayName = null;
 
-        public ImageModel? oldSelected = null;
-
         private readonly OverlayDataService _overlayDataService;
 
         ///////////////////////////////////////////
@@ -57,6 +55,10 @@ namespace UltrawideOverlays.ViewModels
             {
                 OverlayName = existingModel.Name;
                 Images = new ObservableCollection<ImageModel>(existingModel.ImageModels);
+                foreach (var clippingMask in existingModel.ClippingMaskModels)
+                {
+                    Images.Add(clippingMask);
+                }
             }
             else
             {
@@ -67,10 +69,6 @@ namespace UltrawideOverlays.ViewModels
         partial void OnSelectedChanged(ImageModel? oldValue, ImageModel? newValue)
         {
             Debug.WriteLine($"Image selected changed from {oldValue?.ImageName} to {newValue?.ImageName}");
-            if (oldValue != null)
-            {
-                oldSelected = oldValue;
-            }
         }
 
         ///////////////////////////////////////////
@@ -120,11 +118,33 @@ namespace UltrawideOverlays.ViewModels
 
             var overlay = new OverlayDataModel();
             overlay.Name = name;
-            overlay.ImageModels = new List<ImageModel>(Images);
+
+            overlay.ImageModels = new List<ImageModel>();
+            overlay.ClippingMaskModels = new List<ClippingMaskModel>();
+            for (int i = 0; i < Images.Count; i++)
+            {
+                if (Images[i] is ClippingMaskModel clippingMask)
+                {
+                    overlay.ClippingMaskModels.Add(clippingMask);
+                }
+                else 
+                {
+                    overlay.ImageModels.Add(Images[i]);
+                }
+            }
+
             overlay.Width = pixelSize.Width;
             overlay.Height = pixelSize.Height;
 
             _ = _overlayDataService.SaveOverlayAsync(overlay);
+        }
+
+        [RelayCommand]
+        public void AddClippingMask()
+        {
+            //TODO default?
+            var clippingMask = new ClippingMaskModel(new RectangleGeometry(new Rect(0, 0, 800, 800)));
+            Images.Add(clippingMask);
         }
     }
 }
