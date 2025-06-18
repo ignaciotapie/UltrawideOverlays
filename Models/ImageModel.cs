@@ -35,7 +35,7 @@ namespace UltrawideOverlays.Models
             {
                 throw new ArgumentException($"Invalid image path: {imagePath}");
             }
-            
+
             using (var fileStream = new FileStream(imagePath, FileMode.Open, FileAccess.Read, FileShare.Read))
             {
                 using (var image = new Bitmap(fileStream))

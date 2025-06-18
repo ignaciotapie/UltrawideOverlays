@@ -2,7 +2,9 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
+using Avalonia.Markup.Xaml.Converters;
 using Avalonia.Platform.Storage;
+using Eremex.AvaloniaUI.Controls.Editors.Visuals;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -29,7 +31,6 @@ public partial class OverlayEditorWindowView : Window
     public OverlayEditorWindowView()
     {
         InitializeComponent();
-
         PositionProperties();
 
         //TODO: Make screen agnostic
@@ -332,7 +333,6 @@ public partial class OverlayEditorWindowView : Window
 
     private void CloseWindow()
     {
-        ImageCache.ClearCache();
         this.Close();
     }
 
@@ -341,6 +341,24 @@ public partial class OverlayEditorWindowView : Window
         if (vmInstance != null && vmInstance.AddClippingMaskCommand.CanExecute(null))
         {
             vmInstance.AddClippingMaskCommand.Execute(null);
+        }
+    }
+
+    private void MirrorPositionButtonX_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    {
+        if (vmInstance != null)
+        {
+            var pixelSize = new PixelSize((int)Bounds.Width, (int)Bounds.Height);
+            vmInstance.MirrorPositionXCommand.Execute(pixelSize);
+        }
+    }
+
+    private void MirrorPositionButtonY_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    {
+        if (vmInstance != null)
+        {
+            var pixelSize = new PixelSize((int)Bounds.Width, (int)Bounds.Height);
+            vmInstance.MirrorPositionYCommand.Execute(pixelSize);
         }
     }
 }

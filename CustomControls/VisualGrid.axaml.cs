@@ -19,10 +19,10 @@ public partial class VisualGrid : UserControl
         set => SetValue(GridSizeProperty, value);
     }
 
-    public static readonly StyledProperty<Color?> ColorProperty =
-        AvaloniaProperty.Register<VisualGrid, Color?>("Color");
+    public static readonly StyledProperty<IBrush?> ColorProperty =
+        AvaloniaProperty.Register<VisualGrid, IBrush?>("Color");
 
-    public Color? Color
+    public IBrush? Color
     {
         get => GetValue(ColorProperty);
         set => SetValue(ColorProperty, value);
@@ -80,7 +80,7 @@ public partial class VisualGrid : UserControl
             {
                 return;
             }
-            var pen = new Pen(Color.GetValueOrDefault().ToUInt32(), 1);
+            var pen = new Pen(Color, 1);
             for (int i = 0; i < DesiredSize.Width; i += GridSize.Value)
             {
                 context.DrawLine(pen, new Point(i, 0), new Point(i, DesiredSize.Height));

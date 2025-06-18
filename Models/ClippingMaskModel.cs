@@ -1,8 +1,4 @@
-﻿using Avalonia;
-using Avalonia.Media;
-using System;
-using System.Resources;
-using UltrawideOverlays.Utils;
+﻿using Avalonia.Media;
 
 namespace UltrawideOverlays.Models
 {

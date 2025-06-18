@@ -10,6 +10,8 @@
     <Design.DataContext>
         <vm:HomePageViewModel/>
     </Design.DataContext>
-    
-    <Label Content="{Binding HomePageName}"/>
+
+    <Border Background="{DynamicResource PrimaryBackground}">
+        <Label Content="{Binding HomePageName}"/>
+    </Border>
 </UserControl>

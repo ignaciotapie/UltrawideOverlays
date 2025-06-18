@@ -1,10 +1,9 @@
 ﻿using Avalonia;
 using Avalonia.Controls;
-using ExCSS;
+using Avalonia.Media;
 using System;
 using System.Collections.Specialized;
 using System.Linq;
-using Color = Avalonia.Media.Color;
 
 namespace UltrawideOverlays.CustomControls
 {
@@ -42,10 +41,10 @@ namespace UltrawideOverlays.CustomControls
             set => SetValue(PreviewProperty, value);
         }
 
-        public static readonly StyledProperty<Color?> ColorProperty =
-            AvaloniaProperty.Register<DragGridControl, Color?>(nameof(Color));
+        public static readonly StyledProperty<IBrush?> ColorProperty =
+            AvaloniaProperty.Register<DragGridControl, IBrush?>(nameof(Color));
 
-        public Color? Color
+        public IBrush? Color
         {
             get => this.GetValue(ColorProperty);
             set => SetValue(ColorProperty, value);
@@ -92,7 +91,7 @@ namespace UltrawideOverlays.CustomControls
                 // Update the grid brush of the DragPanelLayout
                 if (VisualGrid != null)
                 {
-                    VisualGrid.Color = (Color)change.NewValue!;
+                    VisualGrid.Color = (IBrush)change.NewValue!;
                 }
             }
             else if (change.Property == PreviewProperty)

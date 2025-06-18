@@ -6,9 +6,11 @@ namespace UltrawideOverlays.ViewModels
     {
         [ObservableProperty]
         private string _settingsPageName = "Settings Page";
+
         public SettingsPageViewModel()
         {
-            PageName = Enums.ApplicationPageViews.SettingsPage;
+            Page = Enums.ApplicationPageViews.SettingsPage;
+            PageName = "Settings";
         }
     }
 }

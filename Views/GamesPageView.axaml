@@ -9,5 +9,9 @@
     <Design.DataContext>
         <vm:GamesPageViewModel/>
     </Design.DataContext>
-    <Label Content="{Binding GamesPageTitle}"/>
+
+    <Border Background="{DynamicResource PrimaryBackground}">
+        
+    </Border>
+    
 </UserControl>

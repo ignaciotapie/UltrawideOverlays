@@ -47,5 +47,12 @@ namespace UltrawideOverlays.Services
 
             await Task.WhenAll(tasks);
         }
+
+        public async Task DeleteOverlayAsync(OverlayDataModel overlay)
+        {
+            var db = await _provider.GetDatabaseAsync();
+
+            await db.DeleteAsync(overlay, DatabaseFiles.Overlays);
+        }
     }
 }

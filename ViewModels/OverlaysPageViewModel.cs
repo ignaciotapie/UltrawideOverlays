@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using System;
 using System.Collections.ObjectModel;
+using UltrawideOverlays.Converters;
 using UltrawideOverlays.Factories;
 using UltrawideOverlays.Models;
 using UltrawideOverlays.Services;
@@ -13,6 +14,10 @@ namespace UltrawideOverlays.ViewModels
     {
         [ObservableProperty]
         private string _overlaysPageName = "Overlays Page";
+
+        [ObservableProperty]
+        private OverlayDataModel? _selectedOverlay;
+
         [ObservableProperty]
         private int _selectedOverlayIndex;
 
@@ -26,7 +31,9 @@ namespace UltrawideOverlays.ViewModels
         /// </summary>
         public OverlaysPageViewModel()
         {
-            PageName = Enums.ApplicationPageViews.OverlaysPage;
+            Page = Enums.ApplicationPageViews.OverlaysPage;
+            PageName = "Overlays";
+
             Overlays = [];
 
             if (Design.IsDesignMode)
@@ -39,7 +46,9 @@ namespace UltrawideOverlays.ViewModels
 
         public OverlaysPageViewModel(OverlayDataService service, WindowFactory WFactory)
         {
-            PageName = Enums.ApplicationPageViews.OverlaysPage;
+            Page = Enums.ApplicationPageViews.OverlaysPage;
+            PageName = "Overlays";
+
             Overlays = new ObservableCollection<OverlayDataModel>();
             factory = WFactory;
             overlayDataService = service;
@@ -70,6 +79,18 @@ namespace UltrawideOverlays.ViewModels
             {
                 // Log or handle error
                 System.Diagnostics.Debug.WriteLine($"Error loading overlays: {ex.Message}");
+            }
+        }
+
+        partial void OnSelectedOverlayChanged(OverlayDataModel? value)
+        {
+            if (value != null)
+            {
+                SelectedOverlayIndex = Overlays.IndexOf(value);
+            }
+            else
+            {
+                SelectedOverlayIndex = -1; // No overlay selected
             }
         }
 
@@ -106,6 +127,24 @@ namespace UltrawideOverlays.ViewModels
             window.Closed += OverlayWindowClosed;
         }
 
+        [RelayCommand]
+        private void DeleteButton()
+        {
+            if (SelectedOverlayIndex < 0 || SelectedOverlayIndex >= Overlays.Count)
+            {
+                return; // No overlay selected
+            }
+
+            var overlayToDelete = Overlays[SelectedOverlayIndex];
+            Overlays.RemoveAt(SelectedOverlayIndex);
+
+            // Optionally, you can also delete the overlay from the database
+            if (overlayDataService != null)
+            {
+                overlayDataService.DeleteOverlayAsync(overlayToDelete);
+            }
+        }
+
         ///////////////////////////////////////////
         /// PRIVATE FUNCTIONS
         ///////////////////////////////////////////
@@ -116,7 +155,7 @@ namespace UltrawideOverlays.ViewModels
             {
                 window.Closed -= OverlayWindowClosed;
             }
-
+            PathToBitmapConverter.CleanCache();
             LoadOverlaysAsync();
         }
     }

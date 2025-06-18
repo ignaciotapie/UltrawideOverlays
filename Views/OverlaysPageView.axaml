@@ -3,40 +3,70 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="using:UltrawideOverlays.ViewModels"
-             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-             Background="{DynamicResource SecondaryColor}"
+             xmlns:cc="using:UltrawideOverlays.CustomControls"
+             xmlns:converters="using:UltrawideOverlays.Converters"
+             xmlns:models="using:UltrawideOverlays.Models"
+             mc:Ignorable="d" d:DesignWidth="1000" d:DesignHeight="800"
+             Background="{DynamicResource PrimaryBackground}"
              x:DataType="vm:OverlaysPageViewModel"
              x:Class="UltrawideOverlays.Views.OverlaysPageView">
     <Design.DataContext>
         <vm:OverlaysPageViewModel/>
     </Design.DataContext>
 
-    <Grid ColumnDefinitions="*, *" RowDefinitions="100, *, *">
-        <!-- Banner-->
-        <Border Grid.Row="0" Grid.ColumnSpan="2" Background="{DynamicResource PrimaryColor}">
-            <Label VerticalAlignment="Center" HorizontalAlignment="Center">Overlays</Label>
-        </Border>
+    <Border Margin="10">
+        <Grid RowDefinitions="70,2*,*">
+            <RelativePanel Grid.ColumnSpan="2">
+                <StackPanel Name="OverlaysTitlePanel">
+                    <Label Name="Title" Classes="Title" Margin="0,-10" FontSize="24">Your Overlays</Label>
+                    <Label RelativePanel.Below="Title"  Name="Subtitle" Classes="Subtitle" FontSize="16">Manage and customize your overlays</Label>
+                </StackPanel>
 
-        <!-- Content-->
-        <StackPanel Grid.Row="1" Margin="10" Spacing="10">
-            <Label HorizontalAlignment="Center">Existing Overlays</Label>
-            <Border Background="{DynamicResource PrimaryBackground}">
-                <ListBox ItemsSource="{Binding Overlays}" SelectedIndex="{Binding SelectedOverlayIndex, Mode=TwoWay}">
-                    <ListBox.ItemTemplate>
-                        <DataTemplate>
-                            <StackPanel Orientation="Horizontal">
-                                <Label Content="{Binding Name}"/>
-                                <Label Content="{Binding Path}"/>
-                            </StackPanel>
-                        </DataTemplate>
-                    </ListBox.ItemTemplate>
-                </ListBox>
-            </Border>
-        </StackPanel>
+                <Button RelativePanel.LeftOf="EditButton" RelativePanel.AlignVerticalCenterWith="NewOverlayButton" Classes="Primary" Name="RemoveButton" Margin="0,0,8,0" IsVisible="{Binding SelectedOverlay, Converter={x:Static ObjectConverters.IsNotNull}}" Background="DarkRed" Command="{Binding DeleteButtonCommand}">
+                    Remove
+                </Button>
 
-        <StackPanel Orientation="Vertical" Grid.Row="1" Grid.Column="1" VerticalAlignment="Center">
-            <Button Content="Add New +" VerticalAlignment="Top" Command="{Binding AddNewButtonCommand}"></Button>
-            <Button Grid.Column="1" Content="Edit" VerticalAlignment="Top" Command="{Binding EditButtonCommand}"></Button>
-        </StackPanel>
-    </Grid>
+                <Button RelativePanel.LeftOf="NewOverlayButton" RelativePanel.AlignVerticalCenterWith="NewOverlayButton" Classes="Primary" Name="EditButton" Margin="0,0,8,0" IsVisible="{Binding SelectedOverlay, Converter={x:Static ObjectConverters.IsNotNull}}" Command="{Binding EditButtonCommand}">
+                    Edit
+                </Button>
+
+                <Button RelativePanel.AlignRightWithPanel="True" RelativePanel.AlignVerticalCenterWith="OverlaysTitlePanel" Classes="Primary" Background="#005c92" Name="NewOverlayButton" Margin="0,0,10,0" Command="{Binding AddNewButtonCommand}">
+                    + Add New Overlay
+                </Button>
+            </RelativePanel>
+
+            <Grid Grid.Row="1">
+                <Border CornerRadius="10" Background="{DynamicResource PrimaryColor}">
+                    <cc:VisualGrid Color="#16212c" GridSize="20">
+                    </cc:VisualGrid>
+                </Border>
+                <cc:ScalableImage Source="{Binding SelectedOverlay.Path, Converter={x:Static converters:PathToBitmapConverter.Converter}}"/>
+            </Grid>
+
+            <cc:ListCarouselPanel Grid.Row="2" ItemsSource="{Binding Overlays}" Selected="{Binding SelectedOverlay, Mode=TwoWay}">
+                <cc:ListCarouselPanel.ItemTemplate>
+                    <DataTemplate x:DataType="models:OverlayDataModel">
+                        <cc:SelectableBorder Margin="20" Padding="1" SelectedBrush="{DynamicResource SecondaryAccent}" CornerRadius="10">
+                            <Border Background="{DynamicResource PrimaryColor}" BorderBrush="{DynamicResource PrimaryAccent}" CornerRadius="10" BorderThickness="1">
+                                <StackPanel Margin="15" Spacing="5" Width="250">
+                                    <Label Content="{Binding Name}" Classes="Title" FontSize="16"/>
+                                    <StackPanel Orientation="Horizontal">
+                                        <Label Content="{Binding Width}"/>
+                                        <Label Content="x"/>
+                                        <Label Content="{Binding Height}"/>
+                                    </StackPanel>
+                                    <RelativePanel>
+                                        <Label Name="ModifiedLabel" RelativePanel.AlignBottomWithPanel="True" Content="{Binding LastModified}"></Label>
+                                        <Label RelativePanel.AlignBottomWithPanel="True" RelativePanel.LeftOf="ElementsLabel" RelativePanel.AlignVerticalCenterWith="ElementsLabel" Content="{Binding NumberOfImages}" Classes="Subtitle" FontSize="16" Padding="0" VerticalAlignment="Top"/>
+                                        <Label RelativePanel.AlignBottomWithPanel="True" RelativePanel.AlignRightWithPanel="True" Name="ElementsLabel" Content="Elements" Classes="Subtitle" FontSize="16"/>
+                                    </RelativePanel>
+                                </StackPanel>
+                            </Border>
+                        </cc:SelectableBorder>
+                    </DataTemplate>
+                </cc:ListCarouselPanel.ItemTemplate>
+            </cc:ListCarouselPanel>
+            
+        </Grid>
+    </Border>
 </UserControl>

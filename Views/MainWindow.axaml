@@ -4,31 +4,36 @@
         xmlns:view="using:UltrawideOverlays.Views"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        mc:Ignorable="d" d:DesignWidth="1024" d:DesignHeight="768"
-        Width="1024" Height="768"
+        mc:Ignorable="d" d:DesignWidth="1436" d:DesignHeight="1020"
+        Width="1436" Height="1020"
+        ExtendClientAreaToDecorationsHint="True"
+        Background="Transparent"
         x:Class="UltrawideOverlays.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
         Title="UltrawideOverlays">
 
     <Design.DataContext>
-        <!-- This only sets the DataContext for the previewer in an IDE,
-             to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
         <vm:MainWindowViewModel/>
     </Design.DataContext>
-    
-    <Grid ColumnDefinitions="200,*" Background="{DynamicResource SecondaryColor}">
-        <!-- Page Views -->
-        <ContentControl Grid.Column="2" Content="{Binding CurrentPage}"/>
 
+    <Grid RowDefinitions="32, *" ColumnDefinitions="220, *">
+        <Border Grid.ColumnSpan="2" Grid.RowSpan="2" IsHitTestVisible="False" Background="{DynamicResource PrimaryColor}" CornerRadius="10,10,0,0"/>
         <!-- Tab Section-->
-        <Border Background="{DynamicResource PrimaryColor}">
+        <Border>
             <StackPanel Margin="0, 20" Spacing="20" VerticalAlignment="Stretch" HorizontalAlignment="Center">
-                <Image Width="64" Height="64" HorizontalAlignment="Center" VerticalAlignment="Top">
-                    <Image.Source>
-                        <SvgImage Source="{StaticResource TvLogo}"/>
-                    </Image.Source>
-                </Image>
-                <Button Background="Transparent" HorizontalAlignment="Stretch" VerticalAlignment="Bottom" Command="{Binding NavigateToHomePageCommand}">
+                <StackPanel Orientation="Horizontal" Spacing="10">
+                    <Image Name="Logo" Width="64" Height="64" HorizontalAlignment="Center" VerticalAlignment="Top">
+                        <Image.Source>
+                            <SvgImage Source="{StaticResource TvLogo}"/>
+                        </Image.Source>
+                    </Image>
+                    <StackPanel VerticalAlignment="Center">
+                        <Label Classes="Title">UWOverlays</Label>
+                        <Label Classes="Subtitle" FontWeight="Normal">v1.0.0</Label>
+                    </StackPanel>
+                </StackPanel>
+
+                <Button Classes="TabButton" Background="Transparent" HorizontalAlignment="Stretch" VerticalAlignment="Bottom" Command="{Binding NavigateToHomePageCommand}">
                     <Button.Content>
                         <StackPanel Orientation="Horizontal" Spacing="10">
                             <Image Classes="TabIcon">
@@ -40,7 +45,7 @@
                         </StackPanel>
                     </Button.Content>
                 </Button>
-                <Button Background="Transparent" HorizontalAlignment="Stretch" VerticalAlignment="Bottom" Command="{Binding NavigateToGamesPageCommand}">
+                <Button Classes="TabButton" Background="Transparent" HorizontalAlignment="Stretch" VerticalAlignment="Bottom" Command="{Binding NavigateToGamesPageCommand}">
                     <Button.Content>
                         <StackPanel Orientation="Horizontal" Spacing="10">
                             <Image Classes="TabIcon">
@@ -52,7 +57,7 @@
                         </StackPanel>
                     </Button.Content>
                 </Button>
-                <Button Background="Transparent" HorizontalAlignment="Stretch" VerticalAlignment="Bottom" Command="{Binding NavigateToOverlaysPageCommand}">
+                <Button Classes="TabButton" Background="Transparent" HorizontalAlignment="Stretch" VerticalAlignment="Bottom" Command="{Binding NavigateToOverlaysPageCommand}">
                     <Button.Content>
                         <StackPanel Orientation="Horizontal" Spacing="10">
                             <Image Classes="TabIcon">
@@ -64,8 +69,8 @@
                         </StackPanel>
                     </Button.Content>
                 </Button>
-                
-                <Button Background="Transparent" HorizontalAlignment="Stretch" VerticalAlignment="Bottom" Command="{Binding NavigateToSettingsPageCommand}">
+
+                <Button Classes="TabButton" Background="Transparent" HorizontalAlignment="Stretch" VerticalAlignment="Bottom" Command="{Binding NavigateToSettingsPageCommand}">
                     <Button.Content>
                         <StackPanel Orientation="Horizontal" Spacing="10">
                             <Image Classes="TabIcon">
@@ -79,5 +84,10 @@
                 </Button>
             </StackPanel>
         </Border>
+        <!-- Page Views -->
+        <Border Grid.Row="1" Grid.Column="1" BorderBrush="{DynamicResource PrimaryAccent}" BorderThickness="1,1,0,0">
+            <ContentControl Content="{Binding CurrentPage}"/>
+        </Border>
+
     </Grid>
 </Window>

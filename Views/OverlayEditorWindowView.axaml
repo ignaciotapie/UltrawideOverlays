@@ -11,6 +11,7 @@
         xmlns:vm="using:UltrawideOverlays.ViewModels"
         xmlns:cc="using:UltrawideOverlays.CustomControls"
         xmlns:locators="using:UltrawideOverlays.Locators"
+        xmlns:media="using:Avalonia.Media"
         x:Class="UltrawideOverlays.Views.OverlayEditorWindowView"
         DragDrop.AllowDrop="True"
         CanResize="False"
@@ -20,13 +21,18 @@
 
     <Window.Resources>
         <converter:NumberToStringConverter x:Key="numberToStringConverter"/>
+        <converter:BrushToColorConverter x:Key="brushToColorConverter"/>
     </Window.Resources>
 
     <Window.Styles>
         <Style Selector="Label">
             <Setter Property="Foreground" Value="{DynamicResource PrimaryFontColor}"/>
             <Setter Property="VerticalAlignment" Value="Center"/>
-            <Setter Property="FontSize" Value="18"/>
+            <Setter Property="FontSize" Value="20"/>
+        </Style>
+        <Style Selector="TextBox">
+            <Setter Property="Foreground" Value="{DynamicResource PrimaryFontColor}"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
         </Style>
         <Style Selector="StackPanel">
             <Setter Property="Spacing" Value="10"/>
@@ -35,7 +41,7 @@
 
     <cc:DragGridControl Color="{Binding PreviewColor}" Preview="{Binding PreviewEnabled}" GridOpacity="{Binding PreviewOpacity}" GridSize="{Binding PreviewSize}" x:Name="MainDragGrid">
         <Border x:Name="PropertiesBorder" cc:DragPanel.Position="1320, 420" cc:DragPanel.SnapToGrid="false" ZIndex="99" BorderThickness="0, 20, 0, 0" Margin="0, -10, 0 ,0" Background="{DynamicResource PrimaryAccent}">
-            <Grid ColumnDefinitions="*, *, *" RowDefinitions="50, *, 50" Width="800" Height="600" Background="{DynamicResource SecondaryColor}">
+            <Grid ColumnDefinitions="*, *, *" RowDefinitions="50, *, 50" Width="800" Height="650" Background="{DynamicResource SecondaryColor}">
     
                 <!-- Column 0: Images-->
                 <RelativePanel>
@@ -56,19 +62,19 @@
                     </Button>
                 </RelativePanel>
                 
-                <ListBox x:Name="Images_ListBox" Background="Transparent" Grid.Row="1" ItemsSource="{Binding Images}" BorderBrush="Black" BorderThickness="1" SelectedItem="{Binding Selected, Mode=TwoWay}" AutoScrollToSelectedItem="True">
+                <ListBox x:Name="Images_ListBox" Background="Transparent" Grid.Row="1" ItemsSource="{Binding Images}" BorderBrush="{DynamicResource PrimaryAccent}" BorderThickness="1" SelectedItem="{Binding Selected, Mode=TwoWay}" AutoScrollToSelectedItem="True">
                     <ListBox.ItemTemplate>
                         <DataTemplate>
                             <StackPanel Orientation="Horizontal">
-                                <Image RenderOptions.BitmapInterpolationMode="LowQuality" Source="{Binding ImagePath, Converter={x:Static converter:PathToBitmapConverter.Converter}}"/>
-                                <TextBox BorderBrush="Transparent" Background="{DynamicResource PrimaryBackground}" Height="20" Text="{Binding ImageName, Mode=TwoWay}" Margin="5,0,0,0"/>
+                                <Image RenderOptions.BitmapInterpolationMode="LowQuality" Width="32" Height="32" Source="{Binding ImagePath, Converter={x:Static converter:PathToBitmapConverter.Converter}}"/>
+                                <TextBox BorderBrush="Transparent" Background="{DynamicResource PrimaryBackground}" Text="{Binding ImageName, Mode=TwoWay}" Margin="5,0,0,0"/>
                             </StackPanel>
                         </DataTemplate>
                     </ListBox.ItemTemplate>
                 </ListBox>
 
                 <!-- Column 1: Grid Properties-->
-                <Label Grid.Column="1" DockPanel.Dock="Top" VerticalAlignment="Center" HorizontalAlignment="Center">Grid Properties</Label>
+                <Label Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center">Grid Properties</Label>
                 <StackPanel Grid.Row="1" Grid.Column="1" Spacing="10" VerticalAlignment="Stretch" HorizontalAlignment="Center">
                     <StackPanel Orientation="Horizontal">
                         <Label>Visible Grid</Label>
@@ -76,7 +82,7 @@
                     </StackPanel>
                     <StackPanel Orientation="Horizontal">
                         <Label>Color</Label>
-                        <ColorPicker x:Name="GridColor_ColorPicker" Color="{Binding PreviewColor, Mode=TwoWay}"></ColorPicker>
+                        <ColorPicker x:Name="GridColor_ColorPicker" Color="{Binding PreviewColor, Mode=TwoWay, Converter={StaticResource brushToColorConverter}}"></ColorPicker>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal">
                         <Label>Size</Label>
@@ -84,15 +90,15 @@
                     </StackPanel>
                     <StackPanel Orientation="Horizontal">
                         <Label>Opacity</Label>
-                        <Slider x:Name="GridOpacity_Slider" HorizontalAlignment="Stretch" Width="100" Minimum="0" Maximum="1" Value="{Binding PreviewOpacity, Mode=TwoWay}"/>
+                        <Slider x:Name="GridOpacity_Slider" VerticalAlignment="Center" HorizontalAlignment="Stretch" Width="100" Minimum="0" Maximum="1" Value="{Binding PreviewOpacity, Mode=TwoWay}"/>
                         <Label Content="{Binding PreviewOpacity, Converter={x:Static converter:RoundedNumberToStringConverter.Converter}}"></Label>
                     </StackPanel>
                     <Button Click="AddClippingMaskButton_Click">Add Clipping Mask</Button>
                 </StackPanel>
 
                 <!-- Column 2: Image Properties-->
-                <Label Grid.Column="2" DockPanel.Dock="Top" VerticalAlignment="Center" HorizontalAlignment="Center">Properties</Label>
-                <StackPanel Grid.Row="1" Grid.Column="2" Spacing="10" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+                <Label Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Center">Properties</Label>
+                <StackPanel IsEnabled="{Binding PropertiesEnabled}" Grid.Row="1" Grid.Column="2" Spacing="5" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
                     <StackPanel Orientation="Horizontal">
                         <Label>Position</Label>
                         <TextBox Text="{Binding Selected.ImageProperties.PositionX, Converter={StaticResource numberToStringConverter}, Mode=TwoWay}"></TextBox>
@@ -131,11 +137,19 @@
                         <Label>Draggable</Label>
                         <CheckBox IsChecked="{Binding Selected.ImageProperties.IsDraggable, Mode=TwoWay}"></CheckBox>
                     </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <Label>Mirror Position X</Label>
+                        <Button Click="MirrorPositionButtonX_Click">Mirror</Button>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <Label>Mirror Position Y</Label>
+                        <Button Click="MirrorPositionButtonY_Click">Mirror</Button>
+                    </StackPanel>
                 </StackPanel>
 
                 <!-- Grid Decorations -->
                 <StackPanel Grid.ColumnSpan="2" Grid.Column="1" Grid.Row="2" Orientation="Horizontal" VerticalAlignment="Bottom" HorizontalAlignment="Right">
-                    <TextBox x:Name="OverlayNameBox" Height="20" Width="120" Watermark="Overlay Name" VerticalContentAlignment="Bottom" HorizontalContentAlignment="Right" Text="{Binding OverlayName, Mode=TwoWay}"></TextBox>
+                    <TextBox x:Name="OverlayNameBox" Width="150" Watermark="Overlay Name" VerticalContentAlignment="Bottom" HorizontalContentAlignment="Right" Text="{Binding OverlayName, Mode=TwoWay}"></TextBox>
                     <Button x:Name="AcceptButton" Click="AcceptButton_Click">Accept</Button>
                     <Button x:Name="CancelButton" Click="CancelButton_Click">Cancel</Button>
                 </StackPanel>

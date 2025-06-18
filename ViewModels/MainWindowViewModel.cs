@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using UltrawideOverlays.Enums;
 using UltrawideOverlays.Factories;
 
 namespace UltrawideOverlays.ViewModels
@@ -17,6 +18,8 @@ namespace UltrawideOverlays.ViewModels
         [ObservableProperty]
         private PageViewModel? _currentPage;
 
+        private ApplicationPageViews? pageEnum = null;
+
         private readonly PageFactory? factory;
 
         /// <summary>
@@ -24,7 +27,7 @@ namespace UltrawideOverlays.ViewModels
         /// </summary>
         public MainWindowViewModel()
         {
-            CurrentPage = new SettingsPageViewModel();
+            CurrentPage = new OverlaysPageViewModel();
         }
 
         public MainWindowViewModel(PageFactory PFactory)
@@ -36,41 +39,46 @@ namespace UltrawideOverlays.ViewModels
         [RelayCommand]
         private void NavigateToHomePage()
         {
-            if (factory == null)
+            if (factory == null || pageEnum == Enums.ApplicationPageViews.HomePage)
             {
                 return;
             }
             CurrentPage = factory.GetPageViewModel(Enums.ApplicationPageViews.HomePage);
+            pageEnum = Enums.ApplicationPageViews.HomePage;
         }
 
         [RelayCommand]
         private void NavigateToGamesPage()
         {
-            if (factory == null)
+            if (factory == null || pageEnum == Enums.ApplicationPageViews.GamesPage)
             {
                 return;
             }
             CurrentPage = factory.GetPageViewModel(Enums.ApplicationPageViews.GamesPage);
+            pageEnum = Enums.ApplicationPageViews.GamesPage;
         }
 
         [RelayCommand]
         private void NavigateToOverlaysPage()
         {
-            if (factory == null)
+            if (factory == null || pageEnum == Enums.ApplicationPageViews.OverlaysPage)
             {
                 return;
             }
             CurrentPage = factory.GetPageViewModel(Enums.ApplicationPageViews.OverlaysPage);
+            pageEnum = Enums.ApplicationPageViews.OverlaysPage;
         }
 
         [RelayCommand]
         private void NavigateToSettingsPage()
         {
-            if (factory == null)
+            if (factory == null || pageEnum == Enums.ApplicationPageViews.SettingsPage)
             {
                 return;
             }
+
             CurrentPage = factory.GetPageViewModel(Enums.ApplicationPageViews.SettingsPage);
+            pageEnum = Enums.ApplicationPageViews.SettingsPage;
         }
     }
 }

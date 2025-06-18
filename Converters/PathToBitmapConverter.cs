@@ -15,7 +15,7 @@ namespace UltrawideOverlays.Converters
         // Cache loaded bitmaps with full path key
         private readonly ConcurrentDictionary<string, Bitmap> _bitmapCache = new();
 
-        public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+        public object Convert(object? value, Type targetType, object? saveInCache, CultureInfo culture)
         {
             if (value is not string path || string.IsNullOrWhiteSpace(path))
                 return AvaloniaProperty.UnsetValue;
@@ -31,7 +31,10 @@ namespace UltrawideOverlays.Converters
                 if (File.Exists(fullPath))
                 {
                     var bitmap = new Bitmap(fullPath);
-                    _bitmapCache[fullPath] = bitmap;
+                    if ((saveInCache == null) || (saveInCache is bool save && save))
+                    {
+                        _bitmapCache[fullPath] = bitmap;
+                    }
                     return bitmap;
                 }
             }
@@ -56,6 +59,11 @@ namespace UltrawideOverlays.Converters
             }
 
             _bitmapCache.Clear();
+        }
+
+        public static void CleanCache() 
+        {
+            Converter.DisposeImage();
         }
     }
 }

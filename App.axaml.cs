@@ -67,9 +67,19 @@ namespace UltrawideOverlays
             collection.AddSingleton(dbProvider);
             //Data services
             collection.AddSingleton<OverlayDataService>();
+            collection.AddSingleton<GamesDataService>();
 
             collection.AddSingleton<PageFactory>();
+            collection.AddSingleton<SubviewFactory>();
             collection.AddSingleton<WindowFactory>();
+
+            //ViewModel factories
+            collection.AddTransient<Func<Enums.Subviews, ViewModelBase>>(x => vmName => vmName switch
+            {
+                Enums.Subviews.AddGameSubview => x.GetRequiredService<HomePageViewModel>(),
+                _ => throw new InvalidOperationException($"No ViewModel found for {vmName}")
+            });
+
             collection.AddTransient<Func<Enums.ApplicationPageViews, PageViewModel>>(x => pageName => pageName switch
             {
                 Enums.ApplicationPageViews.HomePage => x.GetRequiredService<HomePageViewModel>(),
@@ -89,6 +99,7 @@ namespace UltrawideOverlays
             collection.AddTransient<GamesPageViewModel>();
             collection.AddTransient<SettingsPageViewModel>();
             collection.AddTransient<OverlayEditorWindowViewModel>();
+            //SubViewModels
 
             return collection.BuildServiceProvider();
         }

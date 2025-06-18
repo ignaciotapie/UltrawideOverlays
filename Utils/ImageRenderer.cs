@@ -1,12 +1,7 @@
 ﻿using Avalonia;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
-using Avalonia.Platform;
-using ImageMagick;
-using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.IO;
 using UltrawideOverlays.Models;
 
 namespace UltrawideOverlays.Utils;
@@ -27,13 +22,54 @@ public static class ImageRenderer
                 if (!props.IsVisible || !FileHandlerUtil.IsValidImagePath(im.ImagePath))
                     continue;
 
-                using (var image = GetPropertyReadyBitmap(im))
+                var image = new Bitmap(im.ImagePath);
+
+                using (ctx.PushTransform(GetTransformMatrix(props)))
                 {
-                    ctx.DrawImage(image, new Rect(props.PositionX, props.PositionY, image.Size.Width, image.Size.Height));
-                };
+                    //For some reason the transform affects THE ENTIRE DRAWING CONTEXT (should've realized that sooner)
+                    //I THOUGHT IT ONLY AFFECTED THE IMAGES ABOUT TO BE DRAWN T_T!!
+                    //What does this mean? Grid coordinates are opposite if mirrored.
+                    //It kinda makes sense, but at the same time it doesn't, fml
+                    var positionX = props.PositionX * (props.IsHMirrored ? -1 : 1);
+                    var positionY = props.PositionY * (props.IsVMirrored ? -1 : 1);
+
+                    // Apply opacity
+                    using (ctx.PushOpacity(props.Opacity)) 
+                    {
+                        ctx.DrawImage(image, new Rect(positionX, positionY, props.Width, props.Height));
+                    }
+                }
             }
         }
         return bitmap;
+    }
+
+    public static Matrix GetTransformMatrix(ImagePropertiesModel props)
+    {
+        // Start with identity matrix
+        var matrix = Matrix.Identity;
+
+        // Apply mirroring transformations
+        if (props.IsHMirrored)
+        {
+            matrix = Matrix.CreateScale(-1, 1) * matrix;
+        }
+        if (props.IsVMirrored)
+        {
+            matrix = Matrix.CreateScale(1, -1) * matrix;
+        }
+
+        //Account for Rendering Origin being top-left
+        if (props.IsHMirrored)
+        {
+            matrix = Matrix.CreateTranslation(-props.Width, 0) * matrix;
+        }
+        if (props.IsVMirrored)
+        {
+            matrix = Matrix.CreateTranslation(0, -props.Height) * matrix;
+        }
+
+        return matrix;
     }
 
     private static Geometry CreateGeometryFromClippingMasks(IEnumerable<ClippingMaskModel> masks, PixelSize outputSize)
@@ -59,62 +95,5 @@ public static class ImageRenderer
     public static RenderTargetBitmap RenderImagesToBitmap(OverlayDataModel overlay)
     {
         return RenderImagesToBitmap(overlay.ImageModels, overlay.ClippingMaskModels, new PixelSize(overlay.Width, overlay.Height));
-    }
-
-    public static Bitmap GetPropertyReadyBitmap(ImageModel im)
-    {
-        if (!FileHandlerUtil.IsValidImagePath(im.ImagePath))
-            throw new ArgumentException($"Invalid image path: {im.ImagePath}");
-
-        var magickImage = ImageCache.GetMagickImage(im.ImagePath);
-
-        return AddProperties(magickImage, im.ImageProperties);
-    }
-
-    public static Bitmap AddProperties(MagickImage image, ImagePropertiesModel properties)
-    {
-        if (properties.IsHMirrored)
-        {
-            image.Flop();
-        }
-        if (properties.IsVMirrored)
-        {
-            image.Flip();
-        }
-        if (properties.Scale != 1.0)
-        {
-            image.Scale((uint)properties.Width, (uint)properties.Height);
-        }
-
-        return image.ToWriteableBitmap();
-    }
-}
-
-public static class ImageCache
-{
-    private static readonly ConcurrentDictionary<string, MagickImage> _cache = new();
-
-    public static MagickImage GetMagickImage(string path)
-    {
-        if (_cache.TryGetValue(path, out var cached))
-        {
-            return (MagickImage)cached.Clone();
-        }
-
-        using (var fs = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read))
-        {
-            var image = new MagickImage(fs);
-            _cache[path] = (MagickImage)image.Clone();
-            return image;
-        }
-    }
-
-    public static void ClearCache()
-    {
-        foreach (var kvp in _cache)
-        {
-            kvp.Value.Dispose();
-        }
-        _cache.Clear();
     }
 }

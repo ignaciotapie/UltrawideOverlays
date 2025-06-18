@@ -8,7 +8,8 @@ namespace UltrawideOverlays.ViewModels
         private string _homePageName = "Home Page";
         public HomePageViewModel()
         {
-            PageName = Enums.ApplicationPageViews.HomePage;
+            Page = Enums.ApplicationPageViews.HomePage;
+            PageName = "Home";
         }
     }
 }

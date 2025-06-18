@@ -7,14 +7,9 @@
         x:Class="UltrawideOverlays.Views.SettingsPageView"
         x:DataType="vm:SettingsPageViewModel">
 
-    <Grid ColumnDefinitions="*, *" RowDefinitions="100, *, *">
-        <!-- Banner-->
-        <Border Grid.Row="0" Grid.ColumnSpan="2" Background="{DynamicResource PrimaryColor}">
-            <Label VerticalAlignment="Center" HorizontalAlignment="Center">Settings</Label>
-        </Border>
-        
+    <Grid ColumnDefinitions="*, *" RowDefinitions="*, *" Background="{DynamicResource PrimaryBackground}">
         <!-- Content-->
-        <Grid Margin="10" Grid.Row="1" ColumnDefinitions="20, 10, *" VerticalAlignment="Top">
+        <Grid Margin="10" ColumnDefinitions="20, 10, *" VerticalAlignment="Top">
             <CheckBox></CheckBox>
             <Label Grid.Column="2" VerticalAlignment="Center">Open on Startup</Label>
         </Grid>

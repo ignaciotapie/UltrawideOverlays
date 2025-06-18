@@ -1,5 +1,7 @@
 ﻿using Avalonia;
+using Avalonia.Markup.Xaml.Converters;
 using Avalonia.Media;
+using Avalonia.Styling;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using System;
@@ -27,10 +29,13 @@ namespace UltrawideOverlays.ViewModels
         private double _previewOpacity = 0.5;
 
         [ObservableProperty]
-        private Color _previewColor = Colors.AliceBlue;
+        private IBrush _previewColor = Brushes.AliceBlue;
 
         [ObservableProperty]
         private ImageModel? _selected = null;
+
+        [ObservableProperty]
+        private Boolean _propertiesEnabled = false;
 
         [ObservableProperty]
         private string? _overlayName = null;
@@ -69,6 +74,14 @@ namespace UltrawideOverlays.ViewModels
         partial void OnSelectedChanged(ImageModel? oldValue, ImageModel? newValue)
         {
             Debug.WriteLine($"Image selected changed from {oldValue?.ImageName} to {newValue?.ImageName}");
+            if (newValue != null)
+            {
+                PropertiesEnabled = true;
+            }
+            else
+            {
+                PropertiesEnabled = false;
+            }
         }
 
         ///////////////////////////////////////////
@@ -127,7 +140,7 @@ namespace UltrawideOverlays.ViewModels
                 {
                     overlay.ClippingMaskModels.Add(clippingMask);
                 }
-                else 
+                else
                 {
                     overlay.ImageModels.Add(Images[i]);
                 }
@@ -135,6 +148,9 @@ namespace UltrawideOverlays.ViewModels
 
             overlay.Width = pixelSize.Width;
             overlay.Height = pixelSize.Height;
+            overlay.NumberOfImages = overlay.ImageModels.Count;
+            overlay.LastModified = DateTime.Now;
+            overlay.LastUsed = DateTime.Now;
 
             _ = _overlayDataService.SaveOverlayAsync(overlay);
         }
@@ -145,6 +161,42 @@ namespace UltrawideOverlays.ViewModels
             //TODO default?
             var clippingMask = new ClippingMaskModel(new RectangleGeometry(new Rect(0, 0, 800, 800)));
             Images.Add(clippingMask);
+        }
+
+        [RelayCommand]
+        public void MirrorPositionX(PixelSize bounds)
+        {
+            if (Selected == null) return;
+
+            double centerX = bounds.Width / 2.0;
+            double imageCenterX = Selected.ImageProperties.PositionX + Selected.ImageProperties.Width / 2.0;
+
+            // Distance from image center to canvas center
+            double distanceFromCenter = imageCenterX - centerX;
+
+            // Mirror the center and reposition the top-left corner accordingly
+            double newCenterX = centerX - distanceFromCenter;
+            double newPositionX = newCenterX - Selected.ImageProperties.Width / 2.0;
+
+            Selected.ImageProperties.Position = new Point(newPositionX, Selected.ImageProperties.PositionY);
+        }
+
+        [RelayCommand]
+        public void MirrorPositionY(PixelSize bounds)
+        {
+            if (Selected == null) return;
+
+            double centerY = bounds.Height / 2.0;
+            double imageCenterY = Selected.ImageProperties.PositionY + Selected.ImageProperties.Height / 2.0;
+
+            // Distance from image center to canvas center
+            double distanceFromCenter = imageCenterY - centerY;
+
+            // Mirror the center and reposition the top-left corner accordingly
+            double newCenterY = centerY - distanceFromCenter;
+            double newPositionY = newCenterY - Selected.ImageProperties.Height / 2.0;
+
+            Selected.ImageProperties.Position = new Point(Selected.ImageProperties.PositionX, newPositionY);
         }
     }
 }

@@ -1,8 +1,8 @@
 ﻿using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Data;
+using Avalonia.Layout;
 using Avalonia.Media;
-using ImageMagick;
 using System;
 using System.ComponentModel;
 using UltrawideOverlays.Converters;
@@ -31,15 +31,23 @@ namespace UltrawideOverlays.CustomControls
             image = new Image
             {
                 IsHitTestVisible = false,
+                Focusable = false,
                 HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Left,
                 VerticalAlignment = Avalonia.Layout.VerticalAlignment.Top,
                 Stretch = Stretch.Fill //TODO: Add stretch options
             };
+            image.Bind(Image.SourceProperty, new Binding("ImagePath")
+            {
+                Converter = new PathToBitmapConverter(),
+                Mode = BindingMode.OneWay
+            });
+
             image.Bind(Image.WidthProperty, new Binding("ImageProperties.Width", BindingMode.TwoWay));
             image.Bind(Image.HeightProperty, new Binding("ImageProperties.Height", BindingMode.TwoWay));
             image.Bind(Image.OpacityProperty, new Binding("ImageProperties.Opacity", BindingMode.TwoWay));
             image.Bind(Image.IsVisibleProperty, new Binding("ImageProperties.IsVisible", BindingMode.TwoWay));
 
+            Bind(ToolTip.TipProperty, new Binding("ImageName"));
             Bind(IsHitTestVisibleProperty, new Binding("ImageProperties.IsDraggable", BindingMode.TwoWay));
             Bind(DragPanel.PositionProperty, new Binding("ImageProperties.Position", BindingMode.TwoWay));
 
@@ -62,7 +70,8 @@ namespace UltrawideOverlays.CustomControls
 
         private void ImageModelPropertyChange(object? sender, PropertyChangedEventArgs e)
         {
-            if (e.PropertyName == nameof(ImageModel.ImagePath) || e.PropertyName == nameof(ImageModel.ImageName))
+            if (e.PropertyName == nameof(ImageModel.ImagePath) ||
+                e.PropertyName == nameof(ImageModel.ImageName))
             {
                 RefreshBitmap();
             }
@@ -71,19 +80,7 @@ namespace UltrawideOverlays.CustomControls
         private void RefreshBitmap()
         {
             if (ImageModel == null) return;
-
-            if (image.Source is IDisposable disposable)
-            {
-                disposable.Dispose();
-            }
-
-            image.Source = ImageRenderer.GetPropertyReadyBitmap(ImageModel!);
             image.InvalidateVisual();
-        }
-
-        private void OnItemSelected(object? sender, object e)
-        {
-            UpdateBorder();
         }
 
         ///////////////////////////////////////////
@@ -99,7 +96,6 @@ namespace UltrawideOverlays.CustomControls
             }
             ImageModel.PropertyChanged += ImageModelPropertyChange;
 
-            ItemSelectedChanged += OnItemSelected;
             base.OnAttachedToVisualTree(e);
         }
         protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
@@ -110,21 +106,28 @@ namespace UltrawideOverlays.CustomControls
                 props.PropertyChanged -= ImageModelPropertiesPropertyChange;
             }
             ImageModel.PropertyChanged -= ImageModelPropertyChange;
-            ItemSelectedChanged -= OnItemSelected;
             base.OnDetachedFromVisualTree(e);
+        }
+
+        protected override Size MeasureOverride(Size availableSize)
+        {
+            return LayoutHelper.MeasureChild(Child, availableSize, new Thickness(0), new Thickness(0));
+        }
+
+        protected override Size ArrangeOverride(Size finalSize)
+        {
+            return LayoutHelper.ArrangeChild(Child, finalSize, new Thickness(0), new Thickness(0));
         }
 
         ///////////////////////////////////////////
         /// PRIVATE FUNCTIONS
         ///////////////////////////////////////////
-        private void UpdateBorder()
-        {
-            BorderBrush = IsSelected ? Brushes.DeepSkyBlue : null;
-        }
-
         private void UpdateTransform()
         {
-            RefreshBitmap();
+            var props = ImageModel?.ImageProperties;
+            var mirroringMatrix = ImageRenderer.GetTransformMatrix(props);
+
+            RenderTransform = new MatrixTransform(mirroringMatrix);
         }
 
         public new void Dispose()
