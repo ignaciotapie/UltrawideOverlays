@@ -1,13 +1,9 @@
 using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Controls.Presenters;
 using Avalonia.Controls.Templates;
 using Avalonia.Input;
-using Avalonia.Markup.Xaml;
 using System;
 using System.Collections;
-using System.Diagnostics;
-using UltrawideOverlays.CustomControls;
 
 namespace UltrawideOverlays.CustomControls;
 
@@ -16,13 +12,13 @@ public partial class ListCarouselPanel : UserControl
     ///////////////////////////////////////////
     /// PROPERTIES
     ///////////////////////////////////////////
-    
+
     public static readonly StyledProperty<Object?> SelectedProperty =
         AvaloniaProperty.Register<ListCarouselPanel, Object?>(nameof(Selected));
 
     public Object? Selected
     {
-        get => GetValue(SelectedProperty); 
+        get => GetValue(SelectedProperty);
         set => SetValue(SelectedProperty, value);
     }
 
@@ -81,7 +77,7 @@ public partial class ListCarouselPanel : UserControl
 
         if (SelectionEnabled)
         {
-            if (e.Source is SelectableItemBase selectableItem) 
+            if (e.Source is SelectableItemBase selectableItem)
             {
                 SelectItem(selectableItem);
             }
@@ -108,7 +104,7 @@ public partial class ListCarouselPanel : UserControl
         _lastSelectedItem = item.IsSelected ? item : null;
     }
 
-    private void CleanLastSelected() 
+    private void CleanLastSelected()
     {
         if (_lastSelectedItem != null)
         {

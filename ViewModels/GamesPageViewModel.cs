@@ -1,10 +1,4 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using UltrawideOverlays.Models;
-using UltrawideOverlays.Services;
-using System.Drawing;
 using UltrawideOverlays.Factories;
 
 namespace UltrawideOverlays.ViewModels

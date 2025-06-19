@@ -93,6 +93,10 @@
         <Setter Property="Padding" Value="10"></Setter>
         <Setter Property="HorizontalAlignment" Value="Center"></Setter>
         <Setter Property="CornerRadius" Value="5"></Setter>
+
+        <Style Selector="^.Blue">
+            <Setter Property="Background" Value="#005c92"/>
+        </Style>
     </Style>
 
     <Style Selector="Image.TabIcon">
@@ -106,6 +110,13 @@
         <Setter Property="FontSize" Value="18"></Setter>
         <Setter Property="FontWeight" Value="Bold"></Setter>
         <Setter Property="Foreground" Value="{DynamicResource PrimaryFontColor}"></Setter>
+    </Style>
+
+    <Style Selector="Rectangle.Separator">
+        <Setter Property="Height" Value="1"/>
+        <Setter Property="Stretch" Value="Fill"/>
+        <Setter Property="Fill" Value="{DynamicResource PrimaryAccent}"/>
+        <Setter Property="VerticalAlignment" Value="Bottom"/>
     </Style>
     
 </Styles>

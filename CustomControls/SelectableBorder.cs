@@ -1,13 +1,7 @@
 ﻿using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Media;
-using System;
-using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using UltrawideOverlays.Models;
 
 namespace UltrawideOverlays.CustomControls
 {
@@ -37,7 +31,7 @@ namespace UltrawideOverlays.CustomControls
             {
                 foreach (var item in e.NewItems)
                 {
-                    if (item is Control c) 
+                    if (item is Control c)
                     {
                         c.IsHitTestVisible = false;
                     }
@@ -46,18 +40,7 @@ namespace UltrawideOverlays.CustomControls
             base.LogicalChildrenCollectionChanged(sender, e);
         }
 
-        protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
-        {
-            ItemSelectedChanged += OnItemSelected;
-            base.OnAttachedToVisualTree(e);
-        }
-        protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
-        {
-            ItemSelectedChanged -= OnItemSelected;
-            base.OnDetachedFromVisualTree(e);
-        }
-
-        protected void OnItemSelected(object? sender, object e)
+        protected override void OnItemSelectedChanged(bool isSelected)
         {
             UpdateBorder();
         }

@@ -61,7 +61,7 @@ namespace UltrawideOverlays.Converters
             _bitmapCache.Clear();
         }
 
-        public static void CleanCache() 
+        public static void CleanCache()
         {
             Converter.DisposeImage();
         }

@@ -34,7 +34,7 @@ public static class ImageRenderer
                     var positionY = props.PositionY * (props.IsVMirrored ? -1 : 1);
 
                     // Apply opacity
-                    using (ctx.PushOpacity(props.Opacity)) 
+                    using (ctx.PushOpacity(props.Opacity))
                     {
                         ctx.DrawImage(image, new Rect(positionX, positionY, props.Width, props.Height));
                     }

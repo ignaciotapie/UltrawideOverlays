@@ -5,7 +5,7 @@ using System.Reactive.Linq;
 
 namespace UltrawideOverlays.CustomControls
 {
-    public class SelectableItemBase : Border, IDisposable
+    public abstract class SelectableItemBase : Border, IDisposable
     {
         public static readonly StyledProperty<bool> IsSelectedProperty =
             AvaloniaProperty.Register<SelectableItemBase, bool>(nameof(IsSelected));
@@ -21,12 +21,15 @@ namespace UltrawideOverlays.CustomControls
         public SelectableItemBase()
         {
             this.GetObservable(IsSelectedProperty).Subscribe(RaiseItemSelected);
+            this.GetObservable(IsSelectedProperty).Subscribe(OnItemSelectedChanged);
         }
 
         private void RaiseItemSelected(bool isSelected)
         {
             ItemSelectedChanged?.Invoke(this, EventArgs.Empty);
         }
+
+        protected abstract void OnItemSelectedChanged(bool isSelected);
 
         public void Dispose()
         {

@@ -3,15 +3,84 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="using:UltrawideOverlays.ViewModels"
-             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             xmlns:mxe="https://schemas.eremexcontrols.net/avalonia/editors"
+             mc:Ignorable="d" d:DesignWidth="1280" d:DesignHeight="800"
              x:DataType="vm:GamesPageViewModel"
+             Background="{DynamicResource PrimaryBackground}"
              x:Class="UltrawideOverlays.Views.GamesPageView">
     <Design.DataContext>
         <vm:GamesPageViewModel/>
     </Design.DataContext>
 
-    <Border Background="{DynamicResource PrimaryBackground}">
-        
-    </Border>
+    <UserControl.Styles>
+        <Style Selector="Button">
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="CornerRadius" Value="5"/>
+        </Style>
+    </UserControl.Styles>
+
+    <Grid RowDefinitions="90, *" Margin="10">
+        <!-- Top Row (Labels and buttons) -->
+        <StackPanel>
+            <Label Name="Title" Classes="Title" Margin="0,-10" FontSize="24">Games Manager</Label>
+            <Label RelativePanel.Below="Title"  Name="Subtitle" Classes="Subtitle" FontSize="16">Configure overlay windows for games</Label>
+        </StackPanel>
+
+        <!-- Content -->
+        <Grid Grid.Row="1" ColumnDefinitions="2*, 20, *" >
+            <Border CornerRadius="10" Background="{DynamicResource PrimaryColor}">
+                <Grid RowDefinitions="*, 50, 250" Margin="10">
+                    <Grid RowDefinitions="3*, 30, 50, 30, 3*">
+                        <StackPanel>
+                            <Label Classes="Title" FontSize="20">Add New Game</Label>
+                        </StackPanel>
+                        <StackPanel Grid.Row="2">
+                            <Label>Game Executable Path</Label>
+                            <Grid ColumnDefinitions="*, 10, 64">
+                                <TextBox Watermark="Paste or type file path..."/>
+                                <Button Grid.Column="2">Browse</Button>
+                            </Grid>
+                        </StackPanel>
+                        <Grid Grid.Row="4" RowDefinitions="32, *">
+                            <RelativePanel>
+                                <Label>Select from Running Processes</Label>
+                                <Button RelativePanel.AlignRightWithPanel="True">Refresh</Button>
+                            </RelativePanel>
+                            <ListBox Grid.Row="1">
+                                
+                            </ListBox>
+                        </Grid>
+                    </Grid>
+
+                    <StackPanel Grid.Row="2" Spacing="20" VerticalAlignment="Bottom">
+                        <Rectangle Grid.Row="1" Classes="Separator"></Rectangle>
+                        <Label Classes="Title" Margin="0,0,0,-20" >Game Configuration</Label>
+                        <Grid Grid.Row="1" ColumnDefinitions="*, 10, *">
+                            <StackPanel>
+                                <Label>Game Name</Label>
+                                <TextBox Watermark="Enter game name..."></TextBox>
+                            </StackPanel>
+                            <StackPanel Grid.Column="2">
+                                <Label>Link to Overlay</Label>
+                                <mxe:ComboBoxEditor Height="40" Watermark="Select overlay.."></mxe:ComboBoxEditor>
+                            </StackPanel>
+                        </Grid>
+                        <StackPanel Grid.Row="2" Spacing="10" Orientation="Horizontal">
+                            <Button Classes="Primary Blue" Width="150">Save Game</Button>
+                            <Button Classes="Primary">Cancel</Button>
+                        </StackPanel>
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <Border Grid.Column="2" CornerRadius="10" Background="{DynamicResource PrimaryColor}">
+                <Grid Margin="10">
+                    <StackPanel>
+                        <Label Classes="Title" FontSize="20">Saved Games</Label>
+                    </StackPanel>
+                </Grid>
+            </Border>
+        </Grid>
+    </Grid>
     
 </UserControl>

@@ -15,6 +15,7 @@ namespace UltrawideOverlays.CustomControls
     {
         public ImageModel? ImageModel { get; private set; }
         public Image? image;
+        public Border? border;
         private bool disposedValue;
 
         public SelectableImage(ImageModel im)
@@ -22,11 +23,8 @@ namespace UltrawideOverlays.CustomControls
             ImageModel = im;
             DataContext = im;
             Background = Brushes.Transparent;
-            BorderBrush = null;
-            BorderThickness = new Thickness(2);
             HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Left;
             VerticalAlignment = Avalonia.Layout.VerticalAlignment.Top;
-
             RenderTransformOrigin = RelativePoint.TopLeft;
             image = new Image
             {
@@ -51,7 +49,19 @@ namespace UltrawideOverlays.CustomControls
             Bind(IsHitTestVisibleProperty, new Binding("ImageProperties.IsDraggable", BindingMode.TwoWay));
             Bind(DragPanel.PositionProperty, new Binding("ImageProperties.Position", BindingMode.TwoWay));
 
-            Child = image;
+            border = new Border
+            {
+                Child = image,
+                IsHitTestVisible = false,
+                Background = Brushes.Transparent,
+                Padding = new Thickness(0),
+                CornerRadius = new CornerRadius(0),
+                BorderThickness = new Thickness(0),
+                HorizontalAlignment = HorizontalAlignment.Left,
+                VerticalAlignment = VerticalAlignment.Top
+            };
+
+            Child = border;
         }
 
 
@@ -76,6 +86,34 @@ namespace UltrawideOverlays.CustomControls
                 RefreshBitmap();
             }
         }
+        private void UpdateSelectionVisual()
+        {
+            if (border == null) return;
+            if (IsSelected == true)
+            {
+                border.BoxShadow = new BoxShadows(
+                    new BoxShadow
+                    {
+                        Color = Colors.DodgerBlue,
+                        Blur = 5,
+                        Spread = 3,
+                        OffsetX = 0,
+                        OffsetY = 0
+                    });
+            }
+            else
+            {
+                border.BoxShadow = new BoxShadows(
+                    new BoxShadow
+                    {
+                        Color = Colors.Transparent,
+                        Blur = 0,
+                        Spread = 0,
+                        OffsetX = 0,
+                        OffsetY = 0
+                    });
+            }
+        }
 
         private void RefreshBitmap()
         {
@@ -95,6 +133,7 @@ namespace UltrawideOverlays.CustomControls
                 UpdateTransform(); //Initial transform update
             }
             ImageModel.PropertyChanged += ImageModelPropertyChange;
+            UpdateSelectionVisual();
 
             base.OnAttachedToVisualTree(e);
         }
@@ -117,6 +156,11 @@ namespace UltrawideOverlays.CustomControls
         protected override Size ArrangeOverride(Size finalSize)
         {
             return LayoutHelper.ArrangeChild(Child, finalSize, new Thickness(0), new Thickness(0));
+        }
+
+        protected override void OnItemSelectedChanged(bool isSelected)
+        {
+            UpdateSelectionVisual();
         }
 
         ///////////////////////////////////////////

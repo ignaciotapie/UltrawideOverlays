@@ -1,8 +1,8 @@
-﻿using System;
-using System.Globalization;
-using Avalonia.Data.Converters;
+﻿using Avalonia.Data.Converters;
 using Avalonia.Media;
 using Avalonia.Media.Immutable;
+using System;
+using System.Globalization;
 
 namespace UltrawideOverlays.Converters
 {

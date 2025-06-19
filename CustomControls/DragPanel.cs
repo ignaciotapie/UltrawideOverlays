@@ -12,6 +12,7 @@ namespace UltrawideOverlays.CustomControls
         private Control? _draggedControl;
         private SelectableItemBase? _selectableControl;
         private Point _dragOffset;
+        private Point _initialPosition;
 
         ///////////////////////////////////////////
         /// STYLED PROPERTIES
@@ -122,6 +123,7 @@ namespace UltrawideOverlays.CustomControls
                 var pointerPos = e.GetPosition(this);
                 var controlPos = GetPosition(control);
                 _dragOffset = pointerPos - controlPos;
+                _initialPosition = controlPos;
                 _draggedControl.Focus();
 
                 if (control is SelectableItemBase selectableItem && _selectableControl != selectableItem)
@@ -156,15 +158,14 @@ namespace UltrawideOverlays.CustomControls
         {
             if (_draggedControl != null)
             {
-                if (!Children.Contains(_draggedControl))
+                if (!_initialPosition.NearlyEquals(GetPosition(_draggedControl)))
                 {
-                    SetPosition(_draggedControl, new Point(0, 0));
+                    SnapToGrid(_draggedControl);
                 }
-                else SnapToGrid(_draggedControl);
 
                 _draggedControl = null;
-                e.Pointer.Capture(null);
             }
+            e.Pointer.Capture(null);
         }
         private void SnapToGrid(Control control)
         {

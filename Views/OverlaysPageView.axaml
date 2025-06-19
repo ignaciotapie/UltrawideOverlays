@@ -15,7 +15,8 @@
     </Design.DataContext>
 
     <Border Margin="10">
-        <Grid RowDefinitions="70,2*,*">
+        <Grid RowDefinitions="90,2*,*">
+            <!-- Top Row (Labels and buttons) -->
             <RelativePanel Grid.ColumnSpan="2">
                 <StackPanel Name="OverlaysTitlePanel">
                     <Label Name="Title" Classes="Title" Margin="0,-10" FontSize="24">Your Overlays</Label>
@@ -30,11 +31,11 @@
                     Edit
                 </Button>
 
-                <Button RelativePanel.AlignRightWithPanel="True" RelativePanel.AlignVerticalCenterWith="OverlaysTitlePanel" Classes="Primary" Background="#005c92" Name="NewOverlayButton" Margin="0,0,10,0" Command="{Binding AddNewButtonCommand}">
+                <Button RelativePanel.AlignRightWithPanel="True" RelativePanel.AlignVerticalCenterWith="OverlaysTitlePanel" Classes="Primary Blue" Name="NewOverlayButton" Margin="0,0,10,0" Command="{Binding AddNewButtonCommand}">
                     + Add New Overlay
                 </Button>
             </RelativePanel>
-
+            <!-- Preview-->
             <Grid Grid.Row="1">
                 <Border CornerRadius="10" Background="{DynamicResource PrimaryColor}">
                     <cc:VisualGrid Color="#16212c" GridSize="20">
@@ -42,11 +43,12 @@
                 </Border>
                 <cc:ScalableImage Source="{Binding SelectedOverlay.Path, Converter={x:Static converters:PathToBitmapConverter.Converter}}"/>
             </Grid>
-
+            
+            <!-- Grid View for Overlays-->
             <cc:ListCarouselPanel Grid.Row="2" ItemsSource="{Binding Overlays}" Selected="{Binding SelectedOverlay, Mode=TwoWay}">
                 <cc:ListCarouselPanel.ItemTemplate>
                     <DataTemplate x:DataType="models:OverlayDataModel">
-                        <cc:SelectableBorder Margin="20" Padding="1" SelectedBrush="{DynamicResource SecondaryAccent}" CornerRadius="10">
+                        <cc:SelectableBorder Margin="20" SelectedBrush="{DynamicResource SecondaryAccent}" CornerRadius="10">
                             <Border Background="{DynamicResource PrimaryColor}" BorderBrush="{DynamicResource PrimaryAccent}" CornerRadius="10" BorderThickness="1">
                                 <StackPanel Margin="15" Spacing="5" Width="250">
                                     <Label Content="{Binding Name}" Classes="Title" FontSize="16"/>
@@ -66,7 +68,6 @@
                     </DataTemplate>
                 </cc:ListCarouselPanel.ItemTemplate>
             </cc:ListCarouselPanel>
-            
         </Grid>
     </Border>
 </UserControl>
