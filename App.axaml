@@ -21,6 +21,7 @@
         <SolidColorBrush x:Key="SecondaryFontColor">#9ca39f</SolidColorBrush>
         <SolidColorBrush x:Key="PrimaryAccent">#404040</SolidColorBrush>
         <SolidColorBrush x:Key="SecondaryAccent">#e57228</SolidColorBrush>
+        <SolidColorBrush x:Key="LinkAccent">#459ff6</SolidColorBrush>
         <SolidColorBrush x:Key="PrimaryBackground">#0f0f0f</SolidColorBrush>
 
          <!-- Images and Icons-->
@@ -31,6 +32,7 @@
         <SvgSource x:Key="GamesLogo">/Assets/Images/joystick-logo.svg</SvgSource>
         <SvgSource x:Key="CopyIcon">/Assets/Images/copy-icon.svg</SvgSource>
         <SvgSource x:Key="DeleteIcon">/Assets/Images/delete-icon.svg</SvgSource>
+        <SvgSource x:Key="UploadIcon">/Assets/Images/upload-icon.svg</SvgSource>
         <Image x:Key="ClippingMask">/Assets/Images/clipping-mask.png</Image>
 
         <!-- Fonts-->

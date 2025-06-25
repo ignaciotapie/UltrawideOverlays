@@ -68,6 +68,8 @@ namespace UltrawideOverlays
             //Data services
             collection.AddSingleton<OverlayDataService>();
             collection.AddSingleton<GamesDataService>();
+            collection.AddSingleton<ProcessDataService>();
+            collection.AddSingleton<ActivityDataService>();
 
             collection.AddSingleton<PageFactory>();
             collection.AddSingleton<SubviewFactory>();

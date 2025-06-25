@@ -1,13 +1,15 @@
-﻿using Avalonia.Media.Imaging;
-using Avalonia.Threading;
+﻿using Avalonia.Threading;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Drawing;
+using System.Drawing.Imaging;
 using System.IO;
 using System.Text.Json;
 using System.Threading.Tasks;
 using UltrawideOverlays.Converters.Comparers;
 using UltrawideOverlays.Utils;
+using Bitmap = Avalonia.Media.Imaging.Bitmap;
 
 namespace UltrawideOverlays.Models
 {
@@ -16,7 +18,13 @@ namespace UltrawideOverlays.Models
         Overlays,
         Games,
         Settings,
-        Images
+        Images,
+        Activities
+    }
+
+    internal static class DatabaseSettings 
+    {
+        public static readonly int MaxActivitiesStored = 50;
     }
 
     internal static class DatabasePaths
@@ -27,15 +35,17 @@ namespace UltrawideOverlays.Models
             System.IO.Path.DirectorySeparatorChar;
 
         public readonly static string OverlaysModelPath = BasePath + "Overlays";
-        public readonly static string SettingsModelPath = BasePath + "Settings";
+        public readonly static string SettingsPath = BasePath + "Settings";
         public readonly static string ImagesPath = BasePath + "Images";
         public readonly static string GamesPath = BasePath + "Games";
+        public readonly static string ActivitiesPath = SettingsPath;
     }
     public class Database
     {
         public HashSet<OverlayDataModel> Overlays { get; }
         public HashSet<GamesModel> Games { get; }
         public SettingsDataModel Settings { get; set; }
+        public Stack<ActivityLogModel> Activities { get; set; }
 
         public bool isInitialized = false;
 
@@ -47,7 +57,9 @@ namespace UltrawideOverlays.Models
             Overlays = new HashSet<OverlayDataModel>(new OverlayDataModelComparer());
             Games = new HashSet<GamesModel>(new GamesModelComparer());
             Settings = new SettingsDataModel();
+            Activities = new Stack<ActivityLogModel>();
         }
+
         //Usable asynchronous constructor
         public async static Task<Database> BuildDatabaseAsync()
         {
@@ -62,8 +74,9 @@ namespace UltrawideOverlays.Models
             var overlayTask = LoadOverlays();
             var gamesTask = LoadGames();
             var settingsTask = LoadSettings();
+            var activitiesTask = LoadActivities();
 
-            await Task.WhenAll([overlayTask, settingsTask, gamesTask]);
+            await Task.WhenAll([overlayTask, settingsTask, gamesTask, activitiesTask]);
             isInitialized = true;
         }
 
@@ -89,7 +102,7 @@ namespace UltrawideOverlays.Models
 
         private async Task LoadSettings()
         {
-            var settingsFile = Path.Combine(DatabasePaths.SettingsModelPath, FileHandlerUtil.AddJSONFileExtension("Settings"));
+            var settingsFile = Path.Combine(DatabasePaths.SettingsPath, FileHandlerUtil.AddJSONFileExtension("Settings"));
             if (FileHandlerUtil.IsValidFilePath(settingsFile))
             {
                 try
@@ -128,15 +141,44 @@ namespace UltrawideOverlays.Models
             }
         }
 
+        public async Task LoadActivities() 
+        {
+            var activityFiles = Directory.GetFiles(DatabasePaths.ActivitiesPath, FileHandlerUtil.AddJSONFileExtension("Activities"));
+            foreach (var file in activityFiles)
+            {
+                try
+                {
+                    using (StreamReader reader = new StreamReader(file))
+                    {
+                        string json = await reader.ReadToEndAsync();
+                        var activities = JsonSerializer.Deserialize<HashSet<ActivityLogModel>>(json);
+                        if (activities != null)
+                        {
+                            // Add activities to the list, ensuring we don't exceed the max limit
+                            foreach (var activity in activities)
+                            {
+                                AddActivity(activity);
+                            }
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine($"Error loading activities from file {file}: {ex.Message}");
+                }
+            }
+        }
+
         private void EnsureFoldersExist()
         {
             var paths = new[]
             {
                 DatabasePaths.BasePath,
                 DatabasePaths.OverlaysModelPath,
-                DatabasePaths.SettingsModelPath,
+                DatabasePaths.SettingsPath,
                 DatabasePaths.GamesPath,
-                DatabasePaths.ImagesPath
+                DatabasePaths.ImagesPath,
+                DatabasePaths.ActivitiesPath
             };
 
             foreach (var path in paths)
@@ -145,10 +187,6 @@ namespace UltrawideOverlays.Models
                     FileHandlerUtil.CreateDirectory(path);
             }
         }
-
-        ///////////////////////////////////////////
-        /// GENERIC
-        ///////////////////////////////////////////
         public async Task SaveAsync(object data, DatabaseFiles fileType)
         {
             string path = string.Empty;
@@ -162,12 +200,18 @@ namespace UltrawideOverlays.Models
                     if (Overlays.Contains(overlay))
                     {
                         Overlays.Remove(overlay);
+                        AddActivity(new ActivityLogModel(DateTime.Now, ActivityLogType.Overlays, ActivityLogAction.Updated, overlay.Name));
+                    }
+                    else 
+                    {
+                        AddActivity(new ActivityLogModel(DateTime.Now, ActivityLogType.Overlays, ActivityLogAction.Added, overlay.Name));
                     }
 
                     Overlays.Add(overlay);
                     break;
                 case DatabaseFiles.Settings:
                     Settings = (SettingsDataModel)data;
+                    AddActivity(new ActivityLogModel(DateTime.Now, ActivityLogType.Settings, ActivityLogAction.Updated, "Settings"));
                     break;
                 case DatabaseFiles.Games:
                     var game = data as GamesModel;
@@ -175,12 +219,21 @@ namespace UltrawideOverlays.Models
                     if (Games.Contains(game))
                     {
                         Games.Remove(game);
+                        AddActivity(new ActivityLogModel(DateTime.Now, ActivityLogType.Games, ActivityLogAction.Updated, game.Name));
+                    }
+                    else
+                    {
+                        AddActivity(new ActivityLogModel(DateTime.Now, ActivityLogType.Games, ActivityLogAction.Added, game.Name));
                     }
 
                     Games.Add(game);
                     break;
                 case DatabaseFiles.Images:
                     throw new InvalidOperationException("Cannot save images as JSON");
+                case DatabaseFiles.Activities:
+                    var activity = data as ActivityLogModel;
+                    AddActivity(activity);
+                    break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(fileType), fileType, null);
             }
@@ -189,6 +242,11 @@ namespace UltrawideOverlays.Models
             {
                 WriteIndented = true
             };
+
+            if (fileType == DatabaseFiles.Activities)
+            {
+                data = Activities;
+            }
 
             var json = JsonSerializer.Serialize(data, typeof(Object), serializerOptions);
             await FileHandlerUtil.WriteToJSON(path, json);
@@ -214,7 +272,7 @@ namespace UltrawideOverlays.Models
                     break;
                 case DatabaseFiles.Settings:
                     // Settings file is always named "Settings.json"
-                    path = Path.Combine(DatabasePaths.SettingsModelPath, FileHandlerUtil.AddJSONFileExtension("Settings"));
+                    path = Path.Combine(DatabasePaths.SettingsPath, FileHandlerUtil.AddJSONFileExtension("Settings"));
                     break;
                 case DatabaseFiles.Images:
                     if (data is OverlayDataModel overlayData)
@@ -226,6 +284,17 @@ namespace UltrawideOverlays.Models
                         throw new ArgumentException("Data must be of type OverlayDataModel", nameof(data));
                     }
                     path = Path.Combine(DatabasePaths.ImagesPath, FileHandlerUtil.AddImageFileExtension(name, ImageExtension.PNG));
+                    break;
+                case DatabaseFiles.Games:
+                    if (data is GamesModel game)
+                    {
+                        name = game.Name;
+                    }
+                    else
+                    {
+                        throw new ArgumentException("Data must be of type GamesModel", nameof(data));
+                    }
+                    path = Path.Combine(DatabasePaths.GamesPath, FileHandlerUtil.AddJSONFileExtension(name));
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(fileType), fileType, null);
@@ -241,8 +310,9 @@ namespace UltrawideOverlays.Models
             {
                 DatabaseFiles.Overlays => Path.Combine(DatabasePaths.OverlaysModelPath, FileHandlerUtil.AddJSONFileExtension(fileName)),
                 DatabaseFiles.Games => Path.Combine(DatabasePaths.GamesPath, FileHandlerUtil.AddJSONFileExtension(fileName)),
-                DatabaseFiles.Settings => Path.Combine(DatabasePaths.SettingsModelPath, FileHandlerUtil.AddJSONFileExtension(fileName)),
+                DatabaseFiles.Settings => Path.Combine(DatabasePaths.SettingsPath, FileHandlerUtil.AddJSONFileExtension(fileName)),
                 DatabaseFiles.Images => throw new InvalidOperationException("Cannot load images as JSON"),
+                DatabaseFiles.Activities => Path.Combine(DatabasePaths.ActivitiesPath, FileHandlerUtil.AddJSONFileExtension(fileName)),
                 _ => throw new ArgumentOutOfRangeException(nameof(fileType), fileType, null),
             };
             if (!FileHandlerUtil.IsValidFilePath(path))
@@ -271,6 +341,7 @@ namespace UltrawideOverlays.Models
                 if (Overlays.Contains(overlay))
                 {
                     Overlays.Remove(overlay);
+                    AddActivity(new ActivityLogModel(DateTime.Now, ActivityLogType.Overlays, ActivityLogAction.Removed, overlay.Name));
                 }
                 // Also delete the image created
                 if (!string.IsNullOrEmpty(overlay.Path) && FileHandlerUtil.IsValidFilePath(overlay.Path))
@@ -281,12 +352,14 @@ namespace UltrawideOverlays.Models
             else if (fileType == DatabaseFiles.Settings)
             {
                 Settings = new SettingsDataModel();
+                AddActivity(new ActivityLogModel(DateTime.Now, ActivityLogType.Settings, ActivityLogAction.Removed, "Settings"));
             }
             else if (fileType == DatabaseFiles.Games && obj is GamesModel game)
             {
                 if (Games.Contains(game))
                 {
                     Games.Remove(game);
+                    AddActivity(new ActivityLogModel(DateTime.Now, ActivityLogType.Games, ActivityLogAction.Removed, game.Name));
                 }
             }
 
@@ -301,9 +374,6 @@ namespace UltrawideOverlays.Models
             }
         }
 
-        ///////////////////////////////////////////
-        /// BITMAPS
-        ///////////////////////////////////////////
         public async Task<Bitmap> LoadBitmapAsync(string fileName)
         {
             string path = Path.Combine(DatabasePaths.ImagesPath, FileHandlerUtil.AddImageFileExtension(fileName, ImageExtension.PNG)!);
@@ -335,6 +405,65 @@ namespace UltrawideOverlays.Models
 
             var bitmap = ImageRenderer.RenderImagesToBitmap(overlayData);
             bitmap.Save(path);
+        }
+
+        public ICollection<ProcessDataModel> LoadProcesses()
+        {
+            var processList = Process.GetProcesses();
+
+            var filteredProcessList = ProcessFilterUtils.FilterProcesses(processList);
+
+            var processDataModels = new List<ProcessDataModel>();
+            foreach (var process in filteredProcessList)
+            {
+                var processPath = GetProcessPath(process);
+                var icon = String.IsNullOrEmpty(processPath) ? SystemIcons.Application : Icon.ExtractAssociatedIcon(processPath);
+
+                var processData = new ProcessDataModel
+                {
+                    Name = process.ProcessName,
+                    Path = processPath,
+                    ProcessId = (uint)process.Id
+                };
+
+                using (var memoryStream = new MemoryStream())
+                {
+                    icon?.ToBitmap()?.Save(memoryStream, ImageFormat.Png);
+                    memoryStream.Position = 0;
+                    processData.Icon = new Avalonia.Media.Imaging.Bitmap(memoryStream);
+                }
+
+                processDataModels.Add(processData);
+            }
+
+            return processDataModels;
+        }
+
+        private string GetProcessPath(Process p)
+        {
+            var outString = "";
+            try
+            {
+                outString = p.MainModule.FileName;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Error loading process {p.ProcessName}: {ex.Message}");
+            }
+
+            return outString;
+        }
+
+        private void AddActivity(ActivityLogModel activity)
+        {
+            if (Activities.Count >= DatabaseSettings.MaxActivitiesStored)
+            {
+                Activities.Pop(); // Remove the oldest activity
+            }
+
+            Debug.WriteLine($"Activity: {activity.ToString()}");
+
+            Activities.Push(activity);
         }
     }
 }

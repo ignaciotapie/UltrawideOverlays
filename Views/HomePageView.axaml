@@ -3,7 +3,8 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="using:UltrawideOverlays.ViewModels"
-             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             mc:Ignorable="d" d:DesignWidth="1200" d:DesignHeight="1000"
+             Background="{DynamicResource PrimaryBackground}"
              x:Class="UltrawideOverlays.Views.HomePageView"
              x:DataType="vm:HomePageViewModel">
              
@@ -11,7 +12,60 @@
         <vm:HomePageViewModel/>
     </Design.DataContext>
 
-    <Border Background="{DynamicResource PrimaryBackground}">
-        <Label Content="{Binding HomePageName}"/>
+    <UserControl.Styles>
+        <Style Selector="Border.Slot">
+            <Setter Property="Background" Value="{DynamicResource PrimaryColor}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource PrimaryAccent}"/>
+            <Setter Property="BorderThickness" Value="2"/>
+            <Setter Property="CornerRadius" Value="10"/>
+            <Setter Property="Margin" Value="30,20"/>
+        </Style>
+    </UserControl.Styles>
+
+    <Border Margin="10,-10,10,0">
+        <Grid RowDefinitions="Auto,*,*,*">
+            <StackPanel Spacing="-10">
+                <Label Classes="Title" FontSize="40">Welcome to Ultrawide Overlays!</Label>
+                <Label Classes="Subtitle" FontSize="24">Enhance your gaming experience by eliminating black bars with custom overlays!</Label>
+            </StackPanel>
+            <Grid Grid.Row="1" ColumnDefinitions="*,*,*">
+                <Border Classes="Slot">
+                    <StackPanel>
+                        <Label Classes="Title">Games Configured</Label>
+                    </StackPanel>
+                </Border>
+                <Border Grid.Column="1" Classes="Slot">
+                    <StackPanel>
+                        <Label Classes="Title">Total Overlays</Label>
+                    </StackPanel>
+                </Border>
+                <Border Grid.Column="2" Classes="Slot">
+                    <StackPanel>
+                        <Label Classes="Title">Last Overlay Used</Label>
+                    </StackPanel>
+                </Border>
+            </Grid>
+
+            <Grid Grid.Row="2" ColumnDefinitions="*,*">
+                <Border Classes="Slot">
+                    <StackPanel>
+                        <Label Classes="Title">Games Setup</Label>
+                    </StackPanel>
+                </Border>
+                <Border Grid.Column="1" Classes="Slot">
+                    <StackPanel>
+                        <Label Classes="Title">Overlay Library</Label>
+                    </StackPanel>
+                </Border>
+            </Grid>
+
+            <Grid Grid.Row="3" ColumnDefinitions="*">
+                <Border Classes="Slot">
+                    <StackPanel>
+                        <Label Classes="Title">Recent Activity</Label>
+                    </StackPanel>
+                </Border>
+            </Grid>
+        </Grid>
     </Border>
 </UserControl>

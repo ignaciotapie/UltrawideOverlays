@@ -3,8 +3,9 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="using:UltrawideOverlays.ViewModels"
+             xmlns:models="using:UltrawideOverlays.Models"
              xmlns:mxe="https://schemas.eremexcontrols.net/avalonia/editors"
-             mc:Ignorable="d" d:DesignWidth="1280" d:DesignHeight="800"
+             mc:Ignorable="d" d:DesignWidth="1280" d:DesignHeight="1000"
              x:DataType="vm:GamesPageViewModel"
              Background="{DynamicResource PrimaryBackground}"
              x:Class="UltrawideOverlays.Views.GamesPageView">
@@ -17,9 +18,29 @@
             <Setter Property="VerticalContentAlignment" Value="Center"/>
             <Setter Property="CornerRadius" Value="5"/>
         </Style>
+        <Style Selector="Label.GameName">
+            <Setter Property="FontSize" Value="20"/>
+        </Style>
+        <Style Selector="Label.FilePath">
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Foreground" Value="DarkGray"/>
+        </Style>
+
+        <Style Selector="Button.Refresh">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="{DynamicResource LinkAccent}"/>
+            <Setter Property="FontSize" Value="18"/>
+        </Style>
+        <Style Selector="Button.Refresh:pointerover /template/ContentPresenter">
+            <Setter Property="Background" Value="Transparent"/>
+        </Style>
+        <Style Selector="Button.Refresh:pressed /template/ContentPresenter">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="{DynamicResource PrimaryFontColor}"/>
+        </Style>
     </UserControl.Styles>
 
-    <Grid RowDefinitions="90, *" Margin="10">
+    <Grid RowDefinitions="Auto, *" Margin="10">
         <!-- Top Row (Labels and buttons) -->
         <StackPanel>
             <Label Name="Title" Classes="Title" Margin="0,-10" FontSize="24">Games Manager</Label>
@@ -29,54 +50,97 @@
         <!-- Content -->
         <Grid Grid.Row="1" ColumnDefinitions="2*, 20, *" >
             <Border CornerRadius="10" Background="{DynamicResource PrimaryColor}">
-                <Grid RowDefinitions="*, 50, 250" Margin="10">
-                    <Grid RowDefinitions="3*, 30, 50, 30, 3*">
-                        <StackPanel>
-                            <Label Classes="Title" FontSize="20">Add New Game</Label>
-                        </StackPanel>
+                <Grid RowDefinitions="*, 250" Margin="10">
+                    <Grid RowDefinitions="2*, 30, Auto, 30, 3*">
+                        <Grid RowDefinitions="Auto, *">
+                            <Label Classes="Title" FontSize="20" Margin="0,0,0,5">Add New Game</Label>
+                            <Grid Name="DashedBorder" Grid.Row="1" ClipToBounds="True" IsEnabled="{Binding GameExecutablePath, Converter={x:Static StringConverters.IsNullOrEmpty}}">
+                                <Rectangle Grid.Row="1" Stroke="{DynamicResource PrimaryAccent}" StrokeThickness="2" StrokeDashArray="4" RadiusX="8" RadiusY="8" ></Rectangle>
+                                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="0">
+                                    <Image Width="64" Height="64">
+                                        <Image.Source>
+                                            <SvgImage Source="{StaticResource UploadIcon}"/>
+                                        </Image.Source>
+                                    </Image>
+                                    <Label Classes="Primary" HorizontalAlignment="Center" >Drag and Drop Game Executable</Label>
+                                    <Label Classes="Secondary" HorizontalAlignment="Center">Or use the options below</Label>
+                                </StackPanel>
+                            </Grid>
+                        </Grid>
                         <StackPanel Grid.Row="2">
-                            <Label>Game Executable Path</Label>
-                            <Grid ColumnDefinitions="*, 10, 64">
-                                <TextBox Watermark="Paste or type file path..."/>
-                                <Button Grid.Column="2">Browse</Button>
+                            <Label Margin="0,0,0,5">Game Executable Path</Label>
+                            <Grid ColumnDefinitions="*, 10, Auto">
+                                <TextBox Watermark="Paste or type file path..." Text="{Binding GameExecutablePath, Mode=TwoWay}" IsEnabled="{Binding SelectedProcess, Converter={x:Static ObjectConverters.IsNull}}"/>
+                                <Button Grid.Column="2" Click="BrowseButton_Clicked">Browse</Button>
                             </Grid>
                         </StackPanel>
-                        <Grid Grid.Row="4" RowDefinitions="32, *">
+                        <Grid Grid.Row="4" RowDefinitions="Auto,*">
                             <RelativePanel>
-                                <Label>Select from Running Processes</Label>
-                                <Button RelativePanel.AlignRightWithPanel="True">Refresh</Button>
+                                <Label RelativePanel.AlignTopWithPanel="True" Name="ProcessesLabel">Select from Running Processes</Label>
+                                <Button Classes="Refresh" RelativePanel.AlignVerticalCenterWith="ProcessesLabel" RelativePanel.AlignRightWithPanel="True" Command="{Binding RefreshProcessesCommand}">Refresh</Button>
                             </RelativePanel>
-                            <ListBox Grid.Row="1">
-                                
+                            <ListBox Grid.Row="1" Background="Transparent" ItemsSource="{Binding Processes}" SelectedItem="{Binding SelectedProcess, Mode=TwoWay}" BorderBrush="{DynamicResource PrimaryAccent}" SelectionMode="Toggle" BorderThickness="1" CornerRadius="3">
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <Grid RowDefinitions="2*,*" ColumnDefinitions="Auto, *">
+                                            <Image HorizontalAlignment="Left" Width="32" Height="32" Margin="0,0,5,0" Source="{Binding Icon}"/>
+                                            <Label Grid.Column="1" Classes="GameName" Content="{Binding Name}"></Label>
+                                            <Label Grid.Column="1" Grid.Row="1" Classes="FilePath" Content="{Binding Path}"></Label>
+                                            <Label Grid.Column="1" Grid.Row="1" Classes="FilePath" FontWeight="Bold" IsVisible="{Binding Path, Converter={x:Static StringConverters.IsNullOrEmpty}}">File path not accesible: Try running as admin</Label>
+                                        </Grid>
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
                             </ListBox>
                         </Grid>
                     </Grid>
 
                     <StackPanel Grid.Row="2" Spacing="20" VerticalAlignment="Bottom">
-                        <Rectangle Grid.Row="1" Classes="Separator"></Rectangle>
+                        <Rectangle Classes="Separator"></Rectangle>
                         <Label Classes="Title" Margin="0,0,0,-20" >Game Configuration</Label>
                         <Grid Grid.Row="1" ColumnDefinitions="*, 10, *">
                             <StackPanel>
                                 <Label>Game Name</Label>
-                                <TextBox Watermark="Enter game name..."></TextBox>
+                                <TextBox Watermark="Enter game name..." Text="{Binding GameName, Mode=TwoWay}"></TextBox>
                             </StackPanel>
                             <StackPanel Grid.Column="2">
                                 <Label>Link to Overlay</Label>
-                                <mxe:ComboBoxEditor Height="40" Watermark="Select overlay.."></mxe:ComboBoxEditor>
+                                <mxe:ComboBoxEditor Height="40" Watermark="Select overlay.." IsEnabled="{Binding GameName, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" SelectedItem="{Binding SelectedOverlay}" DisplayMember="Name" ValueMember="Name" ItemsSource="{Binding Overlays}"/>
                             </StackPanel>
                         </Grid>
                         <StackPanel Grid.Row="2" Spacing="10" Orientation="Horizontal">
-                            <Button Classes="Primary Blue" Width="150">Save Game</Button>
-                            <Button Classes="Primary">Cancel</Button>
+                            <Button Classes="Primary Blue" Width="150" HorizontalContentAlignment="Center" Command="{Binding MakeNewGameCommand}">Save Game</Button>
                         </StackPanel>
                     </StackPanel>
                 </Grid>
             </Border>
 
             <Border Grid.Column="2" CornerRadius="10" Background="{DynamicResource PrimaryColor}">
-                <Grid Margin="10">
-                    <StackPanel>
+                <Grid Margin="10" RowDefinitions="Auto, *">
+                    <RelativePanel Margin="5">
                         <Label Classes="Title" FontSize="20">Saved Games</Label>
+                        <Button RelativePanel.LeftOf="EditButton" Classes="Primary" Name="RemoveButton" Margin="0,0,8,0" IsVisible="{Binding SelectedGame, Converter={x:Static ObjectConverters.IsNotNull}}" Background="DarkRed" Command="{Binding DeleteGameCommand}">
+                            Remove
+                        </Button>
+
+                        <Button Classes="Primary" Name="EditButton" RelativePanel.AlignRightWithPanel="True" Margin="0,0,8,0" IsVisible="{Binding SelectedGame, Converter={x:Static ObjectConverters.IsNotNull}}" Command="{Binding EditGameCommand}">
+                            Edit
+                        </Button>
+                    </RelativePanel>
+                    <StackPanel Grid.Row="1" >
+                        <Rectangle Margin="0,0,0,20" RelativePanel.AlignBottomWithPanel="True" Classes="Separator"/>
+                        <ListBox Background="Transparent" ItemsSource="{Binding Games}" SelectedItem="{Binding SelectedGame}" SelectionMode="Toggle">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Padding="10" BorderBrush="{DynamicResource PrimaryAccent}" CornerRadius="5" BorderThickness="2">
+                                        <Grid RowDefinitions="*,*,*">
+                                            <Label Classes="GameName" Content="{Binding Name}"/>
+                                            <Label Grid.Row="1" Classes="FilePath" Content="{Binding ExecutablePath}"/>
+                                            <Label Grid.Row="2" Classes="Primary" Content="{Binding OverlayName}"/>
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
                     </StackPanel>
                 </Grid>
             </Border>
