@@ -29,17 +29,41 @@ namespace UltrawideOverlays.Utils
         }
     }
 
+    public sealed class ExecutableExtension
+    {
+        public static readonly ExecutableExtension EXE = new ExecutableExtension(".exe");
+
+        public string Extension { get; }
+
+        private ExecutableExtension(string extension)
+        {
+            Extension = extension;
+        }
+
+        public override string ToString() => Extension;
+
+        public static implicit operator string(ExecutableExtension executableExtension)
+        {
+            return executableExtension.Extension;
+        }
+    }
+
     public static class FileHandlerUtil
     {
         private static readonly HashSet<string> _validImageExtensions =
-            [
+        [
             ImageExtension.PNG,
             ImageExtension.BMP,
             ImageExtension.JPG,
             ImageExtension.JPEG,
             ImageExtension.GIF,
             ImageExtension.SVG
-            ];
+        ];
+
+        private static readonly HashSet<string> _validExecutableExtensions =
+        [
+            ExecutableExtension.EXE
+        ];
 
         /// <summary>
         /// Returns file name without extension.
@@ -91,6 +115,13 @@ namespace UltrawideOverlays.Utils
         public static bool IsValidImagePath(Uri uri)
         {
             return IsValidImagePath(uri.LocalPath);
+        }
+
+        public static bool IsValidExecutablePath(string filePath)
+        {
+            string fileExtension = GetFileExtension(filePath);
+
+            return IsValidFilePath(filePath) && _validExecutableExtensions.Contains(fileExtension.ToLowerInvariant());
         }
 
         public static string? AddImageFileExtension(string filePath, ImageExtension fileExtension)

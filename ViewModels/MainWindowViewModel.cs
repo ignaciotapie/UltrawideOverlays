@@ -44,6 +44,14 @@ namespace UltrawideOverlays.ViewModels
                 return;
             }
             CurrentPage = factory.GetPageViewModel(Enums.ApplicationPageViews.HomePage);
+
+            var viewModel = CurrentPage as HomePageViewModel;
+            if (viewModel != null)
+            {
+                viewModel.GoToGamesTab += (s, e) => NavigateToGamesPage();
+                viewModel.GoToOverlaysTab += (s, e) => NavigateToOverlaysPage();
+            }
+
             pageEnum = Enums.ApplicationPageViews.HomePage;
         }
 

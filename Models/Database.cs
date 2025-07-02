@@ -22,7 +22,7 @@ namespace UltrawideOverlays.Models
         Activities
     }
 
-    internal static class DatabaseSettings 
+    internal static class DatabaseSettings
     {
         public static readonly int MaxActivitiesStored = 50;
     }
@@ -114,11 +114,6 @@ namespace UltrawideOverlays.Models
                     Debug.WriteLine($"Error loading settings from file {settingsFile}: {ex.Message}");
                 }
             }
-            else
-            {
-                Settings = new SettingsDataModel();
-                await SaveAsync(Settings, DatabaseFiles.Settings);
-            }
         }
 
         private async Task LoadOverlays()
@@ -141,7 +136,7 @@ namespace UltrawideOverlays.Models
             }
         }
 
-        public async Task LoadActivities() 
+        public async Task LoadActivities()
         {
             var activityFiles = Directory.GetFiles(DatabasePaths.ActivitiesPath, FileHandlerUtil.AddJSONFileExtension("Activities"));
             foreach (var file in activityFiles)
@@ -157,7 +152,7 @@ namespace UltrawideOverlays.Models
                             // Add activities to the list, ensuring we don't exceed the max limit
                             foreach (var activity in activities)
                             {
-                                AddActivity(activity);
+                                AddActivity(activity, false);
                             }
                         }
                     }
@@ -187,7 +182,7 @@ namespace UltrawideOverlays.Models
                     FileHandlerUtil.CreateDirectory(path);
             }
         }
-        public async Task SaveAsync(object data, DatabaseFiles fileType)
+        public async Task SaveAsync(object? data, DatabaseFiles fileType, bool recordActivity = false)
         {
             string path = string.Empty;
             path = GetPathFromFileType(data, fileType);
@@ -200,18 +195,18 @@ namespace UltrawideOverlays.Models
                     if (Overlays.Contains(overlay))
                     {
                         Overlays.Remove(overlay);
-                        AddActivity(new ActivityLogModel(DateTime.Now, ActivityLogType.Overlays, ActivityLogAction.Updated, overlay.Name));
+                        if (recordActivity) AddActivity(new ActivityLogModel(DateTime.Now, ActivityLogType.Overlays, ActivityLogAction.Updated, overlay.Name));
                     }
-                    else 
+                    else
                     {
-                        AddActivity(new ActivityLogModel(DateTime.Now, ActivityLogType.Overlays, ActivityLogAction.Added, overlay.Name));
+                        if (recordActivity) AddActivity(new ActivityLogModel(DateTime.Now, ActivityLogType.Overlays, ActivityLogAction.Added, overlay.Name));
                     }
 
                     Overlays.Add(overlay);
                     break;
                 case DatabaseFiles.Settings:
                     Settings = (SettingsDataModel)data;
-                    AddActivity(new ActivityLogModel(DateTime.Now, ActivityLogType.Settings, ActivityLogAction.Updated, "Settings"));
+                    if (recordActivity) AddActivity(new ActivityLogModel(DateTime.Now, ActivityLogType.Settings, ActivityLogAction.Updated, "Settings"));
                     break;
                 case DatabaseFiles.Games:
                     var game = data as GamesModel;
@@ -219,7 +214,7 @@ namespace UltrawideOverlays.Models
                     if (Games.Contains(game))
                     {
                         Games.Remove(game);
-                        AddActivity(new ActivityLogModel(DateTime.Now, ActivityLogType.Games, ActivityLogAction.Updated, game.Name));
+                        if (recordActivity) AddActivity(new ActivityLogModel(DateTime.Now, ActivityLogType.Games, ActivityLogAction.Updated, game.Name));
                     }
                     else
                     {
@@ -230,10 +225,6 @@ namespace UltrawideOverlays.Models
                     break;
                 case DatabaseFiles.Images:
                     throw new InvalidOperationException("Cannot save images as JSON");
-                case DatabaseFiles.Activities:
-                    var activity = data as ActivityLogModel;
-                    AddActivity(activity);
-                    break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(fileType), fileType, null);
             }
@@ -243,13 +234,24 @@ namespace UltrawideOverlays.Models
                 WriteIndented = true
             };
 
-            if (fileType == DatabaseFiles.Activities)
-            {
-                data = Activities;
-            }
-
             var json = JsonSerializer.Serialize(data, typeof(Object), serializerOptions);
             await FileHandlerUtil.WriteToJSON(path, json);
+
+            if (recordActivity)
+            {
+                await SaveActivitiesAsync();
+            }
+        }
+
+        private async Task SaveActivitiesAsync()
+        {
+            var serializerOptions = new JsonSerializerOptions
+            {
+                WriteIndented = true
+            };
+
+            var json = JsonSerializer.Serialize(Activities, serializerOptions);
+            await FileHandlerUtil.WriteToJSON(GetPathFromFileType(null, DatabaseFiles.Activities), json);
         }
 
         private string GetPathFromFileType(object data, DatabaseFiles fileType)
@@ -295,6 +297,9 @@ namespace UltrawideOverlays.Models
                         throw new ArgumentException("Data must be of type GamesModel", nameof(data));
                     }
                     path = Path.Combine(DatabasePaths.GamesPath, FileHandlerUtil.AddJSONFileExtension(name));
+                    break;
+                case DatabaseFiles.Activities:
+                    path = Path.Combine(DatabasePaths.ActivitiesPath, FileHandlerUtil.AddJSONFileExtension("Activities"));
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(fileType), fileType, null);
@@ -454,7 +459,7 @@ namespace UltrawideOverlays.Models
             return outString;
         }
 
-        private void AddActivity(ActivityLogModel activity)
+        public void AddActivity(ActivityLogModel activity, bool saveAfter = true)
         {
             if (Activities.Count >= DatabaseSettings.MaxActivitiesStored)
             {
@@ -464,6 +469,11 @@ namespace UltrawideOverlays.Models
             Debug.WriteLine($"Activity: {activity.ToString()}");
 
             Activities.Push(activity);
+
+            if (saveAfter)
+            {
+                SaveActivitiesAsync();
+            }
         }
     }
 }

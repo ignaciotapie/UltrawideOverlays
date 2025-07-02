@@ -2,17 +2,21 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="using:UltrawideOverlays.ViewModels"
+        xmlns:converters="using:UltrawideOverlays.Converters"
         mc:Ignorable="d" d:DesignWidth="3440" d:DesignHeight="1440"
-        Width="3440" Height="1440"
         x:Class="UltrawideOverlays.Views.OverlayView"
         Title="OverlayView"
-        Background="{x:Null}" IsHitTestVisible="False"
-        Topmost="True" ExtendClientAreaToDecorationsHint="True">
-        <Grid Background="{x:Null}" ColumnDefinitions="440, *, 440" IsHitTestVisible="False">
-            <Image></Image>
-            <Border Grid.Column="1" Background="Gray">
-                
-            </Border>
-            <Image Source=""></Image>
-        </Grid>
+        Background="Transparent"
+        ShowInTaskbar="False"
+        WindowStartupLocation="Manual"
+        IsHitTestVisible="False"
+        Topmost="True"
+        ExtendClientAreaToDecorationsHint="True"
+        ExtendClientAreaChromeHints="NoChrome"
+        ExtendClientAreaTitleBarHeightHint="-1"
+        x:DataType="vm:OverlayViewModel">
+
+    <Image Source="{Binding ImageSource, Converter={x:Static converters:PathToBitmapConverter.Converter}, ConverterParameter=false}"
+           Stretch="Uniform"/>
 </Window>

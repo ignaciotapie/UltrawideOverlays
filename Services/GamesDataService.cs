@@ -39,7 +39,7 @@ namespace UltrawideOverlays.Services
             var db = await _provider.GetDatabaseAsync();
             var tasks = new List<Task>();
 
-            tasks.Add(db.SaveAsync(game, DatabaseFiles.Games));
+            tasks.Add(db.SaveAsync(game, DatabaseFiles.Games, true));
 
             await Task.WhenAll(tasks);
         }

@@ -3,6 +3,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="using:UltrawideOverlays.ViewModels"
+             xmlns:converters="using:UltrawideOverlays.Converters"
              mc:Ignorable="d" d:DesignWidth="1200" d:DesignHeight="1000"
              Background="{DynamicResource PrimaryBackground}"
              x:Class="UltrawideOverlays.Views.HomePageView"
@@ -13,56 +14,113 @@
     </Design.DataContext>
 
     <UserControl.Styles>
-        <Style Selector="Border.Slot">
-            <Setter Property="Background" Value="{DynamicResource PrimaryColor}"/>
-            <Setter Property="BorderBrush" Value="{DynamicResource PrimaryAccent}"/>
-            <Setter Property="BorderThickness" Value="2"/>
-            <Setter Property="CornerRadius" Value="10"/>
-            <Setter Property="Margin" Value="30,20"/>
+        <Style Selector="Button.Home">
+            <Setter Property="CornerRadius" Value="5"/>
+            <Setter Property="HorizontalAlignment" Value="Stretch"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Height" Value="50"/>
+            <Setter Property="Background" Value="{DynamicResource HomeNewGame}"/>
         </Style>
     </UserControl.Styles>
+    <UserControl.Resources>
+        <converters:ActivityTypeToIconSource x:Key="activityIconConverter"/>
+    </UserControl.Resources>
 
-    <Border Margin="10,-10,10,0">
-        <Grid RowDefinitions="Auto,*,*,*">
+    <Border Margin="10,-10,10, 10">
+        <Grid RowDefinitions="Auto,230,Auto,Auto">
             <StackPanel Spacing="-10">
                 <Label Classes="Title" FontSize="40">Welcome to Ultrawide Overlays!</Label>
-                <Label Classes="Subtitle" FontSize="24">Enhance your gaming experience by eliminating black bars with custom overlays!</Label>
+                <Label Classes="Subtitle" FontSize="24">Enhance your gaming experience by covering black bars with custom overlays</Label>
             </StackPanel>
             <Grid Grid.Row="1" ColumnDefinitions="*,*,*">
                 <Border Classes="Slot">
-                    <StackPanel>
-                        <Label Classes="Title">Games Configured</Label>
-                    </StackPanel>
+                    <RelativePanel Margin="20">
+                        <Border RelativePanel.AlignVerticalCenterWith="Number" Background="{DynamicResource HomeNewGame}" Width="60" Height="60" CornerRadius="5" Opacity="0.1">
+                            <Image Classes="TabIcon" Width="40" Height="40">
+                                <Image.Source>
+                                    <SvgImage Source="{StaticResource GamesLogoColored}"/>
+                                </Image.Source>
+                            </Image>
+                        </Border>
+                        <Label Name="Number" RelativePanel.AlignRightWithPanel="True" Classes="Number" Content="{Binding AmountOfGames}"></Label>
+                        <StackPanel RelativePanel.AlignBottomWithPanel="True">
+                            <Label Classes="Title">Games Configured</Label>
+                            <Label Classes="Subtitle">Ready for overlay enhancement!</Label>
+                        </StackPanel>
+                    </RelativePanel>
                 </Border>
                 <Border Grid.Column="1" Classes="Slot">
-                    <StackPanel>
-                        <Label Classes="Title">Total Overlays</Label>
-                    </StackPanel>
+                    <RelativePanel Margin="20">
+                        <Border RelativePanel.AlignVerticalCenterWith="NumberOverlays" Background="{DynamicResource HomeNewOverlay}" Width="60" Height="60" CornerRadius="5" Opacity="0.1">
+                            <Image Classes="TabIcon" Width="40" Height="40">
+                                <Image.Source>
+                                    <SvgImage Source="{StaticResource OverlayLogoColored}"/>
+                                </Image.Source>
+                            </Image>
+                        </Border>
+                        <Label Name="NumberOverlays" RelativePanel.AlignRightWithPanel="True" Classes="Number" Content="{Binding AmountOfOverlays}"></Label>
+                        <StackPanel RelativePanel.AlignBottomWithPanel="True">
+                            <Label Classes="Title">Total Overlays</Label>
+                            <Label Classes="Subtitle">Make some more overlays!</Label>
+                        </StackPanel>
+                    </RelativePanel>
                 </Border>
+
                 <Border Grid.Column="2" Classes="Slot">
-                    <StackPanel>
-                        <Label Classes="Title">Last Overlay Used</Label>
-                    </StackPanel>
+                    <RelativePanel Margin="20">
+                        <Label RelativePanel.AlignRightWithPanel="True" Classes="Number"></Label>
+                        <StackPanel RelativePanel.AlignBottomWithPanel="True">
+                            <Label Classes="Title">Last Overlay Used</Label>
+                            <Label Classes="Subtitle">Hope you liked this one!</Label>
+                        </StackPanel>
+                    </RelativePanel>
                 </Border>
             </Grid>
 
             <Grid Grid.Row="2" ColumnDefinitions="*,*">
                 <Border Classes="Slot">
-                    <StackPanel>
+                    <StackPanel Margin="20">
                         <Label Classes="Title">Games Setup</Label>
+                        <Label Classes="Subtitle" FontSize="20">Add a new game and configure overlay settings</Label>
+                        <Button Classes="Primary Home" Command="{Binding NavigateToGamesPageCommand}">Add New Game</Button>
                     </StackPanel>
                 </Border>
                 <Border Grid.Column="1" Classes="Slot">
-                    <StackPanel>
+                    <Grid RowDefinitions="*,*,*" Margin="20">
                         <Label Classes="Title">Overlay Library</Label>
-                    </StackPanel>
+                        <Label Grid.Row="1" Classes="Subtitle" FontSize="20">Browse and create your overlays!</Label>
+                        <Button Grid.Row="2" Classes="Primary Home" Background="{DynamicResource HomeNewOverlay}" Command="{Binding NavigateToOverlaysPageCommand}">Browse Library</Button>
+                    </Grid>
                 </Border>
             </Grid>
 
-            <Grid Grid.Row="3" ColumnDefinitions="*">
+            <Grid Grid.Row="3">
                 <Border Classes="Slot">
-                    <StackPanel>
+                    <StackPanel Margin="20">
                         <Label Classes="Title">Recent Activity</Label>
+                        <ItemsControl ItemsSource="{Binding Activities}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Horizontal" Spacing="10" Margin="0,9">
+                                        <Grid>
+                                            <Border Background="{Binding TypeColor}" Width="40" Height="40" CornerRadius="5" Opacity="0.1">
+                                                <Image Classes="TabIcon">
+                                                    <Image.Source>
+                                                        <SvgImage Source="{Binding Type, Converter={StaticResource activityIconConverter}}"/>
+                                                    </Image.Source>
+                                                </Image>
+                                            </Border>
+                                        </Grid>
+                                        <StackPanel Orientation="Horizontal">
+                                            <Label Classes="Primary" Content="{Binding TypeString}"></Label>
+                                            <Label Classes="Primary" FontWeight="Bold" Content="{Binding InvolvedObject}"></Label>
+                                            <Label Classes="Primary" Content="{Binding ActionString}"></Label>
+                                        </StackPanel>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
                     </StackPanel>
                 </Border>
             </Grid>

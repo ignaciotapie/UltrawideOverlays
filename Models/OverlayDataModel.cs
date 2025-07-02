@@ -9,6 +9,8 @@ namespace UltrawideOverlays.Models
         public string Path { get; set; }
         public int Width { get; set; }
         public int Height { get; set; }
+
+        public string Resolution => $"{Width}x{Height}";
         public int NumberOfImages { get; set; }
         public IList<ImageModel>? ImageModels { get; set; }
         public IList<ClippingMaskModel>? ClippingMaskModels { get; set; }

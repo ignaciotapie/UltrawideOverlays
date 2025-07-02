@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using UltrawideOverlays.Factories;
@@ -25,7 +24,7 @@ namespace UltrawideOverlays.Services
         {
             var db = await _provider.GetDatabaseAsync();
 
-            db.SaveAsync(activity, DatabaseFiles.Activities);
+            db.AddActivity(activity);
         }
     }
 }

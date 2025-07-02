@@ -1,19 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Avalonia.Media;
+using System;
+using UltrawideOverlays.Utils;
 
 namespace UltrawideOverlays.Models
 {
-    public enum ActivityLogType 
+    public enum ActivityLogType
     {
         Games,
         Overlays,
         Settings
     }
 
-    public enum ActivityLogAction 
+    public enum ActivityLogAction
     {
         Added,
         Removed,
@@ -26,9 +24,50 @@ namespace UltrawideOverlays.Models
     {
         public DateTime Timestamp { get; set; }
         public ActivityLogAction Action { get; set; }
-        public ActivityLogType Type { get; set; }
-        public string InvolvedObject { get; set; }
 
+        private ActivityLogType _type;
+        public ActivityLogType Type { get => _type; set => SetType(value); }
+        public string InvolvedObject { get; set; }
+        public IBrush TypeColor { get; private set; }
+
+        private void SetType(ActivityLogType value)
+        {
+            _type = value;
+
+            TypeColor = value switch
+            {
+                ActivityLogType.Games => AppColors.Get("HomeNewGame"),
+                ActivityLogType.Overlays => AppColors.Get("HomeNewOverlay"),
+                ActivityLogType.Settings => AppColors.Get("HomeSettings"),
+            };
+        }
+
+        public string TypeString => Type switch
+        {
+            ActivityLogType.Games => "Game",
+            ActivityLogType.Overlays => "Overlay",
+            ActivityLogType.Settings => "Settings",
+            _ => "Unknown"
+        };
+        public string ActionString => Action switch
+        {
+            ActivityLogAction.Added => "added",
+            ActivityLogAction.Removed => "removed",
+            ActivityLogAction.Updated => "was updated",
+            ActivityLogAction.Viewed => "was viewed",
+            ActivityLogAction.Executed => "triggered",
+            _ => "unknown action"
+        };
+        public string Message => ToString();
+
+
+        public ActivityLogModel()
+        {
+            Timestamp = DateTime.Now;
+            Action = ActivityLogAction.Viewed;
+            Type = ActivityLogType.Games;
+            InvolvedObject = "Unknown";
+        }
         public ActivityLogModel(DateTime timestamp, ActivityLogType type, ActivityLogAction action, string involvedObject)
         {
             Timestamp = timestamp;
@@ -41,39 +80,11 @@ namespace UltrawideOverlays.Models
         {
             var outString = "";
 
-            switch (Type)
-            {
-                case ActivityLogType.Games:
-                    outString += "Game ";
-                    break;
-                case ActivityLogType.Overlays:
-                    outString += "Overlay ";
-                    break;
-                case ActivityLogType.Settings:
-                    outString += "Settings ";
-                    break;
-            }
+            outString += TypeString + " ";
 
             outString += InvolvedObject + " ";
 
-            switch (Action)
-            {
-                case ActivityLogAction.Added:
-                    outString += "added";
-                    break;
-                case ActivityLogAction.Removed:
-                    outString += "removed";
-                    break;
-                case ActivityLogAction.Updated:
-                    outString += "was updated";
-                    break;
-                case ActivityLogAction.Viewed:
-                    outString += "was viewed";
-                    break;
-                case ActivityLogAction.Executed:
-                    outString += "triggered";
-                    break;
-            }
+            outString += ActionString;
 
             return outString;
         }

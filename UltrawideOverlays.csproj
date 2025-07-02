@@ -11,6 +11,7 @@
   </PropertyGroup>
   <PropertyGroup Label="Avalonia">
     <AvaloniaNameGeneratorDefaultFieldModifier>Internal</AvaloniaNameGeneratorDefaultFieldModifier>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
 
   <ItemGroup>
@@ -27,6 +28,9 @@
     <None Remove="Assets\Images\copy-icon.svg" />
     <None Remove="Assets\Images\delete-icon.svg" />
     <None Remove="Assets\Images\home-logo.svg" />
+    <None Remove="Assets\Images\joystick-logo-colored.svg" />
+    <None Remove="Assets\Images\overlay-logo-colored.svg" />
+    <None Remove="Assets\Images\settings-icon-colored.svg" />
     <None Remove="Assets\Images\settings-icon.svg" />
     <None Remove="Assets\Images\tv-icon-white.svg" />
   </ItemGroup>
@@ -36,6 +40,10 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
   </ItemGroup>
+
+   <ItemGroup>
+       <AvaloniaResource Include="Assets\Images\tv-icon.ico" />
+   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Avalonia" Version="11.2.6" />

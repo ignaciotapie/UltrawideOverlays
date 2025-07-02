@@ -72,7 +72,7 @@
     </Style>
 
     <Style Selector="Label.Number">
-        <Setter Property="FontSize" Value="16"></Setter>
+        <Setter Property="FontSize" Value="30"></Setter>
         <Setter Property="FontWeight" Value="Bold"></Setter>
         <Setter Property="Foreground" Value="{DynamicResource PrimaryFontColor}"></Setter>
     </Style>
@@ -123,6 +123,14 @@
         <Setter Property="Stretch" Value="Fill"/>
         <Setter Property="Fill" Value="{DynamicResource PrimaryAccent}"/>
         <Setter Property="VerticalAlignment" Value="Bottom"/>
+    </Style>
+
+    <Style Selector="Border.Slot">
+        <Setter Property="Background" Value="{DynamicResource PrimaryColor}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource PrimaryAccent}"/>
+        <Setter Property="BorderThickness" Value="2"/>
+        <Setter Property="CornerRadius" Value="10"/>
+        <Setter Property="Margin" Value="30,20"/>
     </Style>
     
 </Styles>

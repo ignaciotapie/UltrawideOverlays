@@ -23,13 +23,21 @@
         <SolidColorBrush x:Key="SecondaryAccent">#e57228</SolidColorBrush>
         <SolidColorBrush x:Key="LinkAccent">#459ff6</SolidColorBrush>
         <SolidColorBrush x:Key="PrimaryBackground">#0f0f0f</SolidColorBrush>
-
+        
+         <!-- Home Only Colors-->
+        <SolidColorBrush x:Key="HomeNewGame">#048ca7</SolidColorBrush>
+        <SolidColorBrush x:Key="HomeNewOverlay">#2c0a79</SolidColorBrush>
+        <SolidColorBrush x:Key="HomeSettings">#4ff0ba</SolidColorBrush>
+        
          <!-- Images and Icons-->
         <SvgSource x:Key="TvLogo">/Assets/Images/tv-icon-white.svg</SvgSource>
         <SvgSource x:Key="SettingLogo">/Assets/Images/settings-icon.svg</SvgSource>
+        <SvgSource x:Key="SettingLogoColored">/Assets/Images/settings-icon-colored.svg</SvgSource>
         <SvgSource x:Key="HomeLogo">/Assets/Images/home-logo.svg</SvgSource>
         <SvgSource x:Key="OverlayLogo">/Assets/Images/overlay-logo.svg</SvgSource>
+        <SvgSource x:Key="OverlayLogoColored">/Assets/Images/overlay-logo-colored.svg</SvgSource>
         <SvgSource x:Key="GamesLogo">/Assets/Images/joystick-logo.svg</SvgSource>
+        <SvgSource x:Key="GamesLogoColored">/Assets/Images/joystick-logo-colored.svg</SvgSource>
         <SvgSource x:Key="CopyIcon">/Assets/Images/copy-icon.svg</SvgSource>
         <SvgSource x:Key="DeleteIcon">/Assets/Images/delete-icon.svg</SvgSource>
         <SvgSource x:Key="UploadIcon">/Assets/Images/upload-icon.svg</SvgSource>
@@ -45,4 +53,20 @@
         <StyleInclude Source="/Styles/MainWindowStyle.axaml"/>
         <StyleInclude Source="avares://Avalonia.Controls.ColorPicker/Themes/Fluent/Fluent.xaml" />
     </Application.Styles>
+
+    <TrayIcon.Icons>
+        <TrayIcons>
+            <TrayIcon Icon="/Assets/Images/tv-icon.ico"
+                      ToolTipText="UltrawideOverlays"
+                      Clicked="Open_Click">
+                <TrayIcon.Menu>
+                    <NativeMenu>
+                        <NativeMenuItem Header="Open" Click="Open_Click"/>
+                        <NativeMenuItemSeparator />
+                        <NativeMenuItem Header="Quit" Click="Quit_Click"/>
+                    </NativeMenu>
+                </TrayIcon.Menu>
+            </TrayIcon>
+        </TrayIcons>
+    </TrayIcon.Icons>
 </Application>

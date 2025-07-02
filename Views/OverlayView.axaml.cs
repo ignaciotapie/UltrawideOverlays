@@ -1,5 +1,6 @@
+using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Interactivity;
+using System;
 
 namespace UltrawideOverlays.Views;
 
@@ -8,18 +9,43 @@ public partial class OverlayView : Window
     public OverlayView()
     {
         InitializeComponent();
+
+        // Set window properties
+        this.Position = new PixelPoint(0, 0);
+        this.Width = Screens.Primary.Bounds.Width; //TODO: Settings monitor selection?
+        this.Height = Screens.Primary.Bounds.Height;
+        this.CanResize = false;
     }
 
-    protected override void OnLoaded(RoutedEventArgs e)
+    protected override void OnOpened(EventArgs e)
     {
-        base.OnLoaded(e);
-        // Add custom window styles
-        Win32Properties.AddWindowStylesCallback(this, addWindowStyle);
+        base.OnOpened(e);
+        ApplyWindowStyles();
     }
 
-    private (uint style, uint exStyle) addWindowStyle(uint style, uint exStyle)
+    private void ApplyWindowStyles()
     {
-        // Add WS_EX_LAYERED to the extended style
-        return (style, exStyle | 0x00000020);
+        var platformHandle = this.TryGetPlatformHandle();
+        if (platformHandle?.Handle != null)
+        {
+            var hwnd = platformHandle.Handle;
+
+            // Get current extended style
+            var exStyle = (uint)NativeWindowUtils.GetWindowLong(hwnd, NativeWindowUtils.GWL_EXSTYLE);
+
+            // Set new styles
+            exStyle |= NativeWindowUtils.WS_EX_LAYERED
+                    | NativeWindowUtils.WS_EX_TRANSPARENT
+                    | NativeWindowUtils.WS_EX_NOACTIVATE
+                    | NativeWindowUtils.WS_EX_TOOLWINDOW;
+
+            NativeWindowUtils.SetWindowLong(
+                hwnd,
+                NativeWindowUtils.GWL_EXSTYLE,
+                (IntPtr)exStyle);
+
+            // Optional: Set layered window attributes
+            NativeWindowUtils.SetLayeredWindowAttributes(hwnd, 0, 255, 0x2 /* LWA_ALPHA */);
+        }
     }
 }

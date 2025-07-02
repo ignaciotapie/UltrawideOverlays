@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 using UltrawideOverlays.Factories;
 using UltrawideOverlays.Models;
 using UltrawideOverlays.Services;
-
+using UltrawideOverlays.Utils;
 using Bitmap = Avalonia.Media.Imaging.Bitmap;
 
 namespace UltrawideOverlays.ViewModels
@@ -163,6 +163,7 @@ namespace UltrawideOverlays.ViewModels
         {
             if (value != null)
             {
+                GameName = value.Name;
                 GameExecutablePath = value.Path;
             }
         }
@@ -245,10 +246,10 @@ namespace UltrawideOverlays.ViewModels
             }
 
             var file = files.FirstOrDefault();
-            if (file != null)
+            if (file != null && FileHandlerUtil.IsValidExecutablePath(file.TryGetLocalPath()))
             {
                 GameExecutablePath = file.Path.AbsolutePath;
-                GameName = file.Name;
+                GameName = FileHandlerUtil.GetFileName(file.Name);
                 var foundProcess = Processes.FirstOrDefault(p => p.Name.Equals(file.Name, StringComparison.OrdinalIgnoreCase) || p.Path.Equals(file.Path.LocalPath, StringComparison.OrdinalIgnoreCase));
                 if (foundProcess != null)
                 {

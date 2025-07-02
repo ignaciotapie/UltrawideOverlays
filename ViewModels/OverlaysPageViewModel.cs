@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using System;
 using System.Collections.ObjectModel;
+using System.Linq;
 using UltrawideOverlays.Converters;
 using UltrawideOverlays.Factories;
 using UltrawideOverlays.Models;
@@ -20,6 +21,9 @@ namespace UltrawideOverlays.ViewModels
 
         [ObservableProperty]
         private int _selectedOverlayIndex;
+
+        [ObservableProperty]
+        private string _searchBoxText;
 
         private readonly WindowFactory? factory;
         private readonly OverlayDataService? overlayDataService;
@@ -56,29 +60,31 @@ namespace UltrawideOverlays.ViewModels
             LoadOverlaysAsync();
         }
 
-        private async void LoadOverlaysAsync()
+        partial void OnSearchBoxTextChanged(string value)
         {
-            try
+            if (string.IsNullOrWhiteSpace(value))
             {
-                var overlays = await overlayDataService.LoadAllOverlaysAsync();
-                if (overlays != null)
-                {
-                    Overlays.Clear();
-                    foreach (var overlay in overlays)
-                    {
-                        Overlays.Add(overlay);
-                    }
-                    //Default to first overlay
-                    if (Overlays.Count > 0)
-                    {
-                        SelectedOverlayIndex = 0;
-                    }
-                }
+                // If the search box is empty, show all overlays
+                LoadOverlaysAsync();
             }
-            catch (Exception ex)
+            else
             {
-                // Log or handle error
-                System.Diagnostics.Debug.WriteLine($"Error loading overlays: {ex.Message}");
+                // Filter overlays based on the search text
+                var filteredOverlays = new ObservableCollection<OverlayDataModel>(
+                    Overlays.Where(o => o.Name.Contains(value, StringComparison.OrdinalIgnoreCase)));
+
+                Overlays.Clear();
+                foreach (var overlay in filteredOverlays)
+                {
+                    Overlays.Add(overlay);
+                }
+
+                // Reset selected overlay if no overlays match
+                if (Overlays.Count == 0)
+                {
+                    SelectedOverlay = null;
+                    SelectedOverlayIndex = -1;
+                }
             }
         }
 
@@ -148,7 +154,32 @@ namespace UltrawideOverlays.ViewModels
         ///////////////////////////////////////////
         /// PRIVATE FUNCTIONS
         ///////////////////////////////////////////
-        ///
+
+        private async void LoadOverlaysAsync()
+        {
+            try
+            {
+                var overlays = await overlayDataService.LoadAllOverlaysAsync();
+                if (overlays != null)
+                {
+                    Overlays.Clear();
+                    foreach (var overlay in overlays)
+                    {
+                        Overlays.Add(overlay);
+                    }
+                    //Default to first overlay
+                    if (Overlays.Count > 0)
+                    {
+                        SelectedOverlayIndex = 0;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                // Log or handle error
+                System.Diagnostics.Debug.WriteLine($"Error loading overlays: {ex.Message}");
+            }
+        }
         private void OverlayWindowClosed(object? sender, EventArgs e)
         {
             if (sender is Window window)

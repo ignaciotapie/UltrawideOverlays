@@ -1,15 +1,83 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using System;
+using System.Collections.ObjectModel;
+using UltrawideOverlays.Models;
+using UltrawideOverlays.Services;
 
 namespace UltrawideOverlays.ViewModels
 {
     public partial class HomePageViewModel : PageViewModel
     {
         [ObservableProperty]
-        private string _homePageName = "Home Page";
+        private int _amountOfGames;
+
+        [ObservableProperty]
+        private int _amountOfOverlays;
+
+        [ObservableProperty]
+        private ObservableCollection<ActivityLogModel> _activities;
+
+        private readonly GeneralDataService _generalService;
+        private readonly ActivityDataService _activityService;
+
+        public event EventHandler? GoToGamesTab;
+        public event EventHandler? GoToOverlaysTab;
+
+        ///////////////////////////////////////////
+        /// CONSTRUCTOR
+        ///////////////////////////////////////////
+
+        /// <summary>
+        /// Design-only constructor
+        /// </summary>
         public HomePageViewModel()
         {
             Page = Enums.ApplicationPageViews.HomePage;
             PageName = "Home";
+
+            AmountOfGames = 10;
+            AmountOfOverlays = 5;
+            Activities = new ObservableCollection<ActivityLogModel>
+            {
+                new ActivityLogModel() {Type = ActivityLogType.Games , Timestamp = DateTime.Now.AddMinutes(-10), Action = ActivityLogAction.Added, InvolvedObject = "Pepitos" },
+                new ActivityLogModel() {Type = ActivityLogType.Settings , Timestamp = DateTime.Now.AddMinutes(-5), Action = ActivityLogAction.Updated, InvolvedObject = "Gallito" },
+                new ActivityLogModel() {Type = ActivityLogType.Overlays  , Timestamp = DateTime.Now.AddMinutes(-2), Action = ActivityLogAction.Removed, InvolvedObject = "Guachines" }
+            };
+        }
+
+        public HomePageViewModel(GeneralDataService generalService, ActivityDataService activityService)
+        {
+            Page = Enums.ApplicationPageViews.HomePage;
+            PageName = "Home";
+
+            _generalService = generalService;
+            _activityService = activityService;
+
+            LoadDataAsync();
+        }
+
+        private async void LoadDataAsync()
+        {
+            AmountOfGames = await _generalService.GetAmountOfGames();
+            AmountOfOverlays = await _generalService.GetAmountOfOverlays();
+            Activities = new ObservableCollection<ActivityLogModel>(await _activityService.LoadLastActivities(3));
+        }
+
+        ///////////////////////////////////////////
+        /// COMMANDS
+        ///////////////////////////////////////////
+
+        [RelayCommand]
+        private void NavigateToGamesPage()
+        {
+            GoToGamesTab?.Invoke(this, EventArgs.Empty);
+        }
+
+        [RelayCommand]
+        private void NavigateToOverlaysPage()
+        {
+            GoToOverlaysTab?.Invoke(this, EventArgs.Empty);
         }
     }
 }

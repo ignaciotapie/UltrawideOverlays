@@ -43,7 +43,7 @@ namespace UltrawideOverlays.Services
                 tasks.Add(db.SaveBitmapFromOverlayAsync(overlay));
             }
 
-            tasks.Add(db.SaveAsync(overlay, DatabaseFiles.Overlays));
+            tasks.Add(db.SaveAsync(overlay, DatabaseFiles.Overlays, true));
 
             await Task.WhenAll(tasks);
         }
