@@ -17,6 +17,5 @@
         ExtendClientAreaTitleBarHeightHint="-1"
         x:DataType="vm:OverlayViewModel">
 
-    <Image Source="{Binding ImageSource, Converter={x:Static converters:PathToBitmapConverter.Converter}, ConverterParameter=false}"
-           Stretch="Uniform"/>
+    <Image Source="{Binding ImageSource, Converter={x:Static converters:PathToBitmapConverter.Converter}}"/>
 </Window>

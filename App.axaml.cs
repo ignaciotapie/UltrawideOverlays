@@ -5,7 +5,9 @@ using Avalonia.Data.Core.Plugins;
 using Avalonia.Markup.Xaml;
 using Microsoft.Extensions.DependencyInjection;
 using System;
+using System.Diagnostics;
 using System.Linq;
+using UltrawideOverlays.Converters;
 using UltrawideOverlays.Factories;
 using UltrawideOverlays.Services;
 using UltrawideOverlays.ViewModels;
@@ -69,6 +71,8 @@ namespace UltrawideOverlays
                 {
                     mainWindow.Hide();
                 }
+
+                PathToBitmapConverter.CleanCache();
             }
         }
 
@@ -106,7 +110,7 @@ namespace UltrawideOverlays
             collection.AddTransient<Func<Enums.WindowViews, object?, Window>>(x => (windowEnum, args) => CreateWindow(x, windowEnum, args));
 
             //Main Window
-            collection.AddSingleton<MainWindowViewModel>();
+            collection.AddTransient<MainWindowViewModel>();
             //PageViewModels
             collection.AddTransient<HomePageViewModel>();
             collection.AddTransient<OverlaysPageViewModel>();
@@ -129,9 +133,8 @@ namespace UltrawideOverlays
                 services = ConfigureServices();
 
                 desktop.MainWindow = services.GetRequiredService<WindowFactory>().CreateWindow(Enums.WindowViews.MainWindow, null);
-                services.GetRequiredService<WindowFactory>().CreateWindow(Enums.WindowViews.OverlayWindow, null).Show();
+                services.GetRequiredService<WindowFactory>().CreateWindow(Enums.WindowViews.OverlayWindow, null);
             }
-
             base.OnFrameworkInitializationCompleted();
         }
 
@@ -168,9 +171,11 @@ namespace UltrawideOverlays
         {
             if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
             {
-                // Close the main window and all child windows
-                desktop.MainWindow.Close();
-                // Ensure the application exits
+                foreach (var window in desktop.Windows.ToList())
+                {
+                    window.Close();
+                }
+
                 desktop.Shutdown();
             }
         }

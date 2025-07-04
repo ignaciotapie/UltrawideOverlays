@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using System.Diagnostics;
 
 namespace UltrawideOverlays.ViewModels
 {
@@ -12,5 +13,11 @@ namespace UltrawideOverlays.ViewModels
             Page = Enums.ApplicationPageViews.SettingsPage;
             PageName = "Settings";
         }
+
+        ~SettingsPageViewModel()
+        {
+            Debug.WriteLine("SettingsPageViewModel finalized!");
+        }
+
     }
 }

@@ -13,7 +13,7 @@ namespace UltrawideOverlays.CustomControls
 {
     public class SelectableImage : SelectableItemBase
     {
-        public ImageModel? ImageModel { get; private set; }
+        public readonly ImageModel? ImageModel;
         public Image? image;
         public Border? border;
         private bool disposedValue;
@@ -36,7 +36,7 @@ namespace UltrawideOverlays.CustomControls
             };
             image.Bind(Image.SourceProperty, new Binding("ImagePath")
             {
-                Converter = new PathToBitmapConverter(),
+                Converter = PathToBitmapConverter.Converter,
                 Mode = BindingMode.OneWay
             });
 
@@ -184,12 +184,15 @@ namespace UltrawideOverlays.CustomControls
                 if (ImageModel != null)
                     ImageModel.PropertyChanged -= ImageModelPropertyChange;
 
-                ImageModel = null;
                 image = null;
+                border = null;
+                Child = null;
+
+                ClearValue(ToolTip.TipProperty);
+
                 disposedValue = true;
             }
             base.Dispose();
-            GC.SuppressFinalize(this);
         }
     }
 }

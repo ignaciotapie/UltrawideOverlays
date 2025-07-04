@@ -52,6 +52,8 @@ namespace UltrawideOverlays.Services
         {
             try
             {
+                // Remove the focus changed event handler to prevent memory leaks
+                _handler.FocusChanged -= (exePath) => FocusChanged?.Invoke(exePath);
                 _automation.RemoveFocusChangedEventHandler(_handler);
             }
             catch { }

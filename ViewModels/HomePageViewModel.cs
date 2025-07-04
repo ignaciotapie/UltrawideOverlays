@@ -2,6 +2,8 @@
 using CommunityToolkit.Mvvm.Input;
 using System;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
+using System.Threading.Tasks;
 using UltrawideOverlays.Models;
 using UltrawideOverlays.Services;
 
@@ -57,7 +59,12 @@ namespace UltrawideOverlays.ViewModels
             LoadDataAsync();
         }
 
-        private async void LoadDataAsync()
+        ~HomePageViewModel()
+        {
+            Debug.WriteLine("HomePageViewModel finalized!");
+        }
+
+        private async Task LoadDataAsync()
         {
             AmountOfGames = await _generalService.GetAmountOfGames();
             AmountOfOverlays = await _generalService.GetAmountOfOverlays();

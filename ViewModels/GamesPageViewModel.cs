@@ -4,6 +4,7 @@ using CommunityToolkit.Mvvm.Input;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
@@ -133,6 +134,11 @@ namespace UltrawideOverlays.ViewModels
             LoadProcessesAsync();
             LoadOverlaysAsync();
             LoadGamesAsync();
+        }
+
+        ~GamesPageViewModel() 
+        {
+            Debug.WriteLine("GamesPageViewModel finalized!");
         }
 
         private async Task LoadProcessesAsync()

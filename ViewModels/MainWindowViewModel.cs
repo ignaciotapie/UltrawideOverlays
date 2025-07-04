@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using System.Diagnostics;
 using UltrawideOverlays.Enums;
 using UltrawideOverlays.Factories;
 
@@ -30,6 +31,11 @@ namespace UltrawideOverlays.ViewModels
             CurrentPage = new OverlaysPageViewModel();
         }
 
+        ~MainWindowViewModel()
+        {
+            Debug.WriteLine("MainWindowViewModel finalized!");
+        }
+
         public MainWindowViewModel(PageFactory PFactory)
         {
             factory = PFactory;
@@ -48,6 +54,8 @@ namespace UltrawideOverlays.ViewModels
             var viewModel = CurrentPage as HomePageViewModel;
             if (viewModel != null)
             {
+                viewModel.GoToGamesTab -= (s, e) => NavigateToGamesPage(); //Unsuscribe if already suscribed.
+                viewModel.GoToOverlaysTab -= (s, e) => NavigateToOverlaysPage();
                 viewModel.GoToGamesTab += (s, e) => NavigateToGamesPage();
                 viewModel.GoToOverlaysTab += (s, e) => NavigateToOverlaysPage();
             }

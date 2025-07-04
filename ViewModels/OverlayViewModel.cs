@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using UltrawideOverlays.Models;
 using UltrawideOverlays.Services;
@@ -33,6 +34,10 @@ namespace UltrawideOverlays.ViewModels
             GamesDataService = gamesDataService;
 
             FocusMonitorService.FocusChanged += FocusChanged;
+        }
+        ~OverlayViewModel()
+        {
+            Debug.WriteLine("OverlayViewModel finalized!");
         }
 
         private async void FocusChanged(string filePath)

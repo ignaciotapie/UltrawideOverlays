@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using System;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Linq;
 using UltrawideOverlays.Converters;
 using UltrawideOverlays.Factories;
@@ -46,6 +47,11 @@ namespace UltrawideOverlays.ViewModels
                 Overlays.Add(new OverlayDataModel("Overlay 2", "Path 2"));
                 Overlays.Add(new OverlayDataModel("Overlay 3", "Path 3"));
             }
+        }
+
+        ~OverlaysPageViewModel()
+        {
+            Debug.WriteLine("OverlaysPageViewModel finalized!");
         }
 
         public OverlaysPageViewModel(OverlayDataService service, WindowFactory WFactory)
@@ -185,7 +191,9 @@ namespace UltrawideOverlays.ViewModels
             if (sender is Window window)
             {
                 window.Closed -= OverlayWindowClosed;
+                window.DataContext = null; // ⬅ BREAKS binding links!
             }
+
             PathToBitmapConverter.CleanCache();
             LoadOverlaysAsync();
         }

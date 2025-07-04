@@ -50,6 +50,11 @@ namespace UltrawideOverlays.ViewModels
             Images = [];
         }
 
+        ~OverlayEditorWindowViewModel()
+        {
+            Debug.WriteLine("OverlayEditorWindowViewModel finalized!");
+        }
+
         public OverlayEditorWindowViewModel(OverlayDataService service, Object? args)
         {
             _overlayDataService = service;

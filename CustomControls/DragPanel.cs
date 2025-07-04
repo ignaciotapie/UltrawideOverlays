@@ -56,6 +56,11 @@ namespace UltrawideOverlays.CustomControls
         /// OVERRIDE FUNCTIONS
         ///////////////////////////////////////////
 
+        protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
+        {
+            base.OnAttachedToVisualTree(e);
+        }
+
         protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
         {
             PointerPressed -= OnPointerPressed;
@@ -98,6 +103,59 @@ namespace UltrawideOverlays.CustomControls
                 foreach (var newItem in args.NewItems!)
                 {
                     if (newItem is Control control)
+                    {
+                        control.PropertyChanged += OnChildPropertyChanged;
+                    }
+                }
+            }
+            else if (args.Action == NotifyCollectionChangedAction.Remove && args.OldItems != null)
+            {
+                foreach (var oldItem in args.OldItems)
+                {
+                    if (oldItem is Control control)
+                    {
+                        control.PropertyChanged -= OnChildPropertyChanged;
+                    }
+                }
+            }
+            else if (args.Action == NotifyCollectionChangedAction.Replace)
+            {
+                if (args.OldItems != null)
+                {
+                    foreach (var oldItem in args.OldItems)
+                    {
+                        if (oldItem is Control control)
+                        {
+                            control.PropertyChanged -= OnChildPropertyChanged;
+                        }
+                    }
+                }
+                if (args.NewItems != null)
+                {
+                    foreach (var newItem in args.NewItems)
+                    {
+                        if (newItem is Control control)
+                        {
+                            control.PropertyChanged += OnChildPropertyChanged;
+                        }
+                    }
+                }
+            }
+            else if (args.Action == NotifyCollectionChangedAction.Reset)
+            {
+                // Unsubscribe from all previously subscribed children
+                foreach (var child in Children)
+                {
+                    if (child is Control control)
+                    {
+                        control.PropertyChanged -= OnChildPropertyChanged;
+                    }
+                }
+
+                // Then re-subscribe to current ones
+                foreach (var child in Children)
+                {
+                    if (child is Control control)
                     {
                         control.PropertyChanged += OnChildPropertyChanged;
                     }

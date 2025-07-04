@@ -8,6 +8,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
+using System.Linq;
+using UltrawideOverlays.Converters;
 using UltrawideOverlays.CustomControls;
 using UltrawideOverlays.Models;
 using UltrawideOverlays.Utils;
@@ -122,6 +124,9 @@ public partial class OverlayEditorWindowView : Window
 
         if (DataContext is OverlayEditorWindowViewModel vm)
         {
+            vmInstance.PropertyChanging -= DataContext_PropertyChanging;
+            vmInstance.PropertyChanged -= DataContext_PropertyChanged;
+
             vmInstance = vm;
 
             vmInstance.PropertyChanging += DataContext_PropertyChanging;
@@ -164,12 +169,28 @@ public partial class OverlayEditorWindowView : Window
 
     private void OnUnloaded(object? sender, RoutedEventArgs e)
     {
+        if (vmInstance == null) return;
         vmInstance.Images.CollectionChanged -= ImageCollectionChanged;
 
         foreach (ImageModel im in vmInstance!.Images)
         {
             DisposeImageModel(im);
         }
+
+        foreach (var image in modelImageDictionary.Values)
+        {
+            image.ItemSelectedChanged -= OnSelectableImageSelected;
+            image.Dispose();
+        }
+
+        vmInstance.PropertyChanging -= DataContext_PropertyChanging;
+        vmInstance.PropertyChanged -= DataContext_PropertyChanged;
+        PropertyChanged -= OnPropertyChanged;
+
+        modelImageDictionary.Clear();
+        PathToBitmapConverter.CleanCache();
+        vmInstance = null;
+        DataContext = null;
 
         Loaded -= OnLoaded;
         Unloaded -= OnUnloaded;
@@ -203,6 +224,13 @@ public partial class OverlayEditorWindowView : Window
         {
             RemoveImages(e.OldItems);
         }
+        else if (e.Action == NotifyCollectionChangedAction.Reset)
+        {
+            foreach (var im in modelImageDictionary.Keys.ToList())
+            {
+                DisposeImageModel(im);
+            }
+        }
     }
 
     private void RemoveImages(IList? images)
@@ -214,24 +242,22 @@ public partial class OverlayEditorWindowView : Window
                 DisposeImageModel(im);
             }
         }
-        GC.Collect();
-        GC.WaitForPendingFinalizers();
     }
 
     private void DisposeImageModel(ImageModel im)
     {
-        var image = modelImageDictionary[im];
-        image.ItemSelectedChanged -= OnSelectableImageSelected;
-
-        // Remove from visual tree if needed
-        if (image.Parent is Panel parent)
+        if (modelImageDictionary.TryGetValue(im, out var image))
         {
-            parent.Children.Remove(image);
+            image.ItemSelectedChanged -= OnSelectableImageSelected;
+
+            if (image.Parent is Panel parent)
+            {
+                parent.Children.Remove(image);
+            }
+
+            modelImageDictionary.Remove(im);
+            image.Dispose();
         }
-
-        modelImageDictionary.Remove(im);
-
-        image.Dispose();
     }
 
     private void GenerateImages(IList? images)
