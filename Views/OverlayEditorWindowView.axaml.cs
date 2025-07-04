@@ -124,9 +124,11 @@ public partial class OverlayEditorWindowView : Window
 
         if (DataContext is OverlayEditorWindowViewModel vm)
         {
-            vmInstance.PropertyChanging -= DataContext_PropertyChanging;
-            vmInstance.PropertyChanged -= DataContext_PropertyChanged;
-
+            if (vmInstance != null) 
+            {
+                vmInstance.PropertyChanging -= DataContext_PropertyChanging;
+                vmInstance.PropertyChanged -= DataContext_PropertyChanged;
+            }
             vmInstance = vm;
 
             vmInstance.PropertyChanging += DataContext_PropertyChanging;
