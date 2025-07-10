@@ -30,6 +30,8 @@
     <None Remove="Assets\Images\home-logo.svg" />
     <None Remove="Assets\Images\joystick-logo-colored.svg" />
     <None Remove="Assets\Images\overlay-logo-colored.svg" />
+    <None Remove="Assets\Images\resize-height-icon.svg" />
+    <None Remove="Assets\Images\resize-width-icon.svg" />
     <None Remove="Assets\Images\settings-icon-colored.svg" />
     <None Remove="Assets\Images\settings-icon.svg" />
     <None Remove="Assets\Images\tv-icon-white.svg" />

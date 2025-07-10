@@ -3,6 +3,7 @@ using Avalonia.Data.Converters;
 using Avalonia.Media.Imaging;
 using System;
 using System.Collections.Concurrent;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 
@@ -38,9 +39,9 @@ namespace UltrawideOverlays.Converters
                     return bitmap;
                 }
             }
-            catch
+            catch (Exception ex)
             {
-                // Fail silently, return unset
+                Debug.WriteLine($"Could not convert to Bitmap, Path: {path}, Msg: {ex.Message}");
             }
 
             return AvaloniaProperty.UnsetValue;

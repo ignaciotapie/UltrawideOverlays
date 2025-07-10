@@ -30,7 +30,10 @@ namespace UltrawideOverlays.CustomControls
         public static void SetPosition(Control control, Point value)
         {
             Debug.WriteLine($"Setting position of {control} to {value}");
-            control.SetValue(PositionProperty, value);
+            if (GetDraggable(control))
+            {
+                control.SetValue(PositionProperty, value);
+            }
         }
 
         public static readonly StyledProperty<int> SnappingGridSizeProperty =
@@ -40,6 +43,11 @@ namespace UltrawideOverlays.CustomControls
             get => GetValue(SnappingGridSizeProperty);
             set => SetValue(SnappingGridSizeProperty, value);
         }
+
+        public static readonly StyledProperty<bool> DraggableProperty =
+            AvaloniaProperty.RegisterAttached<DragPanel, Control, bool>("Draggable", true);
+        public static void SetDraggable(Control control, bool value) => control.SetValue(DraggableProperty, value);
+        public static bool GetDraggable(Control control) => control.GetValue(DraggableProperty);
 
         ///////////////////////////////////////////
         /// CONSTRUCTOR

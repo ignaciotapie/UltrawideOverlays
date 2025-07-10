@@ -136,7 +136,7 @@ namespace UltrawideOverlays.ViewModels
             LoadGamesAsync();
         }
 
-        ~GamesPageViewModel() 
+        ~GamesPageViewModel()
         {
             Debug.WriteLine("GamesPageViewModel finalized!");
         }
@@ -254,7 +254,7 @@ namespace UltrawideOverlays.ViewModels
             var file = files.FirstOrDefault();
             if (file != null && FileHandlerUtil.IsValidExecutablePath(file.TryGetLocalPath()))
             {
-                GameExecutablePath = file.Path.AbsolutePath;
+                GameExecutablePath = file.Path.LocalPath;
                 GameName = FileHandlerUtil.GetFileName(file.Name);
                 var foundProcess = Processes.FirstOrDefault(p => p.Name.Equals(file.Name, StringComparison.OrdinalIgnoreCase) || p.Path.Equals(file.Path.LocalPath, StringComparison.OrdinalIgnoreCase));
                 if (foundProcess != null)

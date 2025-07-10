@@ -2,9 +2,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Data;
 using System;
-using System.ComponentModel;
 using System.Diagnostics;
-using UltrawideOverlays.ViewModels;
 
 namespace UltrawideOverlays.Views;
 
@@ -54,7 +52,7 @@ public partial class OverlayView : Window
 
     protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
     {
-        if (change.Property == ImageSourceExistsProperty) 
+        if (change.Property == ImageSourceExistsProperty)
         {
             if (change.NewValue is string exists && exists == "True")
             {

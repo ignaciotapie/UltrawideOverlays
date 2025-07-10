@@ -5,7 +5,6 @@ using Avalonia.Data.Core.Plugins;
 using Avalonia.Markup.Xaml;
 using Microsoft.Extensions.DependencyInjection;
 using System;
-using System.Diagnostics;
 using System.Linq;
 using UltrawideOverlays.Converters;
 using UltrawideOverlays.Factories;
@@ -89,6 +88,7 @@ namespace UltrawideOverlays
             collection.AddSingleton<ProcessDataService>();
             collection.AddSingleton<ActivityDataService>();
             collection.AddSingleton<GeneralDataService>();
+            collection.AddSingleton<SettingsDataService>();
 
             var focusMonitorService = new FocusMonitorService();
             collection.AddSingleton(focusMonitorService);

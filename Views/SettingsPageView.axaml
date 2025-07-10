@@ -3,15 +3,154 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:vm="using:UltrawideOverlays.ViewModels"
-        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        xmlns:converters="using:UltrawideOverlays.Converters"
+        mc:Ignorable="d" d:DesignWidth="1200" d:DesignHeight="1000"
+        Background="{DynamicResource PrimaryBackground}"
         x:Class="UltrawideOverlays.Views.SettingsPageView"
         x:DataType="vm:SettingsPageViewModel">
 
-    <Grid ColumnDefinitions="*, *" RowDefinitions="*, *" Background="{DynamicResource PrimaryBackground}">
-        <!-- Content-->
-        <Grid Margin="10" ColumnDefinitions="20, 10, *" VerticalAlignment="Top">
-            <CheckBox></CheckBox>
-            <Label Grid.Column="2" VerticalAlignment="Center">Open on Startup</Label>
+    <UserControl.Styles>
+        <Style Selector="Border.OptionCategory">
+            <Setter Property="BorderBrush" Value="{DynamicResource PrimaryAccent}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="5"/>
+            <Setter Property="Padding" Value="10"/>
+            <Setter Property="Margin" Value="0,10"/>
+            <Setter Property="Background" Value="{DynamicResource PrimaryColor}"/>
+        </Style>
+        <Style Selector="StackPanel > RelativePanel">
+            <Setter Property="Margin" Value="10"/>
+            <Setter Property="Name" Value="Option"/>
+        </Style>
+        <Style Selector="RelativePanel > CheckBox">
+            <Setter Property="Margin" Value="0,15,0,0"/>
+            <Setter Property="RelativePanel.AlignRightWithPanel" Value="True"/>
+        </Style>
+        <Style Selector="RelativePanel > Slider">
+            <Setter Property="Margin" Value="0,15,0,0"/>
+            <Setter Property="RelativePanel.AlignRightWithPanel" Value="True"/>
+        </Style>
+        <Style Selector="RelativePanel > Button">
+            <Setter Property="Margin" Value="0,15,0,0"/>
+            <Setter Property="RelativePanel.AlignRightWithPanel" Value="True"/>
+        </Style>
+        <Style Selector="RelativePanel > ComboBox">
+            <Setter Property="Margin" Value="0,15,0,0"/>
+            <Setter Property="RelativePanel.AlignRightWithPanel" Value="True"/>
+        </Style>
+        <Style Selector="RelativePanel > ToggleSwitch">
+            <Setter Property="Margin" Value="0,15,0,0"/>
+            <Setter Property="RelativePanel.AlignRightWithPanel" Value="True"/>
+        </Style>
+        <Style Selector="Button.Edit">
+            <Setter Property="Width" Value="50"/>
+            <Setter Property="Height" Value="40"/>
+        </Style>
+        <Style Selector="ComboBox">
+            <Setter Property="Width" Value="400"/>
+            <Setter Property="Height" Value="50"/>
+        </Style>
+        <Style Selector="TextBox">
+            <Setter Property="Width" Value="50"/>
+            <Setter Property="Height" Value="50"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+        </Style>
+    </UserControl.Styles>
+    <UserControl.Resources>
+        <converters:StringToColorConverter x:Key="stringToColorConverter"/>
+    </UserControl.Resources>
+    
+    <Border Margin="10,10,10,0">
+        <Grid RowDefinitions="Auto, *">
+            <RelativePanel Margin="0,0,15,10">
+                <StackPanel Spacing="0" RelativePanel.AlignVerticalCenterWithPanel="True">
+                    <Label Name="Title" Classes="Title" Margin="0,-10" FontSize="24">Settings</Label>
+                    <Label RelativePanel.Below="Title"  Name="Subtitle" Classes="Subtitle" FontSize="16">Update your default settings to your own choice</Label>
+                </StackPanel>
+                <Button RelativePanel.LeftOf="SaveButton" RelativePanel.AlignVerticalCenterWithPanel="True" HorizontalAlignment="Left" Classes="Primary Red" Command="{Binding GetDefaultSettingsCommand}" Margin="10,0">Return to Default Settings</Button>
+                <Button Name="SaveButton" RelativePanel.AlignVerticalCenterWithPanel="True" Classes="Primary Blue" Command="{Binding SaveSettingsCommand}" HorizontalAlignment="Right" Margin="0">Save Settings</Button>
+            </RelativePanel>
+            <ScrollViewer Grid.Row="1" AllowAutoHide="True">
+                <StackPanel Margin="0,0,15,0">
+                    <Border Classes="OptionCategory">
+                        <StackPanel>
+                            <Label Classes="Title">Hotkey Configuration</Label>
+                        
+                            <RelativePanel>
+                                <StackPanel>
+                                    <Label Classes="Primary">Toggle Overlay</Label>
+                                    <Label Classes="Secondary">Show/hide the overlay</Label>
+                                </StackPanel>
+                                <Button Classes="Primary Blue" RelativePanel.AlignVerticalCenterWithPanel="True">Edit</Button>
+                            </RelativePanel>
+                        
+                            <RelativePanel>
+                                <StackPanel>
+                                    <Label Classes="Primary">Adjust Overlay Opacity</Label>
+                                    <Label Classes="Secondary">Increase or decrease the overlay transparency</Label>
+                                </StackPanel>
+                                <Button Classes="Primary Blue" RelativePanel.AlignVerticalCenterWithPanel="True">Edit</Button>
+                            </RelativePanel>
+                        </StackPanel>
+                    </Border>
+
+                    <Border Classes="OptionCategory">
+                        <StackPanel>
+                            <Label Classes="Title">General Settings</Label>
+
+                            <RelativePanel>
+                                <StackPanel>
+                                    <Label Classes="Primary">Open on System Startup</Label>
+                                    <Label Classes="Secondary">Automatically start with Windows</Label>
+                                </StackPanel>
+                                <ToggleSwitch RelativePanel.AlignVerticalCenterWithPanel="True" IsChecked="{Binding StartUpEnabled.Value}"></ToggleSwitch>
+                            </RelativePanel>
+
+                            <RelativePanel>
+                                <StackPanel>
+                                    <Label Classes="Primary">Minimize to System Tray </Label>
+                                    <Label Classes="Secondary">Hide in system tray when closed</Label>
+                                </StackPanel>
+                                <ToggleSwitch RelativePanel.AlignVerticalCenterWithPanel="True" IsChecked="{Binding MinimizeToTray.Value}"></ToggleSwitch>
+                            </RelativePanel>
+                        </StackPanel>
+                    </Border>
+
+                    <Border Classes="OptionCategory">
+                        <StackPanel>
+                            <Label Classes="Title">Grid Default Settings</Label>
+
+                            <RelativePanel>
+                                <StackPanel>
+                                    <Label Classes="Primary">Size</Label>
+                                    <Label Classes="Secondary">Amount of pixels per square</Label>
+                                </StackPanel>
+                                <TextBox Text="{Binding GridSize.Value, Mode=TwoWay}" RelativePanel.AlignRightWithPanel="True" RelativePanel.AlignVerticalCenterWithPanel="True" HorizontalContentAlignment="Center"></TextBox>
+                            </RelativePanel>
+
+                            <RelativePanel>
+                                <StackPanel>
+                                    <Label Classes="Primary">Color</Label>
+                                    <Label Classes="Secondary">Tint of the grid lines</Label>
+                                </StackPanel>
+                                <ColorPicker RelativePanel.AlignRightWithPanel="True" RelativePanel.AlignVerticalCenterWithPanel="True" Width="100" Height="50" Color="{Binding GridColor.Value, Converter={StaticResource stringToColorConverter}}"></ColorPicker>
+                            </RelativePanel>
+
+                            <RelativePanel>
+                                <StackPanel>
+                                    <Label Classes="Primary">Opacity</Label>
+                                    <Label Classes="Secondary">Transparency of the grid lines</Label>
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal" RelativePanel.AlignRightWithPanel="True" RelativePanel.AlignVerticalCenterWithPanel="True">
+                                    <TextBox Text="{Binding GridOpacity.Value, Mode=TwoWay}"></TextBox>
+                                </StackPanel>
+                            </RelativePanel>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </ScrollViewer>
         </Grid>
-    </Grid>
+    </Border>
+    
 </UserControl>

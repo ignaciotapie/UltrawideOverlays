@@ -53,13 +53,12 @@ namespace UltrawideOverlays.Models
         {
             ActivityLogAction.Added => "added",
             ActivityLogAction.Removed => "removed",
-            ActivityLogAction.Updated => "was updated",
-            ActivityLogAction.Viewed => "was viewed",
+            ActivityLogAction.Updated => "updated",
+            ActivityLogAction.Viewed => "viewed",
             ActivityLogAction.Executed => "triggered",
             _ => "unknown action"
         };
         public string Message => ToString();
-
 
         public ActivityLogModel()
         {

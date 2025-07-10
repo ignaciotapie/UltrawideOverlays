@@ -1,6 +1,5 @@
 ﻿using Avalonia.Media.Imaging;
 using CommunityToolkit.Mvvm.ComponentModel;
-using System;
 using System.IO;
 using UltrawideOverlays.Utils;
 
@@ -33,7 +32,8 @@ namespace UltrawideOverlays.Models
 
             if (FileHandlerUtil.IsValidImagePath(imagePath) == false)
             {
-                throw new ArgumentException($"Invalid image path: {imagePath}");
+                //Finish Image Model here, handle empty paths later
+                return;
             }
 
             using (var fileStream = new FileStream(imagePath, FileMode.Open, FileAccess.Read, FileShare.Read))

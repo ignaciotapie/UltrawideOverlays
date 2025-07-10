@@ -103,6 +103,9 @@
         <Style Selector="^.Blue">
             <Setter Property="Background" Value="#005c92"/>
         </Style>
+        <Style Selector="^.Red">
+            <Setter Property="Background" Value="DarkRed"/>
+        </Style>
     </Style>
 
     <Style Selector="Image.TabIcon">

@@ -206,6 +206,7 @@ namespace UltrawideOverlays.Models
                     break;
                 case DatabaseFiles.Settings:
                     Settings = (SettingsDataModel)data;
+                    ProcessSettings(Settings);
                     if (recordActivity) AddActivity(new ActivityLogModel(DateTime.Now, ActivityLogType.Settings, ActivityLogAction.Updated, "Settings"));
                     break;
                 case DatabaseFiles.Games:
@@ -241,6 +242,13 @@ namespace UltrawideOverlays.Models
             {
                 await SaveActivitiesAsync();
             }
+        }
+
+        private void ProcessSettings(SettingsDataModel settings)
+        {
+            // Process settings if needed, e.g., apply them to the application
+            // This is a placeholder for any logic that needs to be executed when settings are saved
+            Debug.WriteLine($"Settings saved: {settings}");
         }
 
         private async Task SaveActivitiesAsync()
@@ -352,6 +360,15 @@ namespace UltrawideOverlays.Models
                 if (!string.IsNullOrEmpty(overlay.Path) && FileHandlerUtil.IsValidFilePath(overlay.Path))
                 {
                     await Task.Run(() => { File.Delete(overlay.Path); });
+                }
+                // Find if any games are using this overlay and remove the association
+                foreach (var game in Games)
+                {
+                    if (game.OverlayName == overlay.Name)
+                    {
+                        game.OverlayName = "<Removed Overlay>"; // Clear the overlay association
+                        AddActivity(new ActivityLogModel(DateTime.Now, ActivityLogType.Games, ActivityLogAction.Updated, game.Name));
+                    }
                 }
             }
             else if (fileType == DatabaseFiles.Settings)

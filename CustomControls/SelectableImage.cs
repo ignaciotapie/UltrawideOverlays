@@ -3,7 +3,6 @@ using Avalonia.Controls;
 using Avalonia.Data;
 using Avalonia.Layout;
 using Avalonia.Media;
-using System;
 using System.ComponentModel;
 using UltrawideOverlays.Converters;
 using UltrawideOverlays.Models;
@@ -46,7 +45,7 @@ namespace UltrawideOverlays.CustomControls
             image.Bind(Image.IsVisibleProperty, new Binding("ImageProperties.IsVisible", BindingMode.TwoWay));
 
             Bind(ToolTip.TipProperty, new Binding("ImageName"));
-            Bind(IsHitTestVisibleProperty, new Binding("ImageProperties.IsDraggable", BindingMode.TwoWay));
+            Bind(DragPanel.DraggableProperty, new Binding("ImageProperties.IsDraggable", BindingMode.TwoWay));
             Bind(DragPanel.PositionProperty, new Binding("ImageProperties.Position", BindingMode.TwoWay));
 
             border = new Border

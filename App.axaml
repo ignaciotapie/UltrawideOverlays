@@ -41,6 +41,8 @@
         <SvgSource x:Key="CopyIcon">/Assets/Images/copy-icon.svg</SvgSource>
         <SvgSource x:Key="DeleteIcon">/Assets/Images/delete-icon.svg</SvgSource>
         <SvgSource x:Key="UploadIcon">/Assets/Images/upload-icon.svg</SvgSource>
+        <SvgSource x:Key="ResizeWidthIcon">/Assets/Images/resize-width-icon.svg</SvgSource>
+        <SvgSource x:Key="ResizeHeightIcon">/Assets/Images/resize-height-icon.svg</SvgSource>
         <Image x:Key="ClippingMask">/Assets/Images/clipping-mask.png</Image>
 
         <!-- Fonts-->

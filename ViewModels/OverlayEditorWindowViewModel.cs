@@ -38,6 +38,12 @@ namespace UltrawideOverlays.ViewModels
         [ObservableProperty]
         private string? _overlayName = null;
 
+        [ObservableProperty]
+        private ObservableCollection<ClippingMaskModel> _maskTypes;
+
+        [ObservableProperty]
+        public ClippingMaskModel? _selectedMaskType;
+
         private readonly OverlayDataService _overlayDataService;
 
         ///////////////////////////////////////////
@@ -47,7 +53,12 @@ namespace UltrawideOverlays.ViewModels
         ///Design-only constructor
         public OverlayEditorWindowViewModel()
         {
-            Images = [];
+            Images =
+                [
+                    new ImageModel("", "Example Image 1"),
+                ];
+
+            MaskTypes = GetMaskTypes();
         }
 
         ~OverlayEditorWindowViewModel()
@@ -72,6 +83,20 @@ namespace UltrawideOverlays.ViewModels
             {
                 Images = [];
             }
+
+            MaskTypes = GetMaskTypes();
+        }
+
+        private ObservableCollection<ClippingMaskModel>? GetMaskTypes()
+        {
+            var output = new ObservableCollection<ClippingMaskModel>();
+            for (int i = 0; i < (int)ClippingMaskType.Amount; i++)
+            {
+                var mask = ClippingMaskModel.GetMaskByType(0, 0, (ClippingMaskType)i);
+                output.Add(mask);
+            }
+
+            return output;
         }
 
         partial void OnSelectedChanged(ImageModel? oldValue, ImageModel? newValue)
@@ -96,8 +121,16 @@ namespace UltrawideOverlays.ViewModels
         {
             foreach (var uri in imageFilePaths)
             {
-                var newImage = new ImageModel(uri.AbsolutePath, FileHandlerUtil.GetFileName(uri));
-                Images.Add(newImage);
+                try
+                {
+                    var newImage = new ImageModel(uri.LocalPath, FileHandlerUtil.GetFileName(uri));
+                    Images.Add(newImage);
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine($"Failed to add image model from path {uri.LocalPath}: {ex.Message}");
+                    continue;
+                }
             }
         }
 
@@ -159,10 +192,14 @@ namespace UltrawideOverlays.ViewModels
         }
 
         [RelayCommand]
-        public void AddClippingMask()
+        public void AddClippingMask(PixelSize MonitorSize)
         {
-            //TODO default?
-            var clippingMask = new ClippingMaskModel(new RectangleGeometry(new Rect(0, 0, 800, 800)));
+            if (SelectedMaskType == null) return;
+
+            var clippingMask = SelectedMaskType;
+            clippingMask.ImageProperties.PositionX = (MonitorSize.Width - clippingMask.ImageProperties.Width) / 2.0;
+            clippingMask.ImageProperties.PositionY = (MonitorSize.Height - clippingMask.ImageProperties.Height) / 2.0;
+
             Images.Add(clippingMask);
         }
 

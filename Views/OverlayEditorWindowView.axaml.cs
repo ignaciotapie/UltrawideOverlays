@@ -124,7 +124,7 @@ public partial class OverlayEditorWindowView : Window
 
         if (DataContext is OverlayEditorWindowViewModel vm)
         {
-            if (vmInstance != null) 
+            if (vmInstance != null)
             {
                 vmInstance.PropertyChanging -= DataContext_PropertyChanging;
                 vmInstance.PropertyChanged -= DataContext_PropertyChanged;
@@ -267,6 +267,7 @@ public partial class OverlayEditorWindowView : Window
         if (images == null) return;
         foreach (ImageModel im in images)
         {
+            if (modelImageDictionary.ContainsKey(im)) continue; // Skip if the same exact ImageModel already exists
             var image = new SelectableImage(im);
             modelImageDictionary.Add(im, image);
 
@@ -293,7 +294,7 @@ public partial class OverlayEditorWindowView : Window
             var imageFilePaths = new List<Uri>();
             foreach (var item in storageItems)
             {
-                if (FileHandlerUtil.IsValidImagePath(item.Path))
+                if (FileHandlerUtil.IsValidImagePath(item.TryGetLocalPath()))
                 {
                     imageFilePaths.Add(item.Path);
                 }
@@ -364,9 +365,9 @@ public partial class OverlayEditorWindowView : Window
 
     private void AddClippingMaskButton_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
     {
-        if (vmInstance != null && vmInstance.AddClippingMaskCommand.CanExecute(null))
+        if (vmInstance != null && vmInstance.AddClippingMaskCommand.CanExecute(Screens.Primary?.Bounds.Size))
         {
-            vmInstance.AddClippingMaskCommand.Execute(null);
+            vmInstance.AddClippingMaskCommand.Execute(Screens.Primary?.Bounds.Size);
         }
     }
 
