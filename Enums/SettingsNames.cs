@@ -7,5 +7,8 @@
         public static readonly string GridColor = "Grid Color";
         public static readonly string StartupEnabled = "Startup Enabled";
         public static readonly string MinimizeToTray = "Minimize To Tray";
+        public static readonly string ToggleOverlayHotkey = "Toggle Overlay Hotkey";
+        public static readonly string OpacityUpHotkey = "Opacity Up Hotkey";
+        public static readonly string OpacityDownHotkey = "Opacity Down Hotkey";
     }
 }

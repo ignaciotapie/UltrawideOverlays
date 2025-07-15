@@ -2,6 +2,8 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Media;
 using System;
+using System.Diagnostics;
+using Color = Avalonia.Media.Color;
 
 namespace UltrawideOverlays.CustomControls;
 
@@ -11,7 +13,7 @@ public partial class VisualGrid : UserControl
     /// STYLED PROPERTIES
     ///////////////////////////////////////////
     public static readonly StyledProperty<int?> GridSizeProperty =
-        AvaloniaProperty.Register<VisualGrid, int?>("GridSize");
+        AvaloniaProperty.Register<VisualGrid, int?>(nameof(GridSize));
 
     public int? GridSize
     {
@@ -19,10 +21,10 @@ public partial class VisualGrid : UserControl
         set => SetValue(GridSizeProperty, value);
     }
 
-    public static readonly StyledProperty<IBrush?> ColorProperty =
-        AvaloniaProperty.Register<VisualGrid, IBrush?>("Color");
+    public static readonly StyledProperty<Color?> ColorProperty =
+        AvaloniaProperty.Register<VisualGrid, Color?>(nameof(Color));
 
-    public IBrush? Color
+    public Color? Color
     {
         get => GetValue(ColorProperty);
         set => SetValue(ColorProperty, value);
@@ -80,14 +82,28 @@ public partial class VisualGrid : UserControl
             {
                 return;
             }
-            var pen = new Pen(Color, 1);
-            for (int i = 0; i < DesiredSize.Width; i += GridSize.Value)
+            if (Color == null)
             {
-                context.DrawLine(pen, new Point(i, 0), new Point(i, DesiredSize.Height));
+                return;
             }
-            for (int i = 0; i < DesiredSize.Height; i += GridSize.Value)
+
+            try
             {
-                context.DrawLine(pen, new Point(0, i), new Point(DesiredSize.Width, i));
+                var color = Color?.ToUInt32();
+
+                var pen = new Pen((uint)color);
+                for (int i = 0; i < DesiredSize.Width; i += GridSize.Value)
+                {
+                    context.DrawLine(pen, new Point(i, 0), new Point(i, DesiredSize.Height));
+                }
+                for (int i = 0; i < DesiredSize.Height; i += GridSize.Value)
+                {
+                    context.DrawLine(pen, new Point(0, i), new Point(DesiredSize.Width, i));
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Error rendering VisualGrid: {ex.Message}");
             }
         }
 

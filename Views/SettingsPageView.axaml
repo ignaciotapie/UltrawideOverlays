@@ -18,9 +18,11 @@
             <Setter Property="Margin" Value="0,10"/>
             <Setter Property="Background" Value="{DynamicResource PrimaryColor}"/>
         </Style>
+        <Style Selector="StackPanel > Grid">
+            <Setter Property="Margin" Value="10"/>
+        </Style>
         <Style Selector="StackPanel > RelativePanel">
             <Setter Property="Margin" Value="10"/>
-            <Setter Property="Name" Value="Option"/>
         </Style>
         <Style Selector="RelativePanel > CheckBox">
             <Setter Property="Margin" Value="0,15,0,0"/>
@@ -43,8 +45,10 @@
             <Setter Property="RelativePanel.AlignRightWithPanel" Value="True"/>
         </Style>
         <Style Selector="Button.Edit">
-            <Setter Property="Width" Value="50"/>
-            <Setter Property="Height" Value="40"/>
+            <Setter Property="Width" Value="60"/>
+            <Setter Property="Height" Value="60"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
         </Style>
         <Style Selector="ComboBox">
             <Setter Property="Width" Value="400"/>
@@ -58,7 +62,7 @@
         </Style>
     </UserControl.Styles>
     <UserControl.Resources>
-        <converters:StringToColorConverter x:Key="stringToColorConverter"/>
+        <converters:NumberToColorConverter x:Key="numberToColorConverter"/>
     </UserControl.Resources>
     
     <Border Margin="10,10,10,0">
@@ -74,24 +78,29 @@
             <ScrollViewer Grid.Row="1" AllowAutoHide="True">
                 <StackPanel Margin="0,0,15,0">
                     <Border Classes="OptionCategory">
-                        <StackPanel>
+                        <StackPanel ClipToBounds="True">
                             <Label Classes="Title">Hotkey Configuration</Label>
                         
-                            <RelativePanel>
+                            <Grid ColumnDefinitions="*, Auto, Auto">
                                 <StackPanel>
                                     <Label Classes="Primary">Toggle Overlay</Label>
                                     <Label Classes="Secondary">Show/hide the overlay</Label>
                                 </StackPanel>
-                                <Button Classes="Primary Blue" RelativePanel.AlignVerticalCenterWithPanel="True">Edit</Button>
-                            </RelativePanel>
+                                <Label Grid.Column="1" Classes="Title" Margin="0,0,10,0" VerticalAlignment="Center" Content="{Binding ToggleOverlayHotkey.Value}"></Label>
+                                <Button IsVisible="False" Grid.Column="2" Name="EditButton" Classes="Primary Blue Edit">Edit</Button>
+                            </Grid>
                         
-                            <RelativePanel>
-                                <StackPanel>
+                            <Grid RowDefinitions="Auto, Auto" ColumnDefinitions="*, Auto, Auto">
+                                <StackPanel Grid.RowSpan="2" VerticalAlignment="Center">
                                     <Label Classes="Primary">Adjust Overlay Opacity</Label>
                                     <Label Classes="Secondary">Increase or decrease the overlay transparency</Label>
                                 </StackPanel>
-                                <Button Classes="Primary Blue" RelativePanel.AlignVerticalCenterWithPanel="True">Edit</Button>
-                            </RelativePanel>
+                                <Label Grid.Column="1" Classes="Title" Margin="0,0,10,0" VerticalAlignment="Center" Content="{Binding OpacityUpHotkey.Value}"></Label>
+                                <Button IsVisible="False" Grid.Column="2" Classes="Primary Blue Edit" RelativePanel.AlignVerticalCenterWithPanel="True" Margin="0,0,0,10">Edit</Button>
+                                
+                                <Label Grid.Row="1" Grid.Column="1" Classes="Title" Margin="0,0,10,0" VerticalAlignment="Center" Content="{Binding OpacityDownHotkey.Value}"></Label>
+                                <Button IsVisible="False" Grid.Row="1" Grid.Column="2" Classes="Primary Blue Edit" RelativePanel.AlignVerticalCenterWithPanel="True">Edit</Button>
+                            </Grid>
                         </StackPanel>
                     </Border>
 
@@ -134,7 +143,7 @@
                                     <Label Classes="Primary">Color</Label>
                                     <Label Classes="Secondary">Tint of the grid lines</Label>
                                 </StackPanel>
-                                <ColorPicker RelativePanel.AlignRightWithPanel="True" RelativePanel.AlignVerticalCenterWithPanel="True" Width="100" Height="50" Color="{Binding GridColor.Value, Converter={StaticResource stringToColorConverter}}"></ColorPicker>
+                                <ColorPicker RelativePanel.AlignRightWithPanel="True" RelativePanel.AlignVerticalCenterWithPanel="True" Width="100" Height="50" Color="{Binding GridColor.Value, Converter={StaticResource numberToColorConverter}, Mode=TwoWay}"></ColorPicker>
                             </RelativePanel>
 
                             <RelativePanel>

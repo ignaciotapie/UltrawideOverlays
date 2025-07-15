@@ -51,7 +51,7 @@ public partial class OverlayEditorWindowView : Window
         Unloaded += OnUnloaded;
         PropertyChanged += OnPropertyChanged;
 
-        AddHandler(KeyDownEvent, DeleteHandler);
+        AddHandler(KeyDownEvent, KeyDownHandler);
     }
 
     private void PositionProperties()
@@ -77,7 +77,7 @@ public partial class OverlayEditorWindowView : Window
     ///////////////////////////////////////////
     /// KEY HANDLERS
     ///////////////////////////////////////////
-    private void DeleteHandler(object? sender, KeyEventArgs e)
+    private void KeyDownHandler(object? sender, KeyEventArgs e)
     {
         if (e.Key == Key.Delete)
         {

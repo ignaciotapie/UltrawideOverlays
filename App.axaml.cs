@@ -33,11 +33,9 @@ namespace UltrawideOverlays
                 switch (windowEnum)
                 {
                     case Enums.WindowViews.OverlayEditorWindow:
-                        var overlayService = provider.GetRequiredService<OverlayDataService>();
                         return new OverlayEditorWindowView
                         {
-                            //This goes against DI principles, but making a whole new factory for just passing args to a single window is overkill
-                            DataContext = new OverlayEditorWindowViewModel(overlayService, args)
+                            DataContext = new OverlayEditorWindowViewModel(services.GetRequiredService<OverlayDataService>(), services.GetRequiredService<SettingsDataService>(), args)
                         };
                     case Enums.WindowViews.MainWindow:
                         var window = new MainWindow

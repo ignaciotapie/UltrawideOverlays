@@ -5,45 +5,62 @@ namespace UltrawideOverlays.Models
 {
     public class SettingsDataModel : ModelBase
     {
-        public ConcurrentDictionary<string, SingleSettingModel> Settings { get; set; }
+        public ConcurrentDictionary<string, SingleSettingModel> SettingsDictionary { get; set; }
         //Default values constructor
         public SettingsDataModel()
         {
             var GridSize = new SingleSettingModel { Name = SettingsNames.GridSize, Value = "50" };
             var GridOpacity = new SingleSettingModel { Name = SettingsNames.GridOpacity, Value = "0.5" };
-            var GridColor = new SingleSettingModel { Name = SettingsNames.GridColor, Value = "#FF0000" };
+            var GridColor = new SingleSettingModel { Name = SettingsNames.GridColor, Value = "4294967295" };
             var StartupEnabled = new SingleSettingModel { Name = SettingsNames.StartupEnabled, Value = "true" };
             var MinimizeToTray = new SingleSettingModel { Name = SettingsNames.MinimizeToTray, Value = "true" };
+            var ToggleOverlay = new SingleSettingModel { Name = SettingsNames.ToggleOverlayHotkey, Value = "Ctrl + Shift + O" };
+            var OpacityUp = new SingleSettingModel { Name = SettingsNames.OpacityUpHotkey, Value = "Ctrl + Shift + ↑" };
+            var OpacityDown = new SingleSettingModel { Name = SettingsNames.OpacityDownHotkey, Value = "Ctrl + Shift + ↓" };
 
-
-            Settings = new ConcurrentDictionary<string, SingleSettingModel>();
-            Settings.TryAdd(GridSize.Name, GridSize);
-            Settings.TryAdd(GridOpacity.Name, GridOpacity);
-            Settings.TryAdd(GridColor.Name, GridColor);
-            Settings.TryAdd(StartupEnabled.Name, StartupEnabled);
-            Settings.TryAdd(MinimizeToTray.Name, MinimizeToTray);
+            SettingsDictionary = new ConcurrentDictionary<string, SingleSettingModel>();
+            SettingsDictionary.TryAdd(GridSize.Name, GridSize);
+            SettingsDictionary.TryAdd(GridOpacity.Name, GridOpacity);
+            SettingsDictionary.TryAdd(GridColor.Name, GridColor);
+            SettingsDictionary.TryAdd(StartupEnabled.Name, StartupEnabled);
+            SettingsDictionary.TryAdd(MinimizeToTray.Name, MinimizeToTray);
+            SettingsDictionary.TryAdd(ToggleOverlay.Name, ToggleOverlay);
+            SettingsDictionary.TryAdd(OpacityUp.Name, OpacityUp);
+            SettingsDictionary.TryAdd(OpacityDown.Name, OpacityDown);
         }
 
         public void AddOrUpdate(string key, SingleSettingModel value)
         {
-            if (Settings.ContainsKey(key))
+            if (SettingsDictionary.ContainsKey(key))
             {
-                Settings[key] = value;
+                SettingsDictionary[key] = value;
             }
             else
             {
-                Settings.TryAdd(key, value);
+                SettingsDictionary.TryAdd(key, value);
             }
         }
 
         public override object Clone()
         {
             var clone = new SettingsDataModel();
-            foreach (var setting in Settings)
+            foreach (var setting in SettingsDictionary)
             {
-                clone.Settings.TryUpdate(setting.Key, setting.Value.Clone() as SingleSettingModel, clone.Settings[setting.Key]);
+                clone.SettingsDictionary.TryUpdate(setting.Key, setting.Value.Clone() as SingleSettingModel, clone.SettingsDictionary[setting.Key]);
             }
             return clone;
+        }
+
+        public override string ToString()
+        {
+            var String = "";
+
+            foreach (var setting in SettingsDictionary)
+            {
+                String += $"{setting.Key}: {setting.Value.Value}\n";
+            }
+
+            return String;
         }
     }
 }

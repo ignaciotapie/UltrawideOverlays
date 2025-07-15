@@ -22,7 +22,7 @@
 
     <Window.Resources>
         <converter:NumberToStringConverter x:Key="numberToStringConverter"/>
-        <converter:BrushToColorConverter x:Key="brushToColorConverter"/>
+        <converter:NumberToColorConverter x:Key="numberToColorConverter"/>
     </Window.Resources>
 
     <Window.Styles>
@@ -57,7 +57,7 @@
         </Style>
     </Window.Styles>
 
-    <cc:DragGridControl Color="{Binding PreviewColor}" Preview="{Binding PreviewEnabled}" GridOpacity="{Binding PreviewOpacity}" GridSize="{Binding PreviewSize}" x:Name="MainDragGrid">
+    <cc:DragGridControl Color="{Binding PreviewColor, Converter={StaticResource numberToColorConverter}}" Preview="{Binding PreviewEnabled}" GridOpacity="{Binding PreviewOpacity}" GridSize="{Binding PreviewSize}" x:Name="MainDragGrid">
         <Border x:Name="PropertiesBorder" cc:DragPanel.Position="1320, 420" cc:DragPanel.SnapToGrid="false" ZIndex="999" Background="{DynamicResource PrimaryAccent}" CornerRadius="10,10,0,0">
             <Grid RowDefinitions="50, Auto, Auto">
                 <Border IsHitTestVisible="False" Background="{DynamicResource PrimaryBackground}" BorderBrush="{DynamicResource PrimaryAccent}" BorderThickness="2,2,2,0" CornerRadius="10,10,0,0" Padding="10,0">
@@ -100,7 +100,7 @@
                         <Label>Visible</Label>
                         <ToggleSwitch HorizontalAlignment="Right" x:Name="GridVisible_CheckBox" IsChecked="{Binding PreviewEnabled, Mode=TwoWay}" VerticalAlignment="Center" VerticalContentAlignment="Center"/>
                         <Label Grid.Row="1">Color</Label>
-                        <ColorPicker Grid.Row="1" HorizontalAlignment="Right" x:Name="GridColor_ColorPicker" Color="{Binding PreviewColor, Mode=TwoWay, Converter={StaticResource brushToColorConverter}}"></ColorPicker>
+                        <ColorPicker Grid.Row="1" HorizontalAlignment="Right" x:Name="GridColor_ColorPicker" Color="{Binding PreviewColor, Mode=TwoWay, Converter={StaticResource numberToColorConverter}}"></ColorPicker>
                         <Label Grid.Row="2">Size</Label>
                         <mxe:SpinEditor Grid.Row="3" x:Name="GridSize_TextBox" HorizontalContentAlignment="Center" Minimum="1" Value="{Binding PreviewSize}"></mxe:SpinEditor>
                         <Label Grid.Row="4">Opacity</Label>
@@ -179,7 +179,7 @@
                         </Label>
                         <TextBox x:Name="OverlayNameBox" Width="300" Watermark="Overlay Name" VerticalContentAlignment="Bottom" HorizontalAlignment="Left" HorizontalContentAlignment="Left" Text="{Binding OverlayName, Mode=TwoWay}"></TextBox>
                     </StackPanel>
-                    <Button Classes="Primary" Margin="0,0,5,0" Grid.Column="1" x:Name="AcceptButton" Click="AcceptButton_Click">Accept</Button>
+                    <Button IsEnabled="{Binding CanCreateOverlay}" Classes="Primary" Margin="0,0,5,0" Grid.Column="1" x:Name="AcceptButton" Click="AcceptButton_Click">Accept</Button>
                     <Button Classes="Primary" Margin="0,0,5,0" Grid.Column="2" x:Name="CancelButton" Click="CancelButton_Click">Cancel</Button>
                 </Grid>
             </Grid>

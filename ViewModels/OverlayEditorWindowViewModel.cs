@@ -1,11 +1,12 @@
 ﻿using Avalonia;
-using Avalonia.Media;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Threading.Tasks;
+using UltrawideOverlays.Enums;
 using UltrawideOverlays.Models;
 using UltrawideOverlays.Services;
 using UltrawideOverlays.Utils;
@@ -18,33 +19,37 @@ namespace UltrawideOverlays.ViewModels
         private ObservableCollection<ImageModel> _images;
 
         [ObservableProperty]
-        private bool _previewEnabled = true;
+        private bool _previewEnabled;
 
         [ObservableProperty]
-        private int _previewSize = 50;
+        private int _previewSize;
 
         [ObservableProperty]
-        private double _previewOpacity = 0.5;
+        private double _previewOpacity;
 
         [ObservableProperty]
-        private IBrush _previewColor = Brushes.AliceBlue;
+        private string _previewColor;
 
         [ObservableProperty]
-        private ImageModel? _selected = null;
+        private ImageModel? _selected;
 
         [ObservableProperty]
-        private Boolean _propertiesEnabled = false;
+        private Boolean _propertiesEnabled;
 
         [ObservableProperty]
-        private string? _overlayName = null;
+        private string? _overlayName;
 
         [ObservableProperty]
         private ObservableCollection<ClippingMaskModel> _maskTypes;
 
         [ObservableProperty]
-        public ClippingMaskModel? _selectedMaskType;
+        private ClippingMaskModel? _selectedMaskType;
+
+        [ObservableProperty]
+        private bool _canCreateOverlay;
 
         private readonly OverlayDataService _overlayDataService;
+        private readonly SettingsDataService _settingsDataService;
 
         ///////////////////////////////////////////
         /// CONSTRUCTOR
@@ -66,9 +71,10 @@ namespace UltrawideOverlays.ViewModels
             Debug.WriteLine("OverlayEditorWindowViewModel finalized!");
         }
 
-        public OverlayEditorWindowViewModel(OverlayDataService service, Object? args)
+        public OverlayEditorWindowViewModel(OverlayDataService overlayService, SettingsDataService settingsService, Object? args = null)
         {
-            _overlayDataService = service;
+            _overlayDataService = overlayService;
+            _settingsDataService = settingsService;
 
             if (args is OverlayDataModel existingModel)
             {
@@ -84,7 +90,28 @@ namespace UltrawideOverlays.ViewModels
                 Images = [];
             }
 
+            CanCreateOverlay = Images.Count > 0;
             MaskTypes = GetMaskTypes();
+            ConfigureGrid();
+        }
+
+        private async Task ConfigureGrid()
+        {
+            var settingsSize = await _settingsDataService.LoadSettingAsync(SettingsNames.GridSize);
+            var settingsOpacity = await _settingsDataService.LoadSettingAsync(SettingsNames.GridOpacity);
+            var settingsColor = await _settingsDataService.LoadSettingAsync(SettingsNames.GridColor);
+
+            try
+            {
+                PreviewEnabled = true;
+                PreviewSize = int.Parse(settingsSize);
+                PreviewOpacity = double.Parse(settingsOpacity, System.Globalization.NumberStyles.Number);
+                PreviewColor = settingsColor;
+            }
+            catch (Exception ex)
+            {
+
+            }
         }
 
         private ObservableCollection<ClippingMaskModel>? GetMaskTypes()
@@ -132,6 +159,7 @@ namespace UltrawideOverlays.ViewModels
                     continue;
                 }
             }
+            CanCreateOverlay = Images.Count > 0;
         }
 
         [RelayCommand]
@@ -142,6 +170,7 @@ namespace UltrawideOverlays.ViewModels
                 Images.Remove(Selected);
                 Selected = null;
             }
+            CanCreateOverlay = Images.Count > 0;
         }
 
         [RelayCommand]

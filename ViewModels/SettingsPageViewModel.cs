@@ -10,34 +10,36 @@ namespace UltrawideOverlays.ViewModels
 {
     public partial class SettingsPageViewModel : PageViewModel
     {
-        [ObservableProperty]
-        private string _settingsPageName = "Settings";
 
         private SettingsDataModel _settingsData;
         private SettingsDataModel SettingsData { get => _settingsData; set => UpdatePageSettings(value); }
-
         private SettingsDataService SettingsDataService { get; set; }
+
+        [ObservableProperty]
+        private string _settingsPageName = "Settings";
 
         //Settings
         [ObservableProperty]
         private SingleSettingModel _gridSize;
-
         [ObservableProperty]
         private SingleSettingModel _gridOpacity;
-
         [ObservableProperty]
         private SingleSettingModel _gridColor;
-
         [ObservableProperty]
         private SingleSettingModel _startUpEnabled;
-
         [ObservableProperty]
         private SingleSettingModel _minimizeToTray;
+        [ObservableProperty]
+        private SingleSettingModel _toggleOverlayHotkey;
+        [ObservableProperty]
+        private SingleSettingModel _opacityUpHotkey;
+        [ObservableProperty]
+        private SingleSettingModel _opacityDownHotkey;
 
         public SettingsPageViewModel()
         {
             Page = Enums.ApplicationPageViews.SettingsPage;
-            PageName = "Settings";
+            PageName = SettingsPageName;
         }
 
         ~SettingsPageViewModel()
@@ -48,7 +50,7 @@ namespace UltrawideOverlays.ViewModels
         public SettingsPageViewModel(SettingsDataService settingsService)
         {
             Page = Enums.ApplicationPageViews.SettingsPage;
-            PageName = "Settings";
+            PageName = SettingsPageName;
 
             SettingsDataService = settingsService;
 
@@ -83,11 +85,14 @@ namespace UltrawideOverlays.ViewModels
 
             _settingsData = value;
 
-            GridSize = value.Settings[SettingsNames.GridSize];
-            GridOpacity = value.Settings[SettingsNames.GridOpacity];
-            GridColor = value.Settings[SettingsNames.GridColor];
-            StartUpEnabled = value.Settings[SettingsNames.StartupEnabled];
-            MinimizeToTray = value.Settings[SettingsNames.MinimizeToTray];
+            GridSize = value.SettingsDictionary[SettingsNames.GridSize];
+            GridOpacity = value.SettingsDictionary[SettingsNames.GridOpacity];
+            GridColor = value.SettingsDictionary[SettingsNames.GridColor];
+            StartUpEnabled = value.SettingsDictionary[SettingsNames.StartupEnabled];
+            MinimizeToTray = value.SettingsDictionary[SettingsNames.MinimizeToTray];
+            ToggleOverlayHotkey = value.SettingsDictionary[SettingsNames.ToggleOverlayHotkey];
+            OpacityUpHotkey = value.SettingsDictionary[SettingsNames.OpacityUpHotkey];
+            OpacityDownHotkey = value.SettingsDictionary[SettingsNames.OpacityDownHotkey];
         }
 
         [RelayCommand]
@@ -101,5 +106,24 @@ namespace UltrawideOverlays.ViewModels
         {
             SettingsData = SettingsDataService.LoadDefaultSettings();
         }
+
+        //TODO: add hotkey rebinding
+        //[RelayCommand]
+        //private async void EditHotkey(object obj) 
+        //{
+        //    if (obj is string hotkey) 
+        //    {
+        //        switch (hotkey)
+        //        {
+        //            case "OpacityUp":
+        //                break;
+        //            case "OpacityDown":
+        //                break;
+        //            case "Toggle":
+        //            default:
+        //                break;
+        //        }
+        //    }
+        //}
     }
 }
