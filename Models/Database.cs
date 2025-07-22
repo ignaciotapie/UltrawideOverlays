@@ -44,7 +44,7 @@ namespace UltrawideOverlays.Models
     {
         public HashSet<OverlayDataModel> Overlays { get; }
         public HashSet<GamesModel> Games { get; }
-        public SettingsDataModel Settings { get; set; }
+        public SettingsDataModel? Settings { get; set; }
         public Stack<ActivityLogModel> Activities { get; set; }
 
         public bool isInitialized = false;
@@ -205,8 +205,8 @@ namespace UltrawideOverlays.Models
                     Overlays.Add(overlay);
                     break;
                 case DatabaseFiles.Settings:
-                    Settings = (SettingsDataModel)data;
-                    ProcessSettings(Settings);
+                    Settings = null;
+                    Settings = data as SettingsDataModel ?? new SettingsDataModel();
                     if (recordActivity) AddActivity(new ActivityLogModel(DateTime.Now, ActivityLogType.Settings, ActivityLogAction.Updated, "Settings"));
                     break;
                 case DatabaseFiles.Games:
@@ -242,13 +242,6 @@ namespace UltrawideOverlays.Models
             {
                 await SaveActivitiesAsync();
             }
-        }
-
-        private void ProcessSettings(SettingsDataModel settings)
-        {
-            // Process settings if needed, e.g., apply them to the application
-            // This is a placeholder for any logic that needs to be executed when settings are saved
-            Debug.WriteLine($"Settings saved: {settings}");
         }
 
         private async Task SaveActivitiesAsync()

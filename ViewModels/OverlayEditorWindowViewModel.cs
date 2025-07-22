@@ -4,6 +4,7 @@ using CommunityToolkit.Mvvm.Input;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using UltrawideOverlays.Enums;
@@ -76,21 +77,24 @@ namespace UltrawideOverlays.ViewModels
             _overlayDataService = overlayService;
             _settingsDataService = settingsService;
 
+            Images = [];
+            Images.CollectionChanged += ImagesCollectionChanged;
+
             if (args is OverlayDataModel existingModel)
             {
                 OverlayName = existingModel.Name;
-                Images = new ObservableCollection<ImageModel>(existingModel.ImageModels);
-                foreach (var clippingMask in existingModel.ClippingMaskModels)
+                for (int i = 0; i < existingModel.ImageModels.Count; i++)
                 {
-                    Images.Add(clippingMask);
+                    var image = existingModel.ImageModels[i];
+                    Images.Add(image);
+                }
+                for (int i = 0; i < existingModel.ClippingMaskModels.Count; i++)
+                {
+                    var image = existingModel.ClippingMaskModels[i];
+                    Images.Add(image);
                 }
             }
-            else
-            {
-                Images = [];
-            }
 
-            CanCreateOverlay = Images.Count > 0;
             MaskTypes = GetMaskTypes();
             ConfigureGrid();
         }
@@ -110,7 +114,7 @@ namespace UltrawideOverlays.ViewModels
             }
             catch (Exception ex)
             {
-
+                Debug.WriteLine($"ConfigureGrid failed, exception:{ex.Message}");
             }
         }
 
@@ -138,6 +142,12 @@ namespace UltrawideOverlays.ViewModels
                 PropertiesEnabled = false;
             }
         }
+
+        private void ImagesCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+        {
+            CanCreateOverlay = Images.Count > 0;
+        }
+
 
         ///////////////////////////////////////////
         /// COMMANDS
@@ -194,11 +204,17 @@ namespace UltrawideOverlays.ViewModels
         {
             String? name = (OverlayName != null) ? OverlayName : "Overlay";
 
-            var overlay = new OverlayDataModel();
-            overlay.Name = name;
+            var overlay = new OverlayDataModel()
+            {
+                Name = name,
+                ImageModels = new List<ImageModel>(),
+                ClippingMaskModels = new List<ClippingMaskModel>(),
+                Width = pixelSize.Width,
+                Height = pixelSize.Height,
+                LastModified = DateTime.Now,
+                LastUsed = DateTime.Now
+            };
 
-            overlay.ImageModels = new List<ImageModel>();
-            overlay.ClippingMaskModels = new List<ClippingMaskModel>();
             for (int i = 0; i < Images.Count; i++)
             {
                 if (Images[i] is ClippingMaskModel clippingMask)
@@ -211,11 +227,7 @@ namespace UltrawideOverlays.ViewModels
                 }
             }
 
-            overlay.Width = pixelSize.Width;
-            overlay.Height = pixelSize.Height;
-            overlay.NumberOfImages = overlay.ImageModels.Count;
-            overlay.LastModified = DateTime.Now;
-            overlay.LastUsed = DateTime.Now;
+            overlay.NumberOfImages = overlay.ImageModels.Count + overlay.ClippingMaskModels.Count;
 
             _ = _overlayDataService.SaveOverlayAsync(overlay);
         }

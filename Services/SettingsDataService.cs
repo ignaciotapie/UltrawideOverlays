@@ -1,14 +1,16 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using UltrawideOverlays.Factories;
 using UltrawideOverlays.Models;
+using UltrawideOverlays.Utils;
 
 namespace UltrawideOverlays.Services
 {
     public class SettingsDataService
     {
-        public event EventHandler SettingsChanged;
+        public event EventHandler<SettingsChangedArgs> SettingsChanged;
 
         DatabaseProvider _provider;
 
@@ -35,18 +37,58 @@ namespace UltrawideOverlays.Services
         {
             var db = await _provider.GetDatabaseAsync();
 
-            return db.Settings;
+            return db.Settings.Clone() as SettingsDataModel;
         }
 
-        public async Task SaveSettingsAsync(SettingsDataModel settings)
+        public async Task SaveSettingsAsync(SettingsDataModel newSettings)
         {
             var db = await _provider.GetDatabaseAsync();
 
-            await db.SaveAsync(settings, DatabaseFiles.Settings, true);
+            var oldSettings = await LoadSettingsAsync();
 
-            Debug.WriteLine($"Settings saved: {settings.ToString()}");
+            var settingsChanged = CompareSettings(oldSettings, newSettings);
 
-            SettingsChanged?.Invoke(this, EventArgs.Empty);
+            if (settingsChanged.Count > 0)
+            {
+                await db.SaveAsync(newSettings, DatabaseFiles.Settings);
+                SettingsChanged?.Invoke(this, new SettingsChangedArgs(settingsChanged));
+            }
+            else
+            {
+                Debug.WriteLine("No settings changed, not saving.");
+            }
+
+        }
+
+        public async Task SaveSettingAsync(SingleSettingModel setting)
+        {
+            var db = await _provider.GetDatabaseAsync();
+
+            var oldSettings = await LoadSettingsAsync();
+
+            //Grab a clone of oldSettings and update this newer one.
+            var newSettings = oldSettings.Clone() as SettingsDataModel;
+            newSettings.AddOrUpdate(setting.Name, setting);
+
+            await SaveSettingsAsync(newSettings);
+        }
+
+        private IList<SingleSettingModel> CompareSettings(SettingsDataModel oldSettings, SettingsDataModel newSettings)
+        {
+            var changedSettings = new List<SingleSettingModel>();
+
+            foreach (var newSetting in newSettings.SettingsDictionary)
+            {
+                if (oldSettings.SettingsDictionary.TryGetValue(newSetting.Key, out var oldSetting))
+                {
+                    if (newSetting.Value.Value != oldSetting.Value)
+                    {
+                        changedSettings.Add(newSetting.Value);
+                    }
+                }
+            }
+
+            return changedSettings;
         }
 
         public SettingsDataModel LoadDefaultSettings()

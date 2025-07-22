@@ -109,7 +109,7 @@ public partial class OverlayEditorWindowView : Window
     {
         var files = e.Data.GetFiles();
         e.DragEffects &= DragDropEffects.Copy;
-        AnalyzeIfValidImage(files);
+        AnalyzeIfValidImageFromDrop(files);
 
         e.Handled = true;
     }
@@ -287,7 +287,7 @@ public partial class OverlayEditorWindowView : Window
         vmInstance.SelectImageCommand.Execute(im);
     }
 
-    private void AnalyzeIfValidImage(IEnumerable<IStorageItem>? storageItems)
+    private void AnalyzeIfValidImageFromDrop(IEnumerable<IStorageItem>? storageItems)
     {
         if (storageItems != null)
         {
@@ -386,6 +386,46 @@ public partial class OverlayEditorWindowView : Window
         {
             var pixelSize = new PixelSize((int)Bounds.Width, (int)Bounds.Height);
             vmInstance.MirrorPositionYCommand.Execute(pixelSize);
+        }
+    }
+
+    private async void AddButton_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    {
+        var topLevel = TopLevel.GetTopLevel(this);
+
+        var patterns = FileHandlerUtil.ValidImageExtensions.Select(ext => $"*{ext}").ToList();
+        var patternsString = "Image Files" + string.Join("; ", patterns);
+
+        //Like in GamesView, this should be done with a provider that gives a reference to the window where the filedialog needs to open.
+        //I swear it's just cause I'm lazy and it's not worth it for keeping a clean MVVM, taking into account that the OverlayEditor already needed a lot of non-standard code.
+        //https://docs.avaloniaui.net/docs/basics/user-interface/file-dialogs
+        var files = await topLevel.StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
+        {
+            Title = "Add Images",
+            AllowMultiple = true,
+            FileTypeFilter = new List<FilePickerFileType>
+            {
+                new FilePickerFileType(patternsString)
+                {
+                    Patterns = patterns
+                }
+            }
+        });
+
+        if (files.Count > 0)
+        {
+            var imageFilePaths = new List<Uri>();
+            foreach (var file in files)
+            {
+                if (file.TryGetLocalPath() is { } localPath)
+                {
+                    imageFilePaths.Add(new Uri(localPath));
+                }
+            }
+            if (imageFilePaths.Count > 0)
+            {
+                AddImagesToViewModel(imageFilePaths);
+            }
         }
     }
 }

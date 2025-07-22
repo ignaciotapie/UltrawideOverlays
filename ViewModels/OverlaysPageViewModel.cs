@@ -191,7 +191,7 @@ namespace UltrawideOverlays.ViewModels
             if (sender is Window window)
             {
                 window.Closed -= OverlayWindowClosed;
-                window.DataContext = null; // ⬅ BREAKS binding links!
+                window.DataContext = null;
             }
 
             PathToBitmapConverter.CleanCache();

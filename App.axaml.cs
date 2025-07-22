@@ -7,6 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Linq;
 using UltrawideOverlays.Converters;
+using UltrawideOverlays.Enums;
 using UltrawideOverlays.Factories;
 using UltrawideOverlays.Services;
 using UltrawideOverlays.ViewModels;
@@ -42,35 +43,21 @@ namespace UltrawideOverlays
                         {
                             DataContext = services.GetRequiredService<MainWindowViewModel>(),
                             ClosingBehavior = WindowClosingBehavior.OwnerAndChildWindows,
-                            WindowStartupLocation = WindowStartupLocation.CenterScreen
+                            WindowStartupLocation = WindowStartupLocation.CenterScreen,
                         };
                         window.Closing += MainWindow_Closing;
+                        window.Closed += MainWindow_Closed;
                         return window;
                     case Enums.WindowViews.OverlayWindow:
                         return new OverlayView
                         {
-                            DataContext = provider.GetRequiredService<OverlayViewModel>(),
+                            DataContext = provider.GetRequiredService<OverlayViewModel>()
                         };
                     default:
                         throw new ArgumentOutOfRangeException(nameof(windowEnum), windowEnum, null);
                 }
             }
             return null;
-        }
-
-        private void MainWindow_Closing(object? sender, WindowClosingEventArgs e)
-        {
-            if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
-            {
-                e.Cancel = true; // Cancel the closing event to prevent the main window from closing immediately
-                // Hide the main window instead of closing it
-                if (sender is Window mainWindow)
-                {
-                    mainWindow.Hide();
-                }
-
-                PathToBitmapConverter.CleanCache();
-            }
         }
 
         private ServiceProvider ConfigureServices()
@@ -87,6 +74,8 @@ namespace UltrawideOverlays
             collection.AddSingleton<ActivityDataService>();
             collection.AddSingleton<GeneralDataService>();
             collection.AddSingleton<SettingsDataService>();
+            //TODO: Global hotkey service...
+            //collection.AddSingleton<HotKeyService>();
 
             var focusMonitorService = new FocusMonitorService();
             collection.AddSingleton(focusMonitorService);
@@ -108,6 +97,7 @@ namespace UltrawideOverlays
             collection.AddTransient<Func<Enums.WindowViews, object?, Window>>(x => (windowEnum, args) => CreateWindow(x, windowEnum, args));
 
             //Main Window
+            collection.AddSingleton<AppViewModel>();
             collection.AddTransient<MainWindowViewModel>();
             //PageViewModels
             collection.AddTransient<HomePageViewModel>();
@@ -120,7 +110,7 @@ namespace UltrawideOverlays
 
             return collection.BuildServiceProvider();
         }
-        public override void OnFrameworkInitializationCompleted()
+        public async override void OnFrameworkInitializationCompleted()
         {
             if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
             {
@@ -130,7 +120,18 @@ namespace UltrawideOverlays
 
                 services = ConfigureServices();
 
-                desktop.MainWindow = services.GetRequiredService<WindowFactory>().CreateWindow(Enums.WindowViews.MainWindow, null);
+                var minimizeToTray = await services.GetRequiredService<SettingsDataService>().LoadSettingAsync(SettingsNames.MinimizeToTray);
+
+                if (!desktop.Args.Contains(AutoStartUtil.SILENT_ARG) || minimizeToTray == SettingsBoolValues.False)
+                {
+                    desktop.MainWindow = services.GetRequiredService<WindowFactory>().CreateWindow(Enums.WindowViews.MainWindow, null);
+                    if (desktop.MainWindow != null)
+                    {
+                        desktop.MainWindow.Show();
+                    }
+                }
+
+                DataContext = services.GetRequiredService<AppViewModel>();
                 services.GetRequiredService<WindowFactory>().CreateWindow(Enums.WindowViews.OverlayWindow, null);
             }
             base.OnFrameworkInitializationCompleted();
@@ -149,13 +150,48 @@ namespace UltrawideOverlays
             }
         }
 
+
+        ///////////////////////////////////////////
+        /// TRAY ICON HANDLING
+        ///////////////////////////////////////////
         private void Open_Click(object? sender, System.EventArgs e)
         {
             if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
             {
+                if (desktop.MainWindow == null)
+                {
+                    desktop.MainWindow = services.GetRequiredService<WindowFactory>().CreateWindow(Enums.WindowViews.MainWindow, null);
+                }
                 if (!desktop.MainWindow.IsVisible)
                 {
                     desktop.MainWindow.Show();
+                }
+            }
+        }
+
+        private void MainWindow_Closed(object? sender, EventArgs e)
+        {
+            if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
+            {
+                QuitApp();
+            }
+        }
+
+        private async void MainWindow_Closing(object? sender, WindowClosingEventArgs e)
+        {
+            if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
+            {
+                var settingsService = services.GetRequiredService<SettingsDataService>();
+
+                if (await settingsService.LoadSettingAsync(SettingsNames.MinimizeToTray) == SettingsBoolValues.True)
+                {
+                    e.Cancel = true;
+                    if (sender is Window mainWindow)
+                    {
+                        mainWindow.Hide();
+                    }
+
+                    PathToBitmapConverter.CleanCache();
                 }
             }
         }

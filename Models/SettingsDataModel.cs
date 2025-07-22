@@ -12,8 +12,8 @@ namespace UltrawideOverlays.Models
             var GridSize = new SingleSettingModel { Name = SettingsNames.GridSize, Value = "50" };
             var GridOpacity = new SingleSettingModel { Name = SettingsNames.GridOpacity, Value = "0.5" };
             var GridColor = new SingleSettingModel { Name = SettingsNames.GridColor, Value = "4294967295" };
-            var StartupEnabled = new SingleSettingModel { Name = SettingsNames.StartupEnabled, Value = "true" };
-            var MinimizeToTray = new SingleSettingModel { Name = SettingsNames.MinimizeToTray, Value = "true" };
+            var StartupEnabled = new SingleSettingModel { Name = SettingsNames.StartupEnabled, Value = SettingsBoolValues.False };
+            var MinimizeToTray = new SingleSettingModel { Name = SettingsNames.MinimizeToTray, Value = SettingsBoolValues.False };
             var ToggleOverlay = new SingleSettingModel { Name = SettingsNames.ToggleOverlayHotkey, Value = "Ctrl + Shift + O" };
             var OpacityUp = new SingleSettingModel { Name = SettingsNames.OpacityUpHotkey, Value = "Ctrl + Shift + ↑" };
             var OpacityDown = new SingleSettingModel { Name = SettingsNames.OpacityDownHotkey, Value = "Ctrl + Shift + ↓" };
@@ -46,7 +46,7 @@ namespace UltrawideOverlays.Models
             var clone = new SettingsDataModel();
             foreach (var setting in SettingsDictionary)
             {
-                clone.SettingsDictionary.TryUpdate(setting.Key, setting.Value.Clone() as SingleSettingModel, clone.SettingsDictionary[setting.Key]);
+                clone.AddOrUpdate(setting.Key, setting.Value.Clone() as SingleSettingModel);
             }
             return clone;
         }

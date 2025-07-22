@@ -5,15 +5,19 @@
              xmlns:locators="using:UltrawideOverlays.Locators"
              xmlns:vm="using:UltrawideOverlays.ViewModels"
              xmlns:theme="clr-namespace:Eremex.AvaloniaUI.Themes.DeltaDesign;assembly=Eremex.Avalonia.Themes.DeltaDesign"
-             RequestedThemeVariant="Dark">
+             RequestedThemeVariant="Dark"
+             x:DataType="vm:AppViewModel">
              <!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
 
     <Application.DataTemplates>
         <locators:ViewLocator/>
     </Application.DataTemplates>
 
-    <Application.Resources>
+    <Application.Name>
+        UltrawideOverlays
+    </Application.Name>
 
+    <Application.Resources>
         <!--  Color Definition  -->
         <SolidColorBrush x:Key="PrimaryColor">#1a1a1a</SolidColorBrush>
         <SolidColorBrush x:Key="SecondaryColor">#1b1d1e</SolidColorBrush>
@@ -43,6 +47,7 @@
         <SvgSource x:Key="UploadIcon">/Assets/Images/upload-icon.svg</SvgSource>
         <SvgSource x:Key="ResizeWidthIcon">/Assets/Images/resize-width-icon.svg</SvgSource>
         <SvgSource x:Key="ResizeHeightIcon">/Assets/Images/resize-height-icon.svg</SvgSource>
+        <SvgSource x:Key="PlusIcon">/Assets/Images/plus-icon.svg</SvgSource>
         <Image x:Key="ClippingMask">/Assets/Images/clipping-mask.png</Image>
 
         <!-- Fonts-->
@@ -58,7 +63,7 @@
 
     <TrayIcon.Icons>
         <TrayIcons>
-            <TrayIcon Icon="/Assets/Images/tv-icon.ico"
+            <TrayIcon IsVisible="{Binding TrayEnabled}" Icon="/Assets/Images/tv-icon.ico"
                       ToolTipText="UltrawideOverlays"
                       Clicked="Open_Click">
                 <TrayIcon.Menu>

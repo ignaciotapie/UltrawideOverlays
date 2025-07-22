@@ -11,4 +11,10 @@
         public static readonly string OpacityUpHotkey = "Opacity Up Hotkey";
         public static readonly string OpacityDownHotkey = "Opacity Down Hotkey";
     }
+
+    public class SettingsBoolValues
+    {
+        public static readonly string True = "True";
+        public static readonly string False = "False";
+    }
 }

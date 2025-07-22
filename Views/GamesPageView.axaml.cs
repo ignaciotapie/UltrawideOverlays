@@ -4,6 +4,7 @@ using Avalonia.Interactivity;
 using Avalonia.Platform.Storage;
 using System.Collections.Generic;
 using System.Linq;
+using UltrawideOverlays.Utils;
 
 namespace UltrawideOverlays.Views;
 
@@ -39,12 +40,14 @@ public partial class GamesPageView : UserControl
         }
     }
 
-
     //!! THIS SHOULD BE DONE WITH A PROVIDER IN THE VIEWMODEL
     //but I'm lazy and I'm not doing this for just one button.
     private async void BrowseButton_Clicked(object sender, RoutedEventArgs args)
     {
         var topLevel = TopLevel.GetTopLevel(this);
+
+        var patterns = FileHandlerUtil.ValidExecutableExtensions.Select(p => $"*{p}").ToList();
+        var patternsString = "Executable Files " + string.Join("; ", patterns);
 
         var files = await topLevel.StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
         {
@@ -52,9 +55,9 @@ public partial class GamesPageView : UserControl
             AllowMultiple = false,
             FileTypeFilter = new List<FilePickerFileType>
             {
-                new FilePickerFileType("Executable Files")
+                new FilePickerFileType(patternsString)
                 {
-                    Patterns = new List<string> { "*.exe"}
+                    Patterns = patterns
                 }
             }
         });

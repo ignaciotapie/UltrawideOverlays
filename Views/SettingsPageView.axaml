@@ -3,6 +3,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:vm="using:UltrawideOverlays.ViewModels"
+        xmlns:mxe="https://schemas.eremexcontrols.net/avalonia/editors"
         xmlns:converters="using:UltrawideOverlays.Converters"
         mc:Ignorable="d" d:DesignWidth="1200" d:DesignHeight="1000"
         Background="{DynamicResource PrimaryBackground}"
@@ -77,7 +78,8 @@
             </RelativePanel>
             <ScrollViewer Grid.Row="1" AllowAutoHide="True">
                 <StackPanel Margin="0,0,15,0">
-                    <Border Classes="OptionCategory">
+                    <!--Not visible until I figure out hotkeys in the future... -->
+                    <Border Classes="OptionCategory" IsVisible="False">
                         <StackPanel ClipToBounds="True">
                             <Label Classes="Title">Hotkey Configuration</Label>
                         
@@ -135,7 +137,7 @@
                                     <Label Classes="Primary">Size</Label>
                                     <Label Classes="Secondary">Amount of pixels per square</Label>
                                 </StackPanel>
-                                <TextBox Text="{Binding GridSize.Value, Mode=TwoWay}" RelativePanel.AlignRightWithPanel="True" RelativePanel.AlignVerticalCenterWithPanel="True" HorizontalContentAlignment="Center"></TextBox>
+                                <mxe:SpinEditor Value="{Binding GridSize.Value, Mode=TwoWay}" RelativePanel.AlignRightWithPanel="True" RelativePanel.AlignVerticalCenterWithPanel="True" HorizontalContentAlignment="Center"></mxe:SpinEditor>
                             </RelativePanel>
 
                             <RelativePanel>
@@ -152,7 +154,7 @@
                                     <Label Classes="Secondary">Transparency of the grid lines</Label>
                                 </StackPanel>
                                 <StackPanel Orientation="Horizontal" RelativePanel.AlignRightWithPanel="True" RelativePanel.AlignVerticalCenterWithPanel="True">
-                                    <TextBox Text="{Binding GridOpacity.Value, Mode=TwoWay}"></TextBox>
+                                    <mxe:SpinEditor Value="{Binding GridOpacity.Value, Mode=TwoWay}"></mxe:SpinEditor>
                                 </StackPanel>
                             </RelativePanel>
                         </StackPanel>

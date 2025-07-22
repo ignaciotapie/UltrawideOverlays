@@ -60,14 +60,15 @@ namespace UltrawideOverlays.ViewModels
         public async Task LoadSettingsAsync()
         {
             var origSettings = await SettingsDataService.LoadSettingsAsync();
-            SettingsData = origSettings.Clone() as SettingsDataModel; //Return a clone so we don't save over the original in memory
+            SettingsData = origSettings;
         }
 
         public async Task SaveSettingsAsync()
         {
             if (SettingsData != null)
             {
-                await SettingsDataService.SaveSettingsAsync(SettingsData);
+                //Return clone so there's no memory sharing between new settings and saved
+                await SettingsDataService.SaveSettingsAsync(SettingsData.Clone() as SettingsDataModel);
             }
             else
             {

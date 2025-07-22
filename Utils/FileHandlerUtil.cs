@@ -50,7 +50,7 @@ namespace UltrawideOverlays.Utils
 
     public static class FileHandlerUtil
     {
-        private static readonly HashSet<string> _validImageExtensions =
+        public static readonly HashSet<string> ValidImageExtensions =
         [
             ImageExtension.PNG,
             ImageExtension.BMP,
@@ -60,7 +60,7 @@ namespace UltrawideOverlays.Utils
             ImageExtension.SVG
         ];
 
-        private static readonly HashSet<string> _validExecutableExtensions =
+        public static readonly HashSet<string> ValidExecutableExtensions =
         [
             ExecutableExtension.EXE
         ];
@@ -109,7 +109,7 @@ namespace UltrawideOverlays.Utils
         {
             string fileExtension = GetFileExtension(filePath);
 
-            return IsValidFilePath(filePath) && _validImageExtensions.Contains(fileExtension.ToLowerInvariant());
+            return IsValidFilePath(filePath) && ValidImageExtensions.Contains(fileExtension.ToLowerInvariant());
         }
 
         public static bool IsValidImagePath(Uri uri)
@@ -121,12 +121,12 @@ namespace UltrawideOverlays.Utils
         {
             string fileExtension = GetFileExtension(filePath);
 
-            return IsValidFilePath(filePath) && _validExecutableExtensions.Contains(fileExtension.ToLowerInvariant());
+            return IsValidFilePath(filePath) && ValidExecutableExtensions.Contains(fileExtension.ToLowerInvariant());
         }
 
         public static string? AddImageFileExtension(string filePath, ImageExtension fileExtension)
         {
-            if (_validImageExtensions.Contains(fileExtension))
+            if (ValidImageExtensions.Contains(fileExtension))
             {
                 return filePath + fileExtension;
             }

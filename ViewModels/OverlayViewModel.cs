@@ -3,17 +3,22 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using UltrawideOverlays.Models;
 using UltrawideOverlays.Services;
+using UltrawideOverlays.Utils;
 
 namespace UltrawideOverlays.ViewModels
 {
     public partial class OverlayViewModel : ViewModelBase
     {
         [ObservableProperty]
-        private string? imageSource = null;
+        private string? _imageSource;
+        [ObservableProperty]
+        private double? _imageOpacity;
 
         private readonly OverlayDataService OverlayDataService;
         private readonly FocusMonitorService FocusMonitorService;
         private readonly GamesDataService GamesDataService;
+        private readonly SettingsDataService SettingsDataService;
+        private readonly HotKeyService HotKeyService;
 
         private ICollection<OverlayDataModel> Overlays;
         private ICollection<GamesModel> Games;
@@ -25,14 +30,25 @@ namespace UltrawideOverlays.ViewModels
         {
         }
 
-        public OverlayViewModel(OverlayDataService overlayDataService, GamesDataService gamesDataService, FocusMonitorService focusMonitorService)
+        public OverlayViewModel(OverlayDataService overlayDataService, GamesDataService gamesDataService, SettingsDataService settingsDataService, FocusMonitorService focusMonitorService)
         {
             OverlayDataService = overlayDataService;
             FocusMonitorService = focusMonitorService;
             GamesDataService = gamesDataService;
+            SettingsDataService = settingsDataService;
+            //HotKeyService = hotKeyService;
 
+            ImageOpacity = 1;
+
+            SettingsDataService.SettingsChanged += SettingsChangedHandler;
             FocusMonitorService.FocusChanged += FocusChanged;
         }
+
+        private void SettingsChangedHandler(object? sender, SettingsChangedArgs e)
+        {
+
+        }
+
         ~OverlayViewModel()
         {
             Debug.WriteLine("OverlayViewModel finalized!");
@@ -40,11 +56,9 @@ namespace UltrawideOverlays.ViewModels
 
         private async void FocusChanged(string filePath)
         {
-            // Check if the focused game is in the list of games
             var game = await GamesDataService.LoadGameAsync(filePath);
             if (game != null)
             {
-                // Get the overlay for the focused game
                 var overlay = await OverlayDataService.LoadOverlayAsync(game.OverlayName);
                 if (overlay != null)
                 {

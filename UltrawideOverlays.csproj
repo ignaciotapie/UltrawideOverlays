@@ -8,6 +8,8 @@
     <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
     <UseWPF>False</UseWPF>
     <UseWindowsForms>False</UseWindowsForms>
+    <AnalysisLevel>none</AnalysisLevel>
+    <ApplicationTitle>UltrawideOverlays</ApplicationTitle>
   </PropertyGroup>
   <PropertyGroup Label="Avalonia">
     <AvaloniaNameGeneratorDefaultFieldModifier>Internal</AvaloniaNameGeneratorDefaultFieldModifier>
@@ -30,6 +32,7 @@
     <None Remove="Assets\Images\home-logo.svg" />
     <None Remove="Assets\Images\joystick-logo-colored.svg" />
     <None Remove="Assets\Images\overlay-logo-colored.svg" />
+    <None Remove="Assets\Images\plus-icon.svg" />
     <None Remove="Assets\Images\resize-height-icon.svg" />
     <None Remove="Assets\Images\resize-width-icon.svg" />
     <None Remove="Assets\Images\settings-icon-colored.svg" />

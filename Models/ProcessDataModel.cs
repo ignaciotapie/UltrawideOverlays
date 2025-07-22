@@ -7,7 +7,7 @@ namespace UltrawideOverlays.Models
     {
         public string Name { get; set; }
 
-        public Bitmap? Icon { get; set; }
+        public Bitmap? Icon { get; set; } //Should never reach DB
 
         public string Path { get; set; }
 
