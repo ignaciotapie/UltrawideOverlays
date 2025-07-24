@@ -1,10 +1,8 @@
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Data;
-using Avalonia.Win32.Input;
 using System;
 using System.Diagnostics;
-using UltrawideOverlays.Utils;
 
 namespace UltrawideOverlays.Views;
 

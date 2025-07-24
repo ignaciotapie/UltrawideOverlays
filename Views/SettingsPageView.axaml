@@ -78,8 +78,7 @@
             </RelativePanel>
             <ScrollViewer Grid.Row="1" AllowAutoHide="True">
                 <StackPanel Margin="0,0,15,0">
-                    <!--Not visible until I figure out hotkeys in the future... -->
-                    <Border Classes="OptionCategory" IsVisible="False">
+                    <Border Classes="OptionCategory">
                         <StackPanel ClipToBounds="True">
                             <Label Classes="Title">Hotkey Configuration</Label>
                         
@@ -137,7 +136,7 @@
                                     <Label Classes="Primary">Size</Label>
                                     <Label Classes="Secondary">Amount of pixels per square</Label>
                                 </StackPanel>
-                                <mxe:SpinEditor Value="{Binding GridSize.Value, Mode=TwoWay}" RelativePanel.AlignRightWithPanel="True" RelativePanel.AlignVerticalCenterWithPanel="True" HorizontalContentAlignment="Center"></mxe:SpinEditor>
+                                <mxe:TextEditor Mask="D" MaskType="Numeric" EditorValue="{Binding GridSize.Value, Mode=TwoWay}" RelativePanel.AlignRightWithPanel="True" RelativePanel.AlignVerticalCenterWithPanel="True" HorizontalContentAlignment="Center"></mxe:TextEditor>
                             </RelativePanel>
 
                             <RelativePanel>
@@ -154,7 +153,7 @@
                                     <Label Classes="Secondary">Transparency of the grid lines</Label>
                                 </StackPanel>
                                 <StackPanel Orientation="Horizontal" RelativePanel.AlignRightWithPanel="True" RelativePanel.AlignVerticalCenterWithPanel="True">
-                                    <mxe:SpinEditor Value="{Binding GridOpacity.Value, Mode=TwoWay}"></mxe:SpinEditor>
+                                    <mxe:TextEditor Mask="F" MaskType="Numeric" EditorValue="{Binding GridOpacity.Value, Mode=TwoWay}"></mxe:TextEditor>
                                 </StackPanel>
                             </RelativePanel>
                         </StackPanel>

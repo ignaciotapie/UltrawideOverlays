@@ -190,7 +190,7 @@ public partial class OverlayEditorWindowView : Window
         PropertyChanged -= OnPropertyChanged;
 
         modelImageDictionary.Clear();
-        PathToBitmapConverter.CleanCache();
+        PathToCachedBitmapConverter.Instance.ClearCache();
         vmInstance = null;
         DataContext = null;
 

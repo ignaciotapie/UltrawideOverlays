@@ -3,16 +3,45 @@ using System.Runtime.InteropServices;
 
 namespace UltrawideOverlays.Utils
 {
-    public class HotKeysUtils
+    public static class HotKeysUtils
     {
-        private const uint MOD_ALT = 0x0001;
-        private const uint MOD_CONTROL = 0x0002;
-        private const uint MOD_SHIFT = 0x0004;
-        private const uint MOD_WIN = 0x0008;
-        private const uint MOD_NOREPEAT = 0x4000;
+        [StructLayout(LayoutKind.Sequential)]
+        public struct POINT
+        {
+            public int X;
+            public int Y;
+        }
 
-        private const int WM_HOTKEY = 0x0312;
-        private int _hotKeyId = 1; // Must be unique per application
+        // Message structure
+        [StructLayout(LayoutKind.Sequential)]
+        public struct MSG
+        {
+            public IntPtr hwnd;
+            public uint message;
+            public IntPtr wParam;
+            public IntPtr lParam;
+            public uint time;
+            public POINT pt;
+        }
+
+        public struct MODIFIER_KEYS
+        {
+            public const uint ALT = 0x0001;
+            public const uint CONTROL = 0x0002;
+            public const uint SHIFT = 0x0004;
+            public const uint WIN = 0x0008;
+            public const uint NOREPEAT = 0x4000;
+        }
+
+        public struct KEYS
+        {
+            public const uint O = 0x4F; // Virtual key code for 'O'
+            public const uint UP = 0x26; // Virtual key code for Up Arrow
+            public const uint DOWN = 0x28; // Virtual key code for Down Arrow
+        }
+
+        public const int WM_HOTKEY = 0x0312;
+        public const int HotKeyId = 9001; //Must be unique per application
 
 
         [DllImport("user32.dll")]
@@ -20,5 +49,8 @@ namespace UltrawideOverlays.Utils
 
         [DllImport("user32.dll")]
         public static extern bool UnregisterHotKey(IntPtr hWnd, int id);
+
+        [DllImport("user32.dll")]
+        public static extern bool GetMessage(out MSG lpMsg, IntPtr hWnd, uint wMsgFilterMin, uint wMsgFilterMax);
     }
 }

@@ -1,48 +1,95 @@
-﻿using Avalonia;
-using Avalonia.Input;
-using Avalonia.Win32.Input;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System;
+using System.Diagnostics;
+using System.Threading;
+using UltrawideOverlays.Enums;
 using UltrawideOverlays.Utils;
 
 namespace UltrawideOverlays.Services
 {
     public class HotKeyService
     {
-        private IntPtr _windowHandle;
-        public event Action? HotKeyPressed;
+        public event EventHandler<string>? HotKeyPressed;
+
+        private Thread HotkeyThread;
 
         public HotKeyService()
         {
-            //RegisterHotKeys();
+            RegisterHotKeys();
         }
 
-        //private void RegisterHotKeys()
-        //{
-        //    // Subscribe to window messages
-        //    var wndProc = new WndProc((hWnd, msg, wParam, lParam) =>
-        //    {
-        //        if (msg == WM_HOTKEY)
-        //        {
-        //            // Handle hotkey press here
-        //            int hotKeyId = wParam.ToInt32();
-        //            OnHotKeyPressed(hotKeyId);
-        //            return IntPtr.Zero;
-        //        }
-        //        return DefWindowProc(hWnd, msg, wParam, lParam);
-        //    }
-        //}
+        private void RegisterHotKeys()
+        {
+            if (HotkeyThread == null)
+            {
+                HotkeyThread = new Thread(() =>
+                {
+                    if (!HotKeysUtils.RegisterHotKey(IntPtr.Zero, HotKeysUtils.HotKeyId, HotKeysUtils.MODIFIER_KEYS.CONTROL | HotKeysUtils.MODIFIER_KEYS.ALT, HotKeysUtils.KEYS.O)) //Ctrl + Alt + O
+                    {
+                        throw new InvalidOperationException("Failed to register hotkey for Ctrl + Alt + O.");
+                    }
+
+                    if (!HotKeysUtils.RegisterHotKey(IntPtr.Zero, HotKeysUtils.HotKeyId + 1, HotKeysUtils.MODIFIER_KEYS.CONTROL | HotKeysUtils.MODIFIER_KEYS.ALT, HotKeysUtils.KEYS.UP)) //Ctrl + Alt + Up
+                    {
+                        throw new InvalidOperationException("Failed to register hotkey for Ctrl + Alt + Up.");
+                    }
+
+                    if (!HotKeysUtils.RegisterHotKey(IntPtr.Zero, HotKeysUtils.HotKeyId + 2, HotKeysUtils.MODIFIER_KEYS.CONTROL | HotKeysUtils.MODIFIER_KEYS.ALT, HotKeysUtils.KEYS.DOWN)) //Ctrl + Alt + Down
+                    {
+                        throw new InvalidOperationException("Failed to register hotkey for Ctrl + Alt + Down.");
+                    }
+
+                    // Listen for hotkey events
+                    while (true)
+                    {
+                        HotKeysUtils.MSG msg;
+                        if (HotKeysUtils.GetMessage(out msg, IntPtr.Zero, 0, 0))
+                        {
+                            if (msg.message == HotKeysUtils.WM_HOTKEY)
+                            {
+                                switch (msg.wParam.ToInt32())
+                                {
+                                    case HotKeysUtils.HotKeyId:
+                                        Debug.WriteLine("Ctrl + Alt + O pressed");
+                                        OnHotKeyPressed(SettingsNames.ToggleOverlayHotkey);
+                                        break;
+                                    case HotKeysUtils.HotKeyId + 1:
+                                        Debug.WriteLine("Ctrl + Alt + Up pressed");
+                                        OnHotKeyPressed(SettingsNames.OpacityUpHotkey);
+                                        break;
+                                    case HotKeysUtils.HotKeyId + 2:
+                                        Debug.WriteLine("Ctrl + Alt + Down pressed");
+                                        OnHotKeyPressed(SettingsNames.OpacityDownHotkey);
+                                        break;
+                                }
+                            }
+                        }
+                    }
+                });
+                HotkeyThread.Start();
+            }
+        }
 
         private void UnregisterHotKey()
         {
+            HotkeyThread.Join();
+            if (!HotKeysUtils.UnregisterHotKey(IntPtr.Zero, HotKeysUtils.HotKeyId))
+            {
+                throw new InvalidOperationException("Failed to unregister hotkey.");
+            }
+            if (!HotKeysUtils.UnregisterHotKey(IntPtr.Zero, HotKeysUtils.HotKeyId + 1))
+            {
+                throw new InvalidOperationException("Failed to unregister hotkey for Ctrl + Alt + Up.");
+            }
+            if (!HotKeysUtils.UnregisterHotKey(IntPtr.Zero, HotKeysUtils.HotKeyId + 2))
+            {
+                throw new InvalidOperationException("Failed to unregister hotkey for Ctrl + Alt + Down.");
+            }
         }
 
-        public void OnHotKeyPressed()
+        public void OnHotKeyPressed(string Code)
         {
-            HotKeyPressed?.Invoke();
+            Debug.WriteLine($"HotKey Pressed!! Code:{Code}");
+            HotKeyPressed?.Invoke(this, Code);
         }
     }
 }

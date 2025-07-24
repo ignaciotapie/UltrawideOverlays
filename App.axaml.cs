@@ -68,14 +68,15 @@ namespace UltrawideOverlays
             var dbProvider = new DatabaseProvider();
             collection.AddSingleton(dbProvider);
             //Data services
-            collection.AddSingleton<OverlayDataService>();
-            collection.AddSingleton<GamesDataService>();
-            collection.AddSingleton<ProcessDataService>();
-            collection.AddSingleton<ActivityDataService>();
-            collection.AddSingleton<GeneralDataService>();
+            collection.AddTransient<OverlayDataService>();
+            collection.AddTransient<GamesDataService>();
+            collection.AddTransient<ProcessDataService>();
+            collection.AddTransient<ActivityDataService>();
+            collection.AddTransient<GeneralDataService>();
             collection.AddSingleton<SettingsDataService>();
             //TODO: Global hotkey service...
-            //collection.AddSingleton<HotKeyService>();
+            HotKeyService hkservice = new HotKeyService();
+            collection.AddSingleton<HotKeyService>(hkservice);
 
             var focusMonitorService = new FocusMonitorService();
             collection.AddSingleton(focusMonitorService);
@@ -191,7 +192,7 @@ namespace UltrawideOverlays
                         mainWindow.Hide();
                     }
 
-                    PathToBitmapConverter.CleanCache();
+                    PathToCachedBitmapConverter.Instance.ClearCache();
                 }
             }
         }

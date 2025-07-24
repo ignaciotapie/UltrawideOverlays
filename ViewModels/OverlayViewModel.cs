@@ -1,9 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
-using System.Collections.Generic;
 using System.Diagnostics;
-using UltrawideOverlays.Models;
+using UltrawideOverlays.Enums;
 using UltrawideOverlays.Services;
-using UltrawideOverlays.Utils;
 
 namespace UltrawideOverlays.ViewModels
 {
@@ -11,17 +9,18 @@ namespace UltrawideOverlays.ViewModels
     {
         [ObservableProperty]
         private string? _imageSource;
+
         [ObservableProperty]
         private double? _imageOpacity;
+
+        [ObservableProperty]
+        private bool _isOverlayEnabled;
 
         private readonly OverlayDataService OverlayDataService;
         private readonly FocusMonitorService FocusMonitorService;
         private readonly GamesDataService GamesDataService;
         private readonly SettingsDataService SettingsDataService;
         private readonly HotKeyService HotKeyService;
-
-        private ICollection<OverlayDataModel> Overlays;
-        private ICollection<GamesModel> Games;
 
         /// <summary>
         /// Design-time constructor
@@ -30,31 +29,49 @@ namespace UltrawideOverlays.ViewModels
         {
         }
 
-        public OverlayViewModel(OverlayDataService overlayDataService, GamesDataService gamesDataService, SettingsDataService settingsDataService, FocusMonitorService focusMonitorService)
+        public OverlayViewModel(OverlayDataService overlayDataService, GamesDataService gamesDataService, SettingsDataService settingsDataService, FocusMonitorService focusMonitorService, HotKeyService hotKeyService)
         {
             OverlayDataService = overlayDataService;
             FocusMonitorService = focusMonitorService;
             GamesDataService = gamesDataService;
             SettingsDataService = settingsDataService;
-            //HotKeyService = hotKeyService;
+            HotKeyService = hotKeyService;
 
             ImageOpacity = 1;
+            IsOverlayEnabled = true;
 
-            SettingsDataService.SettingsChanged += SettingsChangedHandler;
-            FocusMonitorService.FocusChanged += FocusChanged;
-        }
-
-        private void SettingsChangedHandler(object? sender, SettingsChangedArgs e)
-        {
-
+            FocusMonitorService.FocusChanged += FocusChangedHandler;
+            HotKeyService.HotKeyPressed += HotkeyPressedHandler;
         }
 
         ~OverlayViewModel()
         {
             Debug.WriteLine("OverlayViewModel finalized!");
+
+            FocusMonitorService.FocusChanged -= FocusChangedHandler;
+            HotKeyService.HotKeyPressed -= HotkeyPressedHandler;
         }
 
-        private async void FocusChanged(string filePath)
+        private void HotkeyPressedHandler(object? sender, string e)
+        {
+            switch (e)
+            {
+                case SettingsNames.ToggleOverlayHotkey:
+                    ToggleOverlayOpacity();
+                    break;
+                case SettingsNames.OpacityUpHotkey:
+                    IncreaseOverlayOpacity();
+                    break;
+                case SettingsNames.OpacityDownHotkey:
+                    DecreaseOverlayOpacity();
+                    break;
+                default:
+                    Debug.WriteLine($"Unknown hotkey action: {e}");
+                    break;
+            }
+        }
+
+        private async void FocusChangedHandler(string filePath)
         {
             var game = await GamesDataService.LoadGameAsync(filePath);
             if (game != null)
@@ -72,6 +89,30 @@ namespace UltrawideOverlays.ViewModels
             else
             {
                 ImageSource = null; // No game found for this file path
+            }
+        }
+
+        private void DecreaseOverlayOpacity()
+        {
+            if (ImageSource != null && ImageOpacity.HasValue && ImageOpacity >= 0.1)
+            {
+                ImageOpacity -= 0.1;
+            }
+        }
+
+        private void IncreaseOverlayOpacity()
+        {
+            if (ImageSource != null && ImageOpacity.HasValue && ImageOpacity <= 0.9)
+            {
+                ImageOpacity += 0.1;
+            }
+        }
+
+        private void ToggleOverlayOpacity()
+        {
+            if (ImageSource != null)
+            {
+                IsOverlayEnabled = !IsOverlayEnabled;
             }
         }
     }

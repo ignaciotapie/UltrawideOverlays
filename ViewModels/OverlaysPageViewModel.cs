@@ -194,7 +194,7 @@ namespace UltrawideOverlays.ViewModels
                 window.DataContext = null;
             }
 
-            PathToBitmapConverter.CleanCache();
+            PathToCachedBitmapConverter.Instance.ClearCache();
             LoadOverlaysAsync();
         }
     }

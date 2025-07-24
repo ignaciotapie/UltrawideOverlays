@@ -12,7 +12,6 @@ namespace UltrawideOverlays.Utils
         public static readonly ImageExtension JPEG = new ImageExtension(".jpeg");
         public static readonly ImageExtension BMP = new ImageExtension(".bmp");
         public static readonly ImageExtension GIF = new ImageExtension(".gif");
-        public static readonly ImageExtension SVG = new ImageExtension(".svg");
 
         public string Extension { get; }
 
@@ -56,8 +55,7 @@ namespace UltrawideOverlays.Utils
             ImageExtension.BMP,
             ImageExtension.JPG,
             ImageExtension.JPEG,
-            ImageExtension.GIF,
-            ImageExtension.SVG
+            ImageExtension.GIF
         ];
 
         public static readonly HashSet<string> ValidExecutableExtensions =

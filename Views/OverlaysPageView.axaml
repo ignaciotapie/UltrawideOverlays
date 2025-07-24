@@ -66,7 +66,7 @@
                             <Grid>
                                 <cc:VisualGrid Color="#16212c" GridSize="20">
                                 </cc:VisualGrid>
-                                <cc:ScalableImage VerticalAlignment="Center" Source="{Binding SelectedOverlay.Path, Converter={x:Static converters:PathToBitmapConverter.Converter}}"/>
+                                <cc:ScalableImage VerticalAlignment="Center" Source="{Binding SelectedOverlay.Path, Converter={x:Static converters:PathToCachedBitmapConverter.Instance}}"/>
                             </Grid>
                         </Border>
                     </Border>

@@ -2,19 +2,19 @@
 {
     public class SettingsNames
     {
-        public static readonly string GridSize = "Grid Size";
-        public static readonly string GridOpacity = "Grid Opacity";
-        public static readonly string GridColor = "Grid Color";
-        public static readonly string StartupEnabled = "Startup Enabled";
-        public static readonly string MinimizeToTray = "Minimize To Tray";
-        public static readonly string ToggleOverlayHotkey = "Toggle Overlay Hotkey";
-        public static readonly string OpacityUpHotkey = "Opacity Up Hotkey";
-        public static readonly string OpacityDownHotkey = "Opacity Down Hotkey";
+        public const string GridSize = "Grid Size";
+        public const string GridOpacity = "Grid Opacity";
+        public const string GridColor = "Grid Color";
+        public const string StartupEnabled = "Startup Enabled";
+        public const string MinimizeToTray = "Minimize To Tray";
+        public const string ToggleOverlayHotkey = "Toggle Overlay Hotkey";
+        public const string OpacityUpHotkey = "Opacity Up Hotkey";
+        public const string OpacityDownHotkey = "Opacity Down Hotkey";
     }
 
     public class SettingsBoolValues
     {
-        public static readonly string True = "True";
-        public static readonly string False = "False";
+        public const string True = "True";
+        public const string False = "False";
     }
 }

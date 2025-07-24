@@ -35,7 +35,7 @@ namespace UltrawideOverlays.CustomControls
             };
             image.Bind(Image.SourceProperty, new Binding("ImagePath")
             {
-                Converter = PathToBitmapConverter.Converter,
+                Converter = PathToCachedBitmapConverter.Instance,
                 Mode = BindingMode.OneWay
             });
 

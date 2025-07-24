@@ -107,7 +107,7 @@
                             <DataTemplate>
                                 <Grid ColumnDefinitions="Auto, Auto">
                                     <Border Margin="0,0,5,0" HorizontalAlignment="Center" Background="{DynamicResource PrimaryBackground}">
-                                        <Image RenderOptions.BitmapInterpolationMode="LowQuality" Width="48" Height="48" Source="{Binding ImagePath, Converter={x:Static converter:PathToBitmapConverter.Converter}}"/>
+                                        <Image RenderOptions.BitmapInterpolationMode="LowQuality" Width="48" Height="48" Source="{Binding ImagePath, Converter={x:Static converter:PathToCachedBitmapConverter.Instance}}"/>
                                     </Border>
                                     <TextBox Grid.Column="1" BorderBrush="Transparent" Background="{DynamicResource PrimaryBackground}" Text="{Binding ImageName, Mode=TwoWay}"/>
                                 </Grid>
