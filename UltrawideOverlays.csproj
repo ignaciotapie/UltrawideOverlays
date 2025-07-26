@@ -14,6 +14,8 @@
   <PropertyGroup Label="Avalonia">
     <AvaloniaNameGeneratorDefaultFieldModifier>Internal</AvaloniaNameGeneratorDefaultFieldModifier>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <PublishSingleFile>true</PublishSingleFile>
+    <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
   </PropertyGroup>
 
   <ItemGroup>
@@ -43,9 +45,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="Assets\Images\clipping-mask.png">
+    <Resource Include="Assets\Images\clipping-mask.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </EmbeddedResource>
+    </Resource>
   </ItemGroup>
 
    <ItemGroup>
