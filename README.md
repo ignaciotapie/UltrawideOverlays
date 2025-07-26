@@ -3,7 +3,7 @@
 
 UltrawideOverlays is a Windows desktop application designed to enhance the gaming experience on ultrawide monitors. It allows you to create and display custom static overlays to cover the black bars that appear when playing games that do not support native ultrawide resolutions.
 
-![Demo](https://i.imgur.com/RV4JX20.gif)
+![Demo](https://github.com/ignaciotapie/UltrawideOverlays/blob/master/Demo/kh3%20demo.gif)
 
 ## Key Features
 
