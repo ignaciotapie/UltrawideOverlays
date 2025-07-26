@@ -108,7 +108,18 @@
                             </StackPanel>
                         </Grid>
                         <StackPanel Grid.Row="2" Spacing="10" Orientation="Horizontal">
-                            <Button Classes="Primary Blue" Width="150" HorizontalContentAlignment="Center" Command="{Binding MakeNewGameCommand}">Save Game</Button>
+                            <Button Classes="Primary Blue" Width="150" HorizontalContentAlignment="Center" Command="{Binding MakeNewGameCommand}">
+                                <Button.Content>
+                                    <StackPanel Orientation="Horizontal">
+                                        <Image Classes="TabIcon">
+                                            <Image.Source>
+                                                <SvgImage Source="{StaticResource LinkIcon}"/>
+                                            </Image.Source>
+                                        </Image>
+                                        <Label Classes="Primary">Link</Label>
+                                    </StackPanel>
+                                </Button.Content>
+                            </Button>
                         </StackPanel>
                     </StackPanel>
                 </Grid>

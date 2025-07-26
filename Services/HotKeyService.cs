@@ -38,6 +38,11 @@ namespace UltrawideOverlays.Services
                         throw new InvalidOperationException("Failed to register hotkey for Ctrl + Alt + Down.");
                     }
 
+                    if (!HotKeysUtils.RegisterHotKey(IntPtr.Zero, HotKeysUtils.HotKeyId + 3, HotKeysUtils.MODIFIER_KEYS.CONTROL | HotKeysUtils.MODIFIER_KEYS.ALT, HotKeysUtils.KEYS.P)) //Ctrl + Alt + P
+                    {
+                        throw new InvalidOperationException("Failed to register hotkey for Ctrl + Alt + P.");
+                    }
+
                     // Listen for hotkey events
                     while (true)
                     {
@@ -60,11 +65,17 @@ namespace UltrawideOverlays.Services
                                         Debug.WriteLine("Ctrl + Alt + Down pressed");
                                         OnHotKeyPressed(SettingsNames.OpacityDownHotkey);
                                         break;
+                                    case HotKeysUtils.HotKeyId + 3:
+                                        Debug.WriteLine("Ctrl + Alt + P pressed");
+                                        OnHotKeyPressed(SettingsNames.OpenMiniOverlayManager);
+                                        break;
                                 }
                             }
                         }
                     }
                 });
+                HotkeyThread.IsBackground = true;
+
                 HotkeyThread.Start();
             }
         }
@@ -83,6 +94,10 @@ namespace UltrawideOverlays.Services
             if (!HotKeysUtils.UnregisterHotKey(IntPtr.Zero, HotKeysUtils.HotKeyId + 2))
             {
                 throw new InvalidOperationException("Failed to unregister hotkey for Ctrl + Alt + Down.");
+            }
+            if (!HotKeysUtils.UnregisterHotKey(IntPtr.Zero, HotKeysUtils.HotKeyId + 3))
+            {
+                throw new InvalidOperationException("Failed to unregister hotkey for Ctrl + Alt + P.");
             }
         }
 

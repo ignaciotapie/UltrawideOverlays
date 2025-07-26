@@ -83,14 +83,37 @@
                     <StackPanel Margin="20">
                         <Label Classes="Title">Games Setup</Label>
                         <Label Classes="Subtitle" FontSize="20">Add a new game and configure overlay settings</Label>
-                        <Button Classes="Primary Home" Command="{Binding NavigateToGamesPageCommand}">Add New Game</Button>
+                        <Button Classes="Home IconButton" Command="{Binding NavigateToGamesPageCommand}">
+                            <StackPanel>
+                                <Image>
+                                    <Image.Source>
+                                        <SvgImage Source="{StaticResource GamesLogo}"/>
+                                    </Image.Source>
+                                </Image>
+                                <Label>
+                                    Add new game
+                                </Label>
+                            </StackPanel>
+                        </Button>
                     </StackPanel>
                 </Border>
                 <Border Grid.Column="1" Classes="Slot">
                     <Grid RowDefinitions="*,*,*" Margin="20">
                         <Label Classes="Title">Overlay Library</Label>
                         <Label Grid.Row="1" Classes="Subtitle" FontSize="20">Browse and create your overlays!</Label>
-                        <Button Grid.Row="2" Classes="Primary Home" Background="{DynamicResource HomeNewOverlay}" Command="{Binding NavigateToOverlaysPageCommand}">Browse Library</Button>
+
+                        <Button Grid.Row="2" Classes="Home IconButton" Background="{DynamicResource HomeNewOverlay}" Command="{Binding NavigateToOverlaysPageCommand}">
+                            <StackPanel>
+                                <Image>
+                                    <Image.Source>
+                                        <SvgImage Source="{StaticResource OverlayLogo}"/>
+                                    </Image.Source>
+                                </Image>
+                                <Label>
+                                    Browse library
+                                </Label>
+                            </StackPanel>
+                        </Button>
                     </Grid>
                 </Border>
             </Grid>

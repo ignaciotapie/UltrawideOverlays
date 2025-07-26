@@ -4,6 +4,7 @@
     {
         MainWindow,
         OverlayWindow,
-        OverlayEditorWindow
+        OverlayEditorWindow,
+        MiniOverlayManager,
     }
 }

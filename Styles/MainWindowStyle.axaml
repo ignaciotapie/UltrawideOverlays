@@ -27,15 +27,32 @@
           <Button Classes="Secondary">
               Secondary Button
           </Button>
+
+          <Button Classes="IconButton">
+              <StackPanel Orientation="Horizontal">
+                  <Image>
+                      <Image.Source>
+                          <SvgImage Source="{StaticResource SettingLogo}"/>
+                      </Image.Source>
+                  </Image>
+                  <Label VerticalContentAlignment="Center" Content="Settings"/>
+              </StackPanel>
+          </Button>
       </UniformGrid>
   </Design.PreviewWith>
 
     <Style Selector="Label">
-        <Setter Property="FontFamily" Value="{StaticResource PrimaryFont}"></Setter>
+        <Setter Property="FontFamily" Value="{DynamicResource PrimaryFont}"></Setter>
     </Style>
 
     <Style Selector="Button">
         <Setter Property="FontFamily" Value="{StaticResource PrimaryFont}"></Setter>
+        <Style Selector="^:disabled">
+            <Setter Property="Opacity" Value="0.5"/>
+            <Style Selector="^ Label">
+                <Setter Property="Foreground" Value="{DynamicResource SecondaryFontColor}"/>
+            </Style>
+        </Style>
     </Style>
 
     <Style Selector="TextBox">
@@ -99,13 +116,14 @@
         <Setter Property="Padding" Value="10"></Setter>
         <Setter Property="HorizontalAlignment" Value="Center"></Setter>
         <Setter Property="CornerRadius" Value="5"></Setter>
+    </Style>
 
-        <Style Selector="^.Blue">
-            <Setter Property="Background" Value="#005c92"/>
-        </Style>
-        <Style Selector="^.Red">
-            <Setter Property="Background" Value="DarkRed"/>
-        </Style>
+    <Style Selector="Button.Red">
+        <Setter Property="Background" Value="DarkRed"/>
+    </Style>
+    
+    <Style Selector="Button.Blue">
+        <Setter Property="Background" Value="#005c92"/>
     </Style>
 
     <Style Selector="Image.TabIcon">
@@ -135,5 +153,24 @@
         <Setter Property="CornerRadius" Value="10"/>
         <Setter Property="Margin" Value="30,20"/>
     </Style>
-    
+
+    <Style Selector="Button.IconButton">
+        <Setter Property="FontSize" Value="16"></Setter>
+        <Setter Property="FontWeight" Value="DemiBold"></Setter>
+        <Setter Property="CornerRadius" Value="5"></Setter>
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+        <Style Selector="^ StackPanel">
+            <Setter Property="Spacing" Value="5"/>
+            <Setter Property="Orientation" Value="Horizontal"/>
+        </Style>
+        <Style Selector="^ Image">
+            <Setter Property="Width" Value="20"/>
+            <Setter Property="Height" Value="20"/>
+        </Style>
+        <Style Selector="^ Label">
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Foreground" Value="{DynamicResource PrimaryFontColor}"/>
+        </Style>
+    </Style>
 </Styles>

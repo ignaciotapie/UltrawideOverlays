@@ -35,6 +35,8 @@ namespace UltrawideOverlays.ViewModels
         private SingleSettingModel _opacityUpHotkey;
         [ObservableProperty]
         private SingleSettingModel _opacityDownHotkey;
+        [ObservableProperty]
+        private SingleSettingModel _quickOverlayHotkey;
 
         public SettingsPageViewModel()
         {
@@ -94,6 +96,7 @@ namespace UltrawideOverlays.ViewModels
             ToggleOverlayHotkey = value.SettingsDictionary[SettingsNames.ToggleOverlayHotkey];
             OpacityUpHotkey = value.SettingsDictionary[SettingsNames.OpacityUpHotkey];
             OpacityDownHotkey = value.SettingsDictionary[SettingsNames.OpacityDownHotkey];
+            QuickOverlayHotkey = value.SettingsDictionary[SettingsNames.OpenMiniOverlayManager];
         }
 
         [RelayCommand]

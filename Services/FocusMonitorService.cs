@@ -37,6 +37,7 @@ namespace UltrawideOverlays.Services
     {
         private CUIAutomation _automation;
         private FocusChangedHandler _handler;
+        public string LastFocusedExePath { get; private set; }
 
         public event Action<string> FocusChanged;
 
@@ -44,15 +45,20 @@ namespace UltrawideOverlays.Services
         {
             _automation = new CUIAutomation();
             _handler = new FocusChangedHandler();
-            _handler.FocusChanged += (exePath) => FocusChanged?.Invoke(exePath);
+            _handler.FocusChanged += handleFocusChanged;
             _automation.AddFocusChangedEventHandler(null, _handler);
+        }
+
+        private void handleFocusChanged(string exePath)
+        {
+            LastFocusedExePath = exePath;
+            FocusChanged?.Invoke(exePath);
         }
 
         public void Dispose()
         {
             try
             {
-                // Remove the focus changed event handler to prevent memory leaks
                 _handler.FocusChanged -= (exePath) => FocusChanged?.Invoke(exePath);
                 _automation.RemoveFocusChangedEventHandler(_handler);
             }

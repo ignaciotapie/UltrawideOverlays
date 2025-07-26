@@ -10,6 +10,7 @@
         public const string ToggleOverlayHotkey = "Toggle Overlay Hotkey";
         public const string OpacityUpHotkey = "Opacity Up Hotkey";
         public const string OpacityDownHotkey = "Opacity Down Hotkey";
+        public const string OpenMiniOverlayManager = "Open Mini Overlay Manager Hotkey";
     }
 
     public class SettingsBoolValues

@@ -36,14 +36,12 @@ namespace UltrawideOverlays
                     case Enums.WindowViews.OverlayEditorWindow:
                         return new OverlayEditorWindowView
                         {
-                            DataContext = new OverlayEditorWindowViewModel(services.GetRequiredService<OverlayDataService>(), services.GetRequiredService<SettingsDataService>(), args)
+                            DataContext = new OverlayEditorWindowViewModel(provider.GetRequiredService<OverlayDataService>(), provider.GetRequiredService<SettingsDataService>(), args)
                         };
                     case Enums.WindowViews.MainWindow:
                         var window = new MainWindow
                         {
-                            DataContext = services.GetRequiredService<MainWindowViewModel>(),
-                            ClosingBehavior = WindowClosingBehavior.OwnerAndChildWindows,
-                            WindowStartupLocation = WindowStartupLocation.CenterScreen,
+                            DataContext = provider.GetRequiredService<MainWindowViewModel>()
                         };
                         window.Closing += MainWindow_Closing;
                         window.Closed += MainWindow_Closed;
@@ -52,6 +50,11 @@ namespace UltrawideOverlays
                         return new OverlayView
                         {
                             DataContext = provider.GetRequiredService<OverlayViewModel>()
+                        };
+                    case Enums.WindowViews.MiniOverlayManager:
+                        return new QuickOverlayWindowView
+                        {
+                            DataContext = provider.GetRequiredService<QuickOverlayWindowViewModel>()
                         };
                     default:
                         throw new ArgumentOutOfRangeException(nameof(windowEnum), windowEnum, null);
@@ -108,6 +111,8 @@ namespace UltrawideOverlays
             collection.AddTransient<OverlayEditorWindowViewModel>();
             //Overlay ViewModel
             collection.AddTransient<OverlayViewModel>();
+            //Quick Overlay ViewModel
+            collection.AddTransient<QuickOverlayWindowViewModel>();
 
             return collection.BuildServiceProvider();
         }

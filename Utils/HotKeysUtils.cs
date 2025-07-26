@@ -38,6 +38,7 @@ namespace UltrawideOverlays.Utils
             public const uint O = 0x4F; // Virtual key code for 'O'
             public const uint UP = 0x26; // Virtual key code for Up Arrow
             public const uint DOWN = 0x28; // Virtual key code for Down Arrow
+            public const uint P = 0x50; // Virtual key code for 'P'
         }
 
         public const int WM_HOTKEY = 0x0312;

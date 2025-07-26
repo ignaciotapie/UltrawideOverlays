@@ -17,6 +17,7 @@ namespace UltrawideOverlays.Models
             var ToggleOverlay = new SingleSettingModel { Name = SettingsNames.ToggleOverlayHotkey, Value = "Ctrl + Shift + O" };
             var OpacityUp = new SingleSettingModel { Name = SettingsNames.OpacityUpHotkey, Value = "Ctrl + Shift + ↑" };
             var OpacityDown = new SingleSettingModel { Name = SettingsNames.OpacityDownHotkey, Value = "Ctrl + Shift + ↓" };
+            var QuickOverlay = new SingleSettingModel { Name = SettingsNames.OpenMiniOverlayManager, Value = "Ctrl + Shift + P" };
 
             SettingsDictionary = new ConcurrentDictionary<string, SingleSettingModel>();
             SettingsDictionary.TryAdd(GridSize.Name, GridSize);
@@ -27,6 +28,7 @@ namespace UltrawideOverlays.Models
             SettingsDictionary.TryAdd(ToggleOverlay.Name, ToggleOverlay);
             SettingsDictionary.TryAdd(OpacityUp.Name, OpacityUp);
             SettingsDictionary.TryAdd(OpacityDown.Name, OpacityDown);
+            SettingsDictionary.TryAdd(QuickOverlay.Name, QuickOverlay);
         }
 
         public void AddOrUpdate(string key, SingleSettingModel value)

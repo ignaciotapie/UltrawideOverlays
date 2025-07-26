@@ -26,6 +26,7 @@
 
   <ItemGroup>
     <None Remove="Assets\Fonts\Cairo.ttf" />
+    <None Remove="Assets\Images\add-icon.svg" />
     <None Remove="Assets\Images\clipping-mask.png" />
     <None Remove="Assets\Images\copy-icon.svg" />
     <None Remove="Assets\Images\delete-icon.svg" />
@@ -35,6 +36,7 @@
     <None Remove="Assets\Images\plus-icon.svg" />
     <None Remove="Assets\Images\resize-height-icon.svg" />
     <None Remove="Assets\Images\resize-width-icon.svg" />
+    <None Remove="Assets\Images\save-icon.svg" />
     <None Remove="Assets\Images\settings-icon-colored.svg" />
     <None Remove="Assets\Images\settings-icon.svg" />
     <None Remove="Assets\Images\tv-icon-white.svg" />

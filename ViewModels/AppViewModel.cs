@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using UltrawideOverlays.Enums;
+using UltrawideOverlays.Factories;
 using UltrawideOverlays.Services;
 using UltrawideOverlays.Utils;
 
@@ -16,14 +17,34 @@ namespace UltrawideOverlays.ViewModels
         private bool _trayEnabled;
 
         private readonly SettingsDataService SettingsService;
+        private readonly WindowFactory WindowFactory;
+        private readonly HotKeyService HotKeyService;
 
-        public AppViewModel(SettingsDataService settingsService)
+        public AppViewModel(SettingsDataService settingsService, HotKeyService hotKeyService, WindowFactory windowFactory)
         {
             SettingsService = settingsService;
             SettingsService.SettingsChanged += SettingsChangedHandler;
+            WindowFactory = windowFactory;
+            HotKeyService = hotKeyService;
 
             SetUpTrayIcon();
             SetUpStartUp();
+
+            HotKeyService.HotKeyPressed += HotKeyPressed;
+        }
+
+        private void HotKeyPressed(object? sender, string e)
+        {
+            switch (e)
+            {
+                case SettingsNames.OpenMiniOverlayManager:
+                    Avalonia.Threading.Dispatcher.UIThread.Post(() =>
+                    {
+                        var miniOverlayManagerWindow = WindowFactory.CreateWindow(WindowViews.MiniOverlayManager);
+                        miniOverlayManagerWindow.Show();
+                    });
+                break;
+            }
         }
 
         private void SettingsChangedHandler(object? sender, SettingsChangedArgs e)

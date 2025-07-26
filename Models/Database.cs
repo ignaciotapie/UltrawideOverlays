@@ -359,7 +359,7 @@ namespace UltrawideOverlays.Models
                 {
                     if (game.OverlayName == overlay.Name)
                     {
-                        game.OverlayName = "<Removed Overlay>"; // Clear the overlay association
+                        game.OverlayName = ""; // Clear the overlay association
                         AddActivity(new ActivityLogModel(DateTime.Now, ActivityLogType.Games, ActivityLogAction.Updated, game.Name));
                     }
                 }

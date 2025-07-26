@@ -1,0 +1,112 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:mxe="https://schemas.eremexcontrols.net/avalonia/editors"
+        xmlns:vm="using:UltrawideOverlays.ViewModels"
+        mc:Ignorable="d" d:DesignWidth="450" d:DesignHeight="450"
+        Width="450" Height="450"
+        CanResize="False"
+        Topmost="True"
+        WindowStartupLocation="CenterScreen"
+        ExtendClientAreaToDecorationsHint="True"
+        Background="Transparent"
+        x:Class="UltrawideOverlays.QuickOverlayWindowView"
+        x:Name="QuickOverlayWindow"
+        x:DataType="vm:QuickOverlayWindowViewModel"
+        Title="QuickOverlayWindowView">
+
+    <Window.Styles>
+        <Style Selector="Border.Light">
+            <Style.Animations>
+                <Animation Duration="0:0:3" IterationCount="INFINITE">
+                    <KeyFrame Cue="0%">
+                        <Setter Property="Opacity" Value="0.0"/>
+                    </KeyFrame>
+                    <KeyFrame Cue="50%">
+                        <Setter Property="Opacity" Value="1.0"/>
+                    </KeyFrame>
+                    <KeyFrame Cue="100%">
+                        <Setter Property="Opacity" Value="0.0"/>
+                    </KeyFrame>
+                </Animation>
+            </Style.Animations>
+        </Style>
+    </Window.Styles>
+
+    <Grid RowDefinitions="32, *">
+        <Border Background="{DynamicResource PrimaryColor}" BorderBrush="{DynamicResource PrimaryAccent}" BorderThickness="0,0,0,1" IsHitTestVisible="False" CornerRadius="10,10,0,0"/>
+        <Border Background="{DynamicResource PrimaryBackground}" Grid.Row="1" IsHitTestVisible="True" CornerRadius="0,0,10,10">
+            <Grid RowDefinitions="*, Auto, 2*, *, Auto" Margin="20">
+                <RelativePanel>
+                    <Image Name="OverlayIcon" Classes="TabIcon" Width="40" Height="40" >
+                        <Image.Source>
+                            <SvgImage Source="{StaticResource OverlayLogoColored}"/>
+                        </Image.Source>
+                    </Image>
+                    <Label RelativePanel.RightOf="OverlayIcon" Classes="Title" Margin="10,0">Mini Overlay Manager</Label>
+                </RelativePanel>
+                <Border Classes="Slot" Margin="0,10" Grid.Row="1">
+                    <Grid RowDefinitions="Auto, Auto" Margin="10">
+                        <StackPanel Orientation="Horizontal">
+                            <Image Name="GamesIcon" Classes="TabIcon" Width="28" Height="28" >
+                                <Image.Source>
+                                    <SvgImage Source="{StaticResource GamesLogoColored}"/>
+                                </Image.Source>
+                            </Image>
+                            <Label VerticalAlignment="Center" Classes="Subtitle" Margin="5,0">Focused Application</Label>
+                        </StackPanel>
+                        <StackPanel Grid.Row="1" VerticalAlignment="Bottom">
+                            <Label Classes="Title" Content="{Binding AppName}"/>
+                            <Label Classes="Subtitle" Content="{Binding AppPath}"/>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+                <StackPanel Grid.Row="2">
+                    <Label Classes="Primary">Select Overlay</Label>
+                    <Grid ColumnDefinitions="*, Auto">
+                        <mxe:ComboBoxEditor Height="40" Watermark="Choose existing overlay..." DisplayMember="Name" ValueMember="Name" ItemsSource="{Binding Overlays}" SelectedItem="{Binding SelectedOverlay}" Margin="0,0,10,0"></mxe:ComboBoxEditor>
+                        <Button Classes="Red IconButton" VerticalAlignment="Stretch" Grid.Column="1" Command="{Binding ResetCommand}">
+                            <StackPanel>
+                                <Image>
+                                    <Image.Source>
+                                        <SvgImage Source="{StaticResource TrashIcon}"/>
+                                    </Image.Source>
+                                </Image>
+                            </StackPanel>
+                        </Button>
+                    </Grid>
+                </StackPanel>
+                <Grid Grid.Row="3" ColumnDefinitions="*, Auto">
+                    <Button VerticalAlignment="Stretch" Classes="Blue IconButton" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Command="{Binding AddGameCommand}" CommandParameter="{Binding ElementName=QuickOverlayWindow}" Margin="0,0,10,0">
+                        <Button.Content>
+                            <StackPanel>
+                                <Image>
+                                    <Image.Source>
+                                        <SvgImage Source="{StaticResource SaveIcon}"/>
+                                    </Image.Source>
+                                </Image>
+                                <Label>
+                                    Save
+                                </Label>
+                            </StackPanel>
+                        </Button.Content>
+                    </Button>
+                    <Button Command="{Binding OpenNewOverlayWindowCommand}" Grid.Column="1" Classes="IconButton" HorizontalAlignment="Right" HorizontalContentAlignment="Center" VerticalAlignment="Stretch" VerticalContentAlignment="Center">
+                        <Button.Content>
+                            <Image>
+                                <Image.Source>
+                                    <SvgImage Source="{StaticResource AddIcon}"></SvgImage>
+                                </Image.Source>
+                            </Image>
+                        </Button.Content>
+                    </Button>
+                </Grid>
+                <StackPanel Grid.Row="4" Orientation="Horizontal">
+                    <Border Classes="Light" Background="Green"  Width="16" Height="16" CornerRadius="100"/>
+                    <Label Margin="5,0" Classes="Subtitle">Ready to overlay</Label>
+                </StackPanel>
+            </Grid>
+        </Border>
+    </Grid>
+</Window>

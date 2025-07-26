@@ -88,7 +88,6 @@
                                     <Label Classes="Secondary">Show/hide the overlay</Label>
                                 </StackPanel>
                                 <Label Grid.Column="1" Classes="Title" Margin="0,0,10,0" VerticalAlignment="Center" Content="{Binding ToggleOverlayHotkey.Value}"></Label>
-                                <Button IsVisible="False" Grid.Column="2" Name="EditButton" Classes="Primary Blue Edit">Edit</Button>
                             </Grid>
                         
                             <Grid RowDefinitions="Auto, Auto" ColumnDefinitions="*, Auto, Auto">
@@ -97,10 +96,16 @@
                                     <Label Classes="Secondary">Increase or decrease the overlay transparency</Label>
                                 </StackPanel>
                                 <Label Grid.Column="1" Classes="Title" Margin="0,0,10,0" VerticalAlignment="Center" Content="{Binding OpacityUpHotkey.Value}"></Label>
-                                <Button IsVisible="False" Grid.Column="2" Classes="Primary Blue Edit" RelativePanel.AlignVerticalCenterWithPanel="True" Margin="0,0,0,10">Edit</Button>
                                 
                                 <Label Grid.Row="1" Grid.Column="1" Classes="Title" Margin="0,0,10,0" VerticalAlignment="Center" Content="{Binding OpacityDownHotkey.Value}"></Label>
-                                <Button IsVisible="False" Grid.Row="1" Grid.Column="2" Classes="Primary Blue Edit" RelativePanel.AlignVerticalCenterWithPanel="True">Edit</Button>
+                            </Grid>
+
+                            <Grid RowDefinitions="Auto" ColumnDefinitions="*, Auto">
+                                <StackPanel Grid.RowSpan="2" VerticalAlignment="Center">
+                                    <Label Classes="Primary">Open Quick Overlay Editor</Label>
+                                    <Label Classes="Secondary">Easily assign overlays without having to open the main app</Label>
+                                </StackPanel>
+                                <Label Grid.Column="1" Classes="Title" Margin="0,0,10,0" VerticalAlignment="Center" Content="{Binding QuickOverlayHotkey.Value}"></Label>
                             </Grid>
                         </StackPanel>
                     </Border>

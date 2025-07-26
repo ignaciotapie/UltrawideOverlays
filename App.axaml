@@ -48,6 +48,10 @@
         <SvgSource x:Key="ResizeWidthIcon">/Assets/Images/resize-width-icon.svg</SvgSource>
         <SvgSource x:Key="ResizeHeightIcon">/Assets/Images/resize-height-icon.svg</SvgSource>
         <SvgSource x:Key="PlusIcon">/Assets/Images/plus-icon.svg</SvgSource>
+        <SvgSource x:Key="LinkIcon">/Assets/Images/link-icon.svg</SvgSource>
+        <SvgSource x:Key="TrashIcon">/Assets/Images/trash-icon.svg</SvgSource>
+        <SvgSource x:Key="AddIcon">/Assets/Images/add-icon.svg</SvgSource>
+        <SvgSource x:Key="SaveIcon">/Assets/Images/save-icon.svg</SvgSource>
         <Image x:Key="ClippingMask">/Assets/Images/clipping-mask.png</Image>
 
         <!-- Fonts-->
