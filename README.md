@@ -1,4 +1,4 @@
-# UltrawideOverlays (Provisional Readme written by GitRead)
+# UltrawideOverlays
 [![Ask DeepWiki](https://devin.ai/assets/askdeepwiki.png)](https://deepwiki.com/ignaciotapie/UltrawideOverlays)
 
 UltrawideOverlays is a Windows desktop application designed to enhance the gaming experience on ultrawide monitors. It allows you to create and display custom static overlays to cover the black bars that appear when playing games that do not support native ultrawide resolutions.
