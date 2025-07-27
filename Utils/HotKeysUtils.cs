@@ -41,9 +41,15 @@ namespace UltrawideOverlays.Utils
             public const uint P = 0x50; // Virtual key code for 'P'
         }
 
-        public const int WM_HOTKEY = 0x0312;
-        public const int HotKeyId = 9001; //Must be unique per application
+        public struct HOTKEY_UNIQUEID
+        {
+            public const int ToggleOverlay = 9001; // Unique ID for Toggle Overlay hotkey
+            public const int OpacityUp = 9002; // Unique ID for Opacity Up hotkey
+            public const int OpacityDown = 9003; // Unique ID for Opacity Down hotkey
+            public const int OpenMiniOverlayManager = 9004; // Unique ID for Open Mini Overlay Manager hotkey
+        }
 
+        public const int WM_HOTKEY = 0x0312;
 
         [DllImport("user32.dll")]
         public static extern bool RegisterHotKey(IntPtr hWnd, int id, uint fsModifiers, uint vk);

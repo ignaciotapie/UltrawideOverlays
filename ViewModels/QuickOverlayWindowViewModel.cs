@@ -4,8 +4,6 @@ using CommunityToolkit.Mvvm.Input;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UltrawideOverlays.Factories;
 using UltrawideOverlays.Models;
 using UltrawideOverlays.Services;
@@ -38,7 +36,7 @@ namespace UltrawideOverlays.ViewModels
         /// </summary>
         public QuickOverlayWindowViewModel()
         {
-            
+
         }
 
         public QuickOverlayWindowViewModel(OverlayDataService overlayService, GamesDataService gamesDataService, FocusMonitorService focusMonitorService, WindowFactory factory)
@@ -71,7 +69,7 @@ namespace UltrawideOverlays.ViewModels
         }
 
         [RelayCommand]
-        private async void AddGame(object parameter) 
+        private async void AddGame(object parameter)
         {
             if (string.IsNullOrEmpty(AppPath) || string.IsNullOrEmpty(AppName))
             {
@@ -94,13 +92,13 @@ namespace UltrawideOverlays.ViewModels
         }
 
         [RelayCommand]
-        private void Reset() 
+        private void Reset()
         {
             SelectedOverlay = null;
         }
 
         [RelayCommand]
-        private void OpenNewOverlayWindow() 
+        private void OpenNewOverlayWindow()
         {
             var window = WindowFactory.CreateWindow(Enums.WindowViews.OverlayEditorWindow);
             if (window is Window w)

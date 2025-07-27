@@ -6,105 +6,130 @@ using UltrawideOverlays.Utils;
 
 namespace UltrawideOverlays.Services
 {
-    public class HotKeyService
+    public class HotKeyService : IDisposable
     {
         public event EventHandler<string>? HotKeyPressed;
 
-        private Thread HotkeyThread;
+        private Thread? _hotkeyThread;
+        private CancellationTokenSource? _cancelToken;
+        private bool _disposed;
+
+        private readonly nint NULL_WINDOW_HANDLE = IntPtr.Zero;
 
         public HotKeyService()
         {
             RegisterHotKeys();
         }
 
+        public void Dispose()
+        {
+            if (_disposed)
+                return;
+
+            UnregisterHotKeys();
+            _disposed = true;
+            GC.SuppressFinalize(this);
+        }
+
+        ~HotKeyService()
+        {
+            Dispose();
+        }
+
         private void RegisterHotKeys()
         {
-            if (HotkeyThread == null)
+            if (_hotkeyThread != null)
+                return;
+
+            _cancelToken = new CancellationTokenSource();
+
+            _hotkeyThread = new Thread(() =>
             {
-                HotkeyThread = new Thread(() =>
+                try
                 {
-                    if (!HotKeysUtils.RegisterHotKey(IntPtr.Zero, HotKeysUtils.HotKeyId, HotKeysUtils.MODIFIER_KEYS.CONTROL | HotKeysUtils.MODIFIER_KEYS.ALT, HotKeysUtils.KEYS.O)) //Ctrl + Alt + O
-                    {
-                        throw new InvalidOperationException("Failed to register hotkey for Ctrl + Alt + O.");
-                    }
+                    RegisterAllHotKeys();
 
-                    if (!HotKeysUtils.RegisterHotKey(IntPtr.Zero, HotKeysUtils.HotKeyId + 1, HotKeysUtils.MODIFIER_KEYS.CONTROL | HotKeysUtils.MODIFIER_KEYS.ALT, HotKeysUtils.KEYS.UP)) //Ctrl + Alt + Up
+                    while (!_cancelToken!.IsCancellationRequested)
                     {
-                        throw new InvalidOperationException("Failed to register hotkey for Ctrl + Alt + Up.");
-                    }
-
-                    if (!HotKeysUtils.RegisterHotKey(IntPtr.Zero, HotKeysUtils.HotKeyId + 2, HotKeysUtils.MODIFIER_KEYS.CONTROL | HotKeysUtils.MODIFIER_KEYS.ALT, HotKeysUtils.KEYS.DOWN)) //Ctrl + Alt + Down
-                    {
-                        throw new InvalidOperationException("Failed to register hotkey for Ctrl + Alt + Down.");
-                    }
-
-                    if (!HotKeysUtils.RegisterHotKey(IntPtr.Zero, HotKeysUtils.HotKeyId + 3, HotKeysUtils.MODIFIER_KEYS.CONTROL | HotKeysUtils.MODIFIER_KEYS.ALT, HotKeysUtils.KEYS.P)) //Ctrl + Alt + P
-                    {
-                        throw new InvalidOperationException("Failed to register hotkey for Ctrl + Alt + P.");
-                    }
-
-                    // Listen for hotkey events
-                    while (true)
-                    {
-                        HotKeysUtils.MSG msg;
-                        if (HotKeysUtils.GetMessage(out msg, IntPtr.Zero, 0, 0))
+                        if (HotKeysUtils.GetMessage(out var msg, NULL_WINDOW_HANDLE, 0, 0))
                         {
                             if (msg.message == HotKeysUtils.WM_HOTKEY)
                             {
-                                switch (msg.wParam.ToInt32())
-                                {
-                                    case HotKeysUtils.HotKeyId:
-                                        Debug.WriteLine("Ctrl + Alt + O pressed");
-                                        OnHotKeyPressed(SettingsNames.ToggleOverlayHotkey);
-                                        break;
-                                    case HotKeysUtils.HotKeyId + 1:
-                                        Debug.WriteLine("Ctrl + Alt + Up pressed");
-                                        OnHotKeyPressed(SettingsNames.OpacityUpHotkey);
-                                        break;
-                                    case HotKeysUtils.HotKeyId + 2:
-                                        Debug.WriteLine("Ctrl + Alt + Down pressed");
-                                        OnHotKeyPressed(SettingsNames.OpacityDownHotkey);
-                                        break;
-                                    case HotKeysUtils.HotKeyId + 3:
-                                        Debug.WriteLine("Ctrl + Alt + P pressed");
-                                        OnHotKeyPressed(SettingsNames.OpenMiniOverlayManager);
-                                        break;
-                                }
+                                HandleHotkeyPressed(msg.wParam.ToInt32());
                             }
                         }
                     }
-                });
-                HotkeyThread.IsBackground = true;
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine($"Hotkey thread error: {ex.Message}");
+                }
+            });
 
-                HotkeyThread.Start();
+            _hotkeyThread.IsBackground = true;
+            _hotkeyThread.Start();
+        }
+
+        private void RegisterAllHotKeys()
+        {
+            RegisterHotkey(HotKeysUtils.HOTKEY_UNIQUEID.ToggleOverlay, HotKeysUtils.KEYS.O, SettingsNames.ToggleOverlayHotkey);
+            RegisterHotkey(HotKeysUtils.HOTKEY_UNIQUEID.OpacityUp, HotKeysUtils.KEYS.UP, SettingsNames.OpacityUpHotkey);
+            RegisterHotkey(HotKeysUtils.HOTKEY_UNIQUEID.OpacityDown, HotKeysUtils.KEYS.DOWN, SettingsNames.OpacityDownHotkey);
+            RegisterHotkey(HotKeysUtils.HOTKEY_UNIQUEID.OpenMiniOverlayManager, HotKeysUtils.KEYS.P, SettingsNames.OpenMiniOverlayManager);
+        }
+
+        private void RegisterHotkey(int id, uint key, string name)
+        {
+            bool success = HotKeysUtils.RegisterHotKey(NULL_WINDOW_HANDLE, id,
+                HotKeysUtils.MODIFIER_KEYS.CONTROL | HotKeysUtils.MODIFIER_KEYS.ALT, key);
+
+            if (!success)
+                throw new InvalidOperationException($"Failed to register hotkey for {name}.");
+        }
+
+        private void HandleHotkeyPressed(int id)
+        {
+            String? hotkey;
+
+            switch (id)
+            {
+                case HotKeysUtils.HOTKEY_UNIQUEID.ToggleOverlay:
+                    hotkey = SettingsNames.ToggleOverlayHotkey;
+                    break;
+                case HotKeysUtils.HOTKEY_UNIQUEID.OpacityUp:
+                    hotkey = SettingsNames.OpacityUpHotkey;
+                    break;
+                case HotKeysUtils.HOTKEY_UNIQUEID.OpacityDown:
+                    hotkey = SettingsNames.OpacityDownHotkey;
+                    break;
+                case HotKeysUtils.HOTKEY_UNIQUEID.OpenMiniOverlayManager:
+                    hotkey = SettingsNames.OpenMiniOverlayManager;
+                    break;
+                default:
+                    hotkey = null;
+                    break;
+            };
+
+            if (hotkey != null)
+            {
+                Debug.WriteLine($"Hotkey triggered: {hotkey}");
+                HotKeyPressed?.Invoke(this, hotkey);
             }
         }
 
-        private void UnregisterHotKey()
+        private void UnregisterHotKeys()
         {
-            HotkeyThread.Join();
-            if (!HotKeysUtils.UnregisterHotKey(IntPtr.Zero, HotKeysUtils.HotKeyId))
-            {
-                throw new InvalidOperationException("Failed to unregister hotkey.");
-            }
-            if (!HotKeysUtils.UnregisterHotKey(IntPtr.Zero, HotKeysUtils.HotKeyId + 1))
-            {
-                throw new InvalidOperationException("Failed to unregister hotkey for Ctrl + Alt + Up.");
-            }
-            if (!HotKeysUtils.UnregisterHotKey(IntPtr.Zero, HotKeysUtils.HotKeyId + 2))
-            {
-                throw new InvalidOperationException("Failed to unregister hotkey for Ctrl + Alt + Down.");
-            }
-            if (!HotKeysUtils.UnregisterHotKey(IntPtr.Zero, HotKeysUtils.HotKeyId + 3))
-            {
-                throw new InvalidOperationException("Failed to unregister hotkey for Ctrl + Alt + P.");
-            }
-        }
+            _cancelToken?.Cancel();
+            _hotkeyThread?.Join();
 
-        public void OnHotKeyPressed(string Code)
-        {
-            Debug.WriteLine($"HotKey Pressed!! Code:{Code}");
-            HotKeyPressed?.Invoke(this, Code);
+            HotKeysUtils.UnregisterHotKey(NULL_WINDOW_HANDLE, HotKeysUtils.HOTKEY_UNIQUEID.ToggleOverlay);
+            HotKeysUtils.UnregisterHotKey(NULL_WINDOW_HANDLE, HotKeysUtils.HOTKEY_UNIQUEID.OpacityUp);
+            HotKeysUtils.UnregisterHotKey(NULL_WINDOW_HANDLE, HotKeysUtils.HOTKEY_UNIQUEID.OpacityDown);
+            HotKeysUtils.UnregisterHotKey(NULL_WINDOW_HANDLE, HotKeysUtils.HOTKEY_UNIQUEID.OpenMiniOverlayManager);
+
+            _hotkeyThread = null;
+            _cancelToken?.Dispose();
+            _cancelToken = null;
         }
     }
 }

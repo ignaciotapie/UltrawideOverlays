@@ -23,6 +23,13 @@
     <Window.Resources>
         <converter:NumberToStringConverter x:Key="numberToStringConverter"/>
         <converter:NumberToColorConverter x:Key="numberToColorConverter"/>
+
+        <ContextMenu x:Key="RightClickContext">
+            <MenuItem Header="Move to Back" Command="{Binding MoveToBottomOrderCommand}" CommandParameter="{Binding Selected}"/>
+            <MenuItem Header="Move Down" Command="{Binding MoveDownOrderCommand}" CommandParameter="{Binding Selected}"/>
+            <MenuItem Header="Move Up" Command="{Binding MoveUpOrderCommand}" CommandParameter="{Binding Selected}"/>
+            <MenuItem Header="Move to Front" Command="{Binding MoveToTopOrderCommand}" CommandParameter="{Binding Selected}"/>
+        </ContextMenu>
     </Window.Resources>
 
     <Window.Styles>
@@ -105,11 +112,53 @@
                     <ListBox Classes="ImagesList" Grid.Row="1" x:Name="Images_ListBox" Background="Transparent" ItemsSource="{Binding Images}" SelectedItem="{Binding Selected, Mode=TwoWay}" SelectionMode="Toggle" AutoScrollToSelectedItem="True" Margin="10">
                         <ListBox.ItemTemplate>
                             <DataTemplate>
-                                <Grid ColumnDefinitions="Auto, Auto">
-                                    <Border Margin="0,0,5,0" HorizontalAlignment="Center" Background="{DynamicResource PrimaryBackground}">
-                                        <Image RenderOptions.BitmapInterpolationMode="LowQuality" Width="48" Height="48" Source="{Binding ImagePath, Converter={x:Static converter:PathToCachedBitmapConverter.Instance}}"/>
-                                    </Border>
-                                    <TextBox Grid.Column="1" BorderBrush="Transparent" Background="{DynamicResource PrimaryBackground}" Text="{Binding ImageName, Mode=TwoWay}"/>
+                                <Grid ColumnDefinitions="Auto, *, Auto">
+                                    <Image RenderOptions.BitmapInterpolationMode="LowQuality" Width="48" Height="48" Source="{Binding ImagePath, Converter={x:Static converter:PathToCachedBitmapConverter.Instance}}"/>
+                                    <TextBox Grid.Column="1"  BorderBrush="Transparent" Background="{DynamicResource PrimaryBackground}" Text="{Binding ImageName, Mode=TwoWay}" Margin="0,0,5,0"/>
+                                    <StackPanel Grid.Column="2" IsVisible="{Binding $parent[ListBoxItem].IsSelected}">
+                                        <StackPanel.Styles>
+                                            <Style Selector="Button">
+                                                <Setter Property="HorizontalAlignment" Value="Stretch"/>
+                                                <Setter Property="VerticalAlignment" Value="Center"/>
+                                            </Style>
+                                        </StackPanel.Styles>
+                                        <Button Height="28" Command="{Binding #Images_ListBox.((vm:OverlayEditorWindowViewModel)DataContext).MoveToTopOrderCommand}" CommandParameter="{Binding .}">
+                                            <Button.Content>
+                                                <Image>
+                                                    <Image.Source>
+                                                        <SvgImage Source="{StaticResource UpArrowTopIcon}"/>
+                                                    </Image.Source>
+                                                </Image>
+                                            </Button.Content>
+                                        </Button>
+                                        <Button Height="32" Command="{Binding #Images_ListBox.((vm:OverlayEditorWindowViewModel)DataContext).MoveUpOrderCommand}" CommandParameter="{Binding .}">
+                                            <Button.Content>
+                                                <Image>
+                                                    <Image.Source>
+                                                        <SvgImage Source="{StaticResource UpArrowIcon}"/>
+                                                    </Image.Source>
+                                                </Image>
+                                            </Button.Content>
+                                        </Button>
+                                        <Button Height="32" Command="{Binding #Images_ListBox.((vm:OverlayEditorWindowViewModel)DataContext).MoveDownOrderCommand}" CommandParameter="{Binding .}">
+                                            <Button.Content>
+                                                <Image>
+                                                    <Image.Source>
+                                                        <SvgImage Source="{StaticResource DownArrowIcon}"/>
+                                                    </Image.Source>
+                                                </Image>
+                                            </Button.Content>
+                                        </Button>
+                                        <Button Height="28" Command="{Binding #Images_ListBox.((vm:OverlayEditorWindowViewModel)DataContext).MoveToBottomOrderCommand}" CommandParameter="{Binding .}">
+                                            <Button.Content>
+                                                <Image>
+                                                    <Image.Source>
+                                                        <SvgImage Source="{StaticResource DownArrowBottomIcon}"/>
+                                                    </Image.Source>
+                                                </Image>
+                                            </Button.Content>
+                                        </Button>
+                                    </StackPanel>
                                 </Grid>
                             </DataTemplate>
                         </ListBox.ItemTemplate>
@@ -162,7 +211,7 @@
                         <ToggleSwitch Grid.Row="11" HorizontalAlignment="Right" IsChecked="{Binding Selected.ImageProperties.IsVisible, Mode=TwoWay}"/>
                         <Label Grid.Row="11" Grid.Column="1">Draggable</Label>
                         <ToggleSwitch Grid.Row="11" Grid.Column="1" HorizontalAlignment="Right" IsChecked="{Binding Selected.ImageProperties.IsDraggable, Mode=TwoWay}"/>
-                        <Button Grid.Row="12" Background="{DynamicResource HomeNewOverlay}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Margin="0,0,10,0" Click="MirrorPositionButtonX_Click">
+                        <Button Grid.Row="12" Background="{DynamicResource OverlayColor}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Margin="0,0,10,0" Click="MirrorPositionButtonX_Click">
                             <Button.Content>
                                 <StackPanel Orientation="Horizontal">
                                     <Image Width="20" Height="20">
@@ -174,7 +223,7 @@
                                 </StackPanel>
                             </Button.Content>
                         </Button>
-                        <Button Grid.Row="12" Background="{DynamicResource HomeNewOverlay}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Margin="0,0,10,0" Grid.Column="1" Click="MirrorPositionButtonY_Click">
+                        <Button Grid.Row="12" Background="{DynamicResource OverlayColor}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Margin="0,0,10,0" Grid.Column="1" Click="MirrorPositionButtonY_Click">
                             <Button.Content>
                                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Spacing="5">
                                     <Image Width="20" Height="20">
@@ -200,7 +249,7 @@
                         </Label>
                         <TextBox x:Name="OverlayNameBox" Width="300" Watermark="Overlay Name" VerticalContentAlignment="Bottom" HorizontalAlignment="Left" HorizontalContentAlignment="Left" Text="{Binding OverlayName, Mode=TwoWay}"></TextBox>
                     </StackPanel>
-                    <Button IsEnabled="{Binding CanCreateOverlay}" Background="{DynamicResource HomeNewOverlay}" Classes="IconButton" VerticalContentAlignment="Center" Height="58" Margin="0,0,5,0" Grid.Column="1" x:Name="AcceptButton" Click="AcceptButton_Click">
+                    <Button IsEnabled="{Binding CanCreateOverlay}" Background="{DynamicResource OverlayColor}" Classes="IconButton" VerticalContentAlignment="Center" Height="58" Margin="0,0,5,0" Grid.Column="1" x:Name="AcceptButton" Click="AcceptButton_Click">
                         <StackPanel>
                             <Image>
                                 <Image.Source>

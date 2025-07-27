@@ -36,9 +36,9 @@ namespace UltrawideOverlays.Models
 
             TypeColor = value switch
             {
-                ActivityLogType.Games => AppColors.Get("HomeNewGame"),
-                ActivityLogType.Overlays => AppColors.Get("HomeNewOverlay"),
-                ActivityLogType.Settings => AppColors.Get("HomeSettings"),
+                ActivityLogType.Games => AppColors.Get("GameColor"),
+                ActivityLogType.Overlays => AppColors.Get("OverlayColor"),
+                ActivityLogType.Settings => AppColors.Get("SettingsColor"),
             };
         }
 

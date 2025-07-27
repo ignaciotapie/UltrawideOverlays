@@ -20,7 +20,7 @@
             <Setter Property="HorizontalContentAlignment" Value="Center"/>
             <Setter Property="VerticalContentAlignment" Value="Center"/>
             <Setter Property="Height" Value="50"/>
-            <Setter Property="Background" Value="{DynamicResource HomeNewGame}"/>
+            <Setter Property="Background" Value="{DynamicResource GameColor}"/>
         </Style>
     </UserControl.Styles>
     <UserControl.Resources>
@@ -36,7 +36,7 @@
             <Grid Grid.Row="1" ColumnDefinitions="*,*,*">
                 <Border Classes="Slot">
                     <RelativePanel Margin="20">
-                        <Border RelativePanel.AlignVerticalCenterWith="Number" Background="{DynamicResource HomeNewGame}" Width="60" Height="60" CornerRadius="5" Opacity="0.1">
+                        <Border RelativePanel.AlignVerticalCenterWith="Number" Background="{DynamicResource GameColor}" Width="60" Height="60" CornerRadius="5" Opacity="0.1">
                             <Image Classes="TabIcon" Width="40" Height="40">
                                 <Image.Source>
                                     <SvgImage Source="{StaticResource GamesLogoColored}"/>
@@ -52,7 +52,7 @@
                 </Border>
                 <Border Grid.Column="1" Classes="Slot">
                     <RelativePanel Margin="20">
-                        <Border RelativePanel.AlignVerticalCenterWith="NumberOverlays" Background="{DynamicResource HomeNewOverlay}" Width="60" Height="60" CornerRadius="5" Opacity="0.1">
+                        <Border RelativePanel.AlignVerticalCenterWith="NumberOverlays" Background="{DynamicResource OverlayColor}" Width="60" Height="60" CornerRadius="5" Opacity="0.1">
                             <Image Classes="TabIcon" Width="40" Height="40">
                                 <Image.Source>
                                     <SvgImage Source="{StaticResource OverlayLogoColored}"/>
@@ -69,7 +69,14 @@
 
                 <Border Grid.Column="2" Classes="Slot">
                     <RelativePanel Margin="20">
-                        <Label RelativePanel.AlignRightWithPanel="True" Classes="Number"></Label>
+                        <Border Name="PencilIcon" RelativePanel.AlignTopWithPanel="True" Background="{DynamicResource SettingsColor}" Width="60" Height="60" CornerRadius="5" Opacity="0.1">
+                            <Image Classes="TabIcon" Width="40" Height="40">
+                                <Image.Source>
+                                    <SvgImage Source="{StaticResource PencilIcon}"/>
+                                </Image.Source>
+                            </Image>
+                        </Border>
+                        <Label Name="OverlayName" RelativePanel.AlignVerticalCenterWith="PencilIcon" RelativePanel.AlignRightWithPanel="True" HorizontalContentAlignment="Right" Classes="Primary" MaxWidth="200" Content="{Binding LastOverlayUsed}"></Label>
                         <StackPanel RelativePanel.AlignBottomWithPanel="True">
                             <Label Classes="Title">Last Overlay Used</Label>
                             <Label Classes="Subtitle">Hope you liked this one!</Label>
@@ -102,7 +109,7 @@
                         <Label Classes="Title">Overlay Library</Label>
                         <Label Grid.Row="1" Classes="Subtitle" FontSize="20">Browse and create your overlays!</Label>
 
-                        <Button Grid.Row="2" Classes="Home IconButton" Background="{DynamicResource HomeNewOverlay}" Command="{Binding NavigateToOverlaysPageCommand}">
+                        <Button Grid.Row="2" Classes="Home IconButton" Background="{DynamicResource OverlayColor}" Command="{Binding NavigateToOverlaysPageCommand}">
                             <StackPanel>
                                 <Image>
                                     <Image.Source>

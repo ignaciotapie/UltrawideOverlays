@@ -32,9 +32,12 @@
     <None Remove="Assets\Images\clipping-mask.png" />
     <None Remove="Assets\Images\copy-icon.svg" />
     <None Remove="Assets\Images\delete-icon.svg" />
+    <None Remove="Assets\Images\down-arrow-bottom-icon.svg" />
+    <None Remove="Assets\Images\down-arrow-icon.svg" />
     <None Remove="Assets\Images\home-logo.svg" />
     <None Remove="Assets\Images\joystick-logo-colored.svg" />
     <None Remove="Assets\Images\overlay-logo-colored.svg" />
+    <None Remove="Assets\Images\pencil-icon.svg" />
     <None Remove="Assets\Images\plus-icon.svg" />
     <None Remove="Assets\Images\resize-height-icon.svg" />
     <None Remove="Assets\Images\resize-width-icon.svg" />
@@ -42,6 +45,8 @@
     <None Remove="Assets\Images\settings-icon-colored.svg" />
     <None Remove="Assets\Images\settings-icon.svg" />
     <None Remove="Assets\Images\tv-icon-white.svg" />
+    <None Remove="Assets\Images\up-arrow-icon.svg" />
+    <None Remove="Assets\Images\up-arrow-top-icon.svg" />
   </ItemGroup>
 
   <ItemGroup>

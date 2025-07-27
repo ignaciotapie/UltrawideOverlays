@@ -146,6 +146,18 @@ namespace UltrawideOverlays.ViewModels
         private void ImagesCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
         {
             CanCreateOverlay = Images.Count > 0;
+            //Update ZIndex
+            foreach (ImageModel image in Images)
+            {
+                image.ImageProperties.ZIndex = Images.IndexOf(image);
+            }
+        }
+
+        private void MoveIndexOfImage(int currentIndex, int newIndex)
+        {
+            Images.Move(currentIndex, newIndex);
+
+            SelectImage(Images[newIndex]);
         }
 
 
@@ -161,6 +173,7 @@ namespace UltrawideOverlays.ViewModels
                 try
                 {
                     var newImage = new ImageModel(uri.LocalPath, FileHandlerUtil.GetFileName(uri));
+                    newImage.ImageProperties.ZIndex = Images.Count;
                     Images.Add(newImage);
                 }
                 catch (Exception ex)
@@ -196,6 +209,7 @@ namespace UltrawideOverlays.ViewModels
             {
                 var newImage = Selected.Clone();
                 Images.Add(newImage);
+                SelectImage(newImage);
             }
         }
 
@@ -278,6 +292,58 @@ namespace UltrawideOverlays.ViewModels
             double newPositionY = newCenterY - Selected.ImageProperties.Height / 2.0;
 
             Selected.ImageProperties.Position = new Point(Selected.ImageProperties.PositionX, newPositionY);
+        }
+
+        [RelayCommand]
+        public void MoveUpOrder(ImageModel? imageModel)
+        {
+            if (imageModel == null || Images.Count < 2 || !Images.Contains(imageModel))
+                return;
+
+            int currentIndex = Images.IndexOf(imageModel);
+            if (currentIndex > 0)
+            {
+                MoveIndexOfImage(currentIndex, currentIndex - 1);
+            }
+        }
+
+        [RelayCommand]
+        public void MoveDownOrder(ImageModel? imageModel)
+        {
+            if (imageModel == null || Images.Count < 2 || !Images.Contains(imageModel))
+                return;
+
+            int currentIndex = Images.IndexOf(imageModel);
+            if (currentIndex < Images.Count - 1)
+            {
+                MoveIndexOfImage(currentIndex, currentIndex + 1);
+            }
+        }
+
+        [RelayCommand]
+        public void MoveToTopOrder(ImageModel? imageModel)
+        {
+            if (imageModel == null || Images.Count < 2 || !Images.Contains(imageModel))
+                return;
+
+            int currentIndex = Images.IndexOf(imageModel);
+            if (currentIndex > 0)
+            {
+                MoveIndexOfImage(currentIndex, 0);
+            }
+        }
+
+        [RelayCommand]
+        public void MoveToBottomOrder(ImageModel? imageModel)
+        {
+            if (imageModel == null || Images.Count < 2 || !Images.Contains(imageModel))
+                return;
+
+            int currentIndex = Images.IndexOf(imageModel);
+            if (currentIndex < Images.Count - 1)
+            {
+                MoveIndexOfImage(currentIndex, Images.Count - 1);
+            }
         }
     }
 }

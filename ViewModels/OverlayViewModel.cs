@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using System.Diagnostics;
 using UltrawideOverlays.Enums;
+using UltrawideOverlays.Models;
 using UltrawideOverlays.Services;
 
 namespace UltrawideOverlays.ViewModels
@@ -21,6 +22,7 @@ namespace UltrawideOverlays.ViewModels
         private readonly GamesDataService GamesDataService;
         private readonly SettingsDataService SettingsDataService;
         private readonly HotKeyService HotKeyService;
+        private readonly ActivityDataService ActivityDataService;
 
         /// <summary>
         /// Design-time constructor
@@ -29,13 +31,19 @@ namespace UltrawideOverlays.ViewModels
         {
         }
 
-        public OverlayViewModel(OverlayDataService overlayDataService, GamesDataService gamesDataService, SettingsDataService settingsDataService, FocusMonitorService focusMonitorService, HotKeyService hotKeyService)
+        public OverlayViewModel(OverlayDataService overlayDataService,
+                                GamesDataService gamesDataService,
+                                SettingsDataService settingsDataService,
+                                FocusMonitorService focusMonitorService,
+                                HotKeyService hotKeyService,
+                                ActivityDataService activityService)
         {
             OverlayDataService = overlayDataService;
             FocusMonitorService = focusMonitorService;
             GamesDataService = gamesDataService;
             SettingsDataService = settingsDataService;
             HotKeyService = hotKeyService;
+            ActivityDataService = activityService;
 
             ImageOpacity = 1;
             IsOverlayEnabled = true;
@@ -57,7 +65,7 @@ namespace UltrawideOverlays.ViewModels
             switch (e)
             {
                 case SettingsNames.ToggleOverlayHotkey:
-                    ToggleOverlayOpacity();
+                    ToggleOverlay();
                     break;
                 case SettingsNames.OpacityUpHotkey:
                     IncreaseOverlayOpacity();
@@ -79,6 +87,7 @@ namespace UltrawideOverlays.ViewModels
                 var overlay = await OverlayDataService.LoadOverlayAsync(game.OverlayName);
                 if (overlay != null)
                 {
+                    ActivityDataService.SaveActivity(new ActivityLogModel(System.DateTime.Now, ActivityLogType.Overlays, ActivityLogAction.Viewed, overlay.Name));
                     ImageSource = overlay.Path;
                 }
                 else
@@ -108,7 +117,7 @@ namespace UltrawideOverlays.ViewModels
             }
         }
 
-        private void ToggleOverlayOpacity()
+        private void ToggleOverlay()
         {
             if (ImageSource != null)
             {

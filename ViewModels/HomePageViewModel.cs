@@ -18,6 +18,9 @@ namespace UltrawideOverlays.ViewModels
         private int _amountOfOverlays;
 
         [ObservableProperty]
+        private string _lastOverlayUsed;
+
+        [ObservableProperty]
         private ObservableCollection<ActivityLogModel> _activities;
 
         private readonly GeneralDataService _generalService;
@@ -40,6 +43,7 @@ namespace UltrawideOverlays.ViewModels
 
             AmountOfGames = 10;
             AmountOfOverlays = 5;
+            LastOverlayUsed = "Guachines";
             Activities = new ObservableCollection<ActivityLogModel>
             {
                 new ActivityLogModel() {Type = ActivityLogType.Games , Timestamp = DateTime.Now.AddMinutes(-10), Action = ActivityLogAction.Added, InvolvedObject = "Pepitos" },
@@ -52,11 +56,22 @@ namespace UltrawideOverlays.ViewModels
         {
             Page = Enums.ApplicationPageViews.HomePage;
             PageName = "Home";
+            LastOverlayUsed = "None";
 
             _generalService = generalService;
             _activityService = activityService;
 
+            _activityService.ActivityTriggered += ActivityTriggeredHandler;
+
             LoadDataAsync();
+        }
+
+        private void ActivityTriggeredHandler(ActivityLogModel obj)
+        {
+            if (obj.Type == ActivityLogType.Overlays && obj.Action == ActivityLogAction.Viewed)
+            {
+                LastOverlayUsed = _activityService.GetLastOverlayUsed();
+            }
         }
 
         ~HomePageViewModel()
@@ -69,6 +84,7 @@ namespace UltrawideOverlays.ViewModels
             AmountOfGames = await _generalService.GetAmountOfGames();
             AmountOfOverlays = await _generalService.GetAmountOfOverlays();
             Activities = new ObservableCollection<ActivityLogModel>(await _activityService.LoadLastActivities(3));
+            LastOverlayUsed = _activityService.GetLastOverlayUsed();
         }
 
         ///////////////////////////////////////////

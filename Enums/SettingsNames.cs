@@ -1,6 +1,6 @@
 ﻿namespace UltrawideOverlays.Enums
 {
-    public class SettingsNames
+    public struct SettingsNames
     {
         public const string GridSize = "Grid Size";
         public const string GridOpacity = "Grid Opacity";
@@ -13,7 +13,7 @@
         public const string OpenMiniOverlayManager = "Open Mini Overlay Manager Hotkey";
     }
 
-    public class SettingsBoolValues
+    public struct SettingsBoolValues
     {
         public const string True = "True";
         public const string False = "False";

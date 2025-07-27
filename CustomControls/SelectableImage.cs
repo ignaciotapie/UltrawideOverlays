@@ -47,6 +47,7 @@ namespace UltrawideOverlays.CustomControls
             Bind(ToolTip.TipProperty, new Binding("ImageName"));
             Bind(DragPanel.DraggableProperty, new Binding("ImageProperties.IsDraggable", BindingMode.TwoWay));
             Bind(DragPanel.PositionProperty, new Binding("ImageProperties.Position", BindingMode.TwoWay));
+            Bind(ZIndexProperty, new Binding("ImageProperties.ZIndex", BindingMode.TwoWay));
 
             border = new Border
             {

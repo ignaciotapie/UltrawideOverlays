@@ -43,7 +43,7 @@ namespace UltrawideOverlays.ViewModels
                         var miniOverlayManagerWindow = WindowFactory.CreateWindow(WindowViews.MiniOverlayManager);
                         miniOverlayManagerWindow.Show();
                     });
-                break;
+                    break;
             }
         }
 

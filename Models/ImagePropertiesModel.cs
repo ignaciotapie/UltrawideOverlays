@@ -99,5 +99,8 @@ namespace UltrawideOverlays.Models
 
         [ObservableProperty]
         private bool _isDraggable = true;
+
+        [ObservableProperty]
+        private int _zIndex = 0;
     }
 }

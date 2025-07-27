@@ -74,7 +74,7 @@ namespace UltrawideOverlays
             collection.AddTransient<OverlayDataService>();
             collection.AddTransient<GamesDataService>();
             collection.AddTransient<ProcessDataService>();
-            collection.AddTransient<ActivityDataService>();
+            collection.AddSingleton<ActivityDataService>();
             collection.AddTransient<GeneralDataService>();
             collection.AddSingleton<SettingsDataService>();
             //TODO: Global hotkey service...
@@ -85,8 +85,8 @@ namespace UltrawideOverlays
             collection.AddSingleton(focusMonitorService);
 
             //Factories
-            collection.AddSingleton<PageFactory>();
-            collection.AddSingleton<WindowFactory>();
+            collection.AddTransient<PageFactory>();
+            collection.AddTransient<WindowFactory>();
 
             //ViewModel factories
             collection.AddTransient<Func<Enums.ApplicationPageViews, PageViewModel>>(x => pageName => pageName switch

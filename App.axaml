@@ -29,9 +29,9 @@
         <SolidColorBrush x:Key="PrimaryBackground">#0f0f0f</SolidColorBrush>
         
          <!-- Home Only Colors-->
-        <SolidColorBrush x:Key="HomeNewGame">#048ca7</SolidColorBrush>
-        <SolidColorBrush x:Key="HomeNewOverlay">#2c0a79</SolidColorBrush>
-        <SolidColorBrush x:Key="HomeSettings">#4ff0ba</SolidColorBrush>
+        <SolidColorBrush x:Key="GameColor">#048ca7</SolidColorBrush>
+        <SolidColorBrush x:Key="OverlayColor">#2c0a79</SolidColorBrush>
+        <SolidColorBrush x:Key="SettingsColor">#4ff0ba</SolidColorBrush>
         
          <!-- Images and Icons-->
         <SvgSource x:Key="TvLogo">/Assets/Images/tv-icon-white.svg</SvgSource>
@@ -52,6 +52,11 @@
         <SvgSource x:Key="TrashIcon">/Assets/Images/trash-icon.svg</SvgSource>
         <SvgSource x:Key="AddIcon">/Assets/Images/add-icon.svg</SvgSource>
         <SvgSource x:Key="SaveIcon">/Assets/Images/save-icon.svg</SvgSource>
+        <SvgSource x:Key="UpArrowTopIcon">/Assets/Images/up-arrow-top-icon.svg</SvgSource>
+        <SvgSource x:Key="DownArrowBottomIcon">/Assets/Images/down-arrow-bottom-icon.svg</SvgSource>
+        <SvgSource x:Key="UpArrowIcon">/Assets/Images/up-arrow-icon.svg</SvgSource>
+        <SvgSource x:Key="DownArrowIcon">/Assets/Images/down-arrow-icon.svg</SvgSource>
+        <SvgSource x:Key="PencilIcon">/Assets/Images/pencil-icon.svg</SvgSource>
         <Image x:Key="ClippingMask">/Assets/Images/clipping-mask.png</Image>
 
         <!-- Fonts-->
