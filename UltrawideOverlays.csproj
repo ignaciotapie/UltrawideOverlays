@@ -50,9 +50,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Resource Include="Assets\Images\clipping-mask.png">
+    <EmbeddedResource Include="Assets\Images\clipping-mask.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Resource>
+    </EmbeddedResource>
   </ItemGroup>
 
    <ItemGroup>

@@ -44,6 +44,9 @@ namespace UltrawideOverlays.ViewModels
         [ObservableProperty]
         private GamesModel? _selectedGame;
 
+        [ObservableProperty]
+        private string _searchBoxText;
+
         private PageFactory _factory;
         private ProcessDataService _processService;
         private OverlayDataService _overlayService;
@@ -174,6 +177,33 @@ namespace UltrawideOverlays.ViewModels
             }
         }
 
+        partial void OnSearchBoxTextChanged(string value)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                // If the search box is empty, show all games
+                LoadGamesAsync();
+            }
+            else
+            {
+                // Filter games based on the search text
+                var filteredGames = new ObservableCollection<GamesModel>(
+                    Games.Where(o => o.Name.Contains(value, StringComparison.OrdinalIgnoreCase)));
+
+                Games.Clear();
+                foreach (var game in filteredGames)
+                {
+                    Games.Add(game);
+                }
+
+                // Reset selected game if no games match
+                if (Games.Count == 0)
+                {
+                    SelectedGame = null;
+                }
+            }
+        }
+
         ///////////////////////////////////////////
         /// COMMANDS
         ///////////////////////////////////////////
@@ -218,28 +248,18 @@ namespace UltrawideOverlays.ViewModels
         }
 
         [RelayCommand]
-        private void EditGame()
+        private void EditGame(GamesModel game)
         {
-            if (SelectedGame == null)
-            {
-                return;
-            }
-
-            GameName = SelectedGame.Name;
-            GameExecutablePath = SelectedGame.ExecutablePath;
-            SelectedOverlay = Overlays.FirstOrDefault(o => o.Name.Equals(SelectedGame.OverlayName, StringComparison.OrdinalIgnoreCase));
+            GameName = game.Name;
+            GameExecutablePath = game.ExecutablePath;
+            SelectedOverlay = Overlays.FirstOrDefault(o => o.Name.Equals(game.OverlayName, StringComparison.OrdinalIgnoreCase));
             SelectedProcess = null;
         }
 
         [RelayCommand]
-        private void DeleteGame()
+        private void DeleteGame(GamesModel game)
         {
-            if (SelectedGame == null)
-            {
-                return;
-            }
-
-            _gamesService.DeleteGameAsync(SelectedGame);
+            _gamesService.DeleteGameAsync(game);
             LoadGamesAsync();
         }
 

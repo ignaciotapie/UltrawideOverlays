@@ -38,6 +38,19 @@
             <Setter Property="Background" Value="Transparent"/>
             <Setter Property="Foreground" Value="{DynamicResource PrimaryFontColor}"/>
         </Style>
+
+        <Style Selector="ListBox.GamesList > ListBoxItem">
+            <Setter Property="BorderBrush" Value="{DynamicResource PrimaryAccent}"/>
+            <Setter Property="Background" Value="{DynamicResource PrimaryBackground}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="5"/>
+            <Setter Property="Margin" Value="0,5"/>
+            <Setter Property="Padding" Value="10"/>
+        </Style>
+        <Style Selector="ListBox.GamesList > ListBoxItem:selected /template/ ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource PrimaryAccent}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource SecondaryAccent}"/>
+        </Style>
     </UserControl.Styles>
 
     <Grid RowDefinitions="Auto, *" Margin="10">
@@ -128,27 +141,30 @@
             <Border Grid.Column="2" CornerRadius="10" Background="{DynamicResource PrimaryColor}">
                 <Grid Margin="10" RowDefinitions="Auto, *">
                     <RelativePanel Margin="5">
-                        <Label Classes="Title" FontSize="20">Saved Games</Label>
-                        <Button RelativePanel.AlignRightWithPanel="True" Classes="Primary" Name="RemoveButton" Margin="0,0,8,0" IsVisible="{Binding SelectedGame, Converter={x:Static ObjectConverters.IsNotNull}}" Background="DarkRed" Command="{Binding DeleteGameCommand}">
-                            Remove
-                        </Button>
-
-                        <Button RelativePanel.LeftOf="RemoveButton" Classes="Primary" Name="EditButton"  Margin="0,0,8,0" IsVisible="{Binding SelectedGame, Converter={x:Static ObjectConverters.IsNotNull}}" Command="{Binding EditGameCommand}">
-                            Edit
-                        </Button>
+                        <Label Name="SavedGamesTitle" Classes="Title" FontSize="20" Margin="0,0,5,0">Saved Games</Label>
+                        <TextBox Grid.Row="1" Name="Searchbox" RelativePanel.RightOf="SavedGamesTitle" Watermark="Search games..." Width="255" Background="{DynamicResource PrimaryColor}" Text="{Binding SearchBoxText, Mode=TwoWay}">
+                        </TextBox>
                     </RelativePanel>
                     <StackPanel Grid.Row="1" >
                         <Rectangle Margin="0,0,0,20" RelativePanel.AlignBottomWithPanel="True" Classes="Separator"/>
-                        <ListBox Background="Transparent" ItemsSource="{Binding Games}" SelectedItem="{Binding SelectedGame}" SelectionMode="Toggle">
+                        <ListBox Classes="GamesList" Name="Games_ListBox" Background="Transparent" ItemsSource="{Binding Games}" SelectedItem="{Binding SelectedGame}" SelectionMode="Toggle">
                             <ListBox.ItemTemplate>
                                 <DataTemplate>
-                                    <Border Padding="10" BorderBrush="{DynamicResource PrimaryAccent}" CornerRadius="5" BorderThickness="2">
-                                        <Grid RowDefinitions="*,*,*">
-                                            <Label Classes="GameName" Content="{Binding Name}"/>
-                                            <Label Grid.Row="1" Classes="FilePath" Content="{Binding ExecutablePath}"/>
-                                            <Label Grid.Row="2" Classes="Primary" Content="{Binding OverlayName}"/>
-                                        </Grid>
-                                    </Border>
+                                    <Grid RowDefinitions="*,*,*" ColumnDefinitions="*, Auto">
+                                        <Label Classes="GameName" Content="{Binding Name}"/>
+                                        <Label Grid.Row="1" Grid.ColumnSpan="2" Classes="FilePath" Content="{Binding ExecutablePath}"/>
+                                        <Label Grid.Row="2" Classes="Primary" Content="{Binding OverlayName}"/>
+
+
+                                        <StackPanel IsVisible="{Binding $parent[ListBoxItem].IsSelected}" Grid.Column="1" Grid.RowSpan="3" VerticalAlignment="Top" Spacing="5" Orientation="Horizontal">
+                                            <Button Classes="Blue" Height="40" FontSize="12" Background="{DynamicResource SecondaryAccent}" Name="EditButton" Command="{Binding #Games_ListBox.((vm:GamesPageViewModel)DataContext).EditGameCommand}" CommandParameter="{Binding .}" >
+                                                Edit
+                                            </Button>
+                                            <Button Classes="Red" Height="40" FontSize="12" Name="RemoveButton" Command="{Binding #Games_ListBox.((vm:GamesPageViewModel)DataContext).DeleteGameCommand}" CommandParameter="{Binding .}">
+                                                Remove
+                                            </Button>
+                                        </StackPanel>
+                                    </Grid>
                                 </DataTemplate>
                             </ListBox.ItemTemplate>
                         </ListBox>
