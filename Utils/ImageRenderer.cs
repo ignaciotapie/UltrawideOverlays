@@ -62,11 +62,11 @@ public static class ImageRenderer
         //Account for Rendering Origin being top-left
         if (props.IsHMirrored)
         {
-            matrix = Matrix.CreateTranslation(-props.Width, 0) * matrix;
+            matrix = Matrix.CreateTranslation(-props.OriginalWidth * props.Scale, 0) * matrix;
         }
         if (props.IsVMirrored)
         {
-            matrix = Matrix.CreateTranslation(0, -props.Height) * matrix;
+            matrix = Matrix.CreateTranslation(0, -props.OriginalHeight * props.Scale) * matrix;
         }
 
         return matrix;

@@ -205,7 +205,7 @@
 
                         <Label Grid.Row="8">Opacity</Label>
                         <Slider Margin="0,0,10,0" Grid.Row="9" Grid.ColumnSpan="2" IsSnapToTickEnabled="True" TickFrequency=".1" TickPlacement="TopLeft" x:Name="ImageOpacity_Slider" Value="{Binding Selected.ImageProperties.Opacity, Mode=TwoWay}" HorizontalAlignment="Stretch" Minimum="0" Maximum="1" />
-                        <mxe:SpinEditor Grid.Row="10" HorizontalAlignment="Left" Increment="0.1" Minimum="0" Value="{Binding Selected.ImageProperties.Opacity, Mode=TwoWay}"></mxe:SpinEditor>
+                        <mxe:SpinEditor Grid.Row="10" HorizontalAlignment="Left" Increment="0.1" Minimum="0" Maximum="1" Value="{Binding Selected.ImageProperties.Opacity, Mode=TwoWay}"></mxe:SpinEditor>
 
                         <Label Grid.Row="11">Visible</Label>
                         <ToggleSwitch Grid.Row="11" HorizontalAlignment="Right" IsChecked="{Binding Selected.ImageProperties.IsVisible, Mode=TwoWay}"/>

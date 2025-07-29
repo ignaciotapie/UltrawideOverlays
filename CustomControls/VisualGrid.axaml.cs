@@ -70,7 +70,19 @@ public partial class VisualGrid : UserControl
 
     protected override Size MeasureOverride(Size finalSize)
     {
-        return finalSize;
+        Size DesiredSize;
+        if (GridSize != null && GridSize.Value > 0)
+        {
+            var widthLines = Math.Ceiling(finalSize.Width / GridSize.Value);
+            var heightLines = Math.Ceiling(finalSize.Height / GridSize.Value);
+
+            DesiredSize = new Size(widthLines * GridSize.Value, heightLines * GridSize.Value);
+        }
+        else
+        {
+            DesiredSize = finalSize;
+        }
+        return DesiredSize;
     }
 
     public sealed override void Render(DrawingContext context)
