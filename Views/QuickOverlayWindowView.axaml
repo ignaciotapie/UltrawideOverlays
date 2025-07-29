@@ -14,6 +14,7 @@
         x:Class="UltrawideOverlays.QuickOverlayWindowView"
         x:Name="QuickOverlayWindow"
         x:DataType="vm:QuickOverlayWindowViewModel"
+        Icon="avares://UltrawideOverlays/Assets/Images/tv-icon.ico"
         Title="QuickOverlayWindowView">
 
     <Window.Styles>

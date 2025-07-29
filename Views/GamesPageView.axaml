@@ -66,8 +66,8 @@
                 <Grid RowDefinitions="*, 250" Margin="10">
                     <Grid RowDefinitions="2*, 30, Auto, 30, 3*">
                         <Grid RowDefinitions="Auto, *">
-                            <Label Classes="Title" FontSize="20" Margin="0,0,0,5">Add New Game</Label>
-                            <Grid Name="DragDropRectangle" DragDrop.AllowDrop="True" Background="Transparent" Grid.Row="1" ClipToBounds="True" MinHeight="150" MinWidth="300">
+                            <Label Classes="Title" FontSize="20" Margin="0,0,5,5">Add New Game</Label>
+                            <Grid Name="DragDropRectangle" DragDrop.AllowDrop="True" Background="Transparent" Grid.Row="1" ClipToBounds="True" MinWidth="300">
                                 <Rectangle Grid.Row="1" Stroke="{DynamicResource PrimaryAccent}" StrokeThickness="2" StrokeDashArray="4" RadiusX="8" RadiusY="8" ></Rectangle>
                                 <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="0">
                                     <Image Width="64" Height="64">

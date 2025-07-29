@@ -16,6 +16,7 @@
         x:Class="UltrawideOverlays.Views.OverlayEditorWindowView"
         DragDrop.AllowDrop="True"
         CanResize="False"
+        Icon="avares://UltrawideOverlays/Assets/Images/tv-icon.ico"
         Title="OverlayEditorWindowView">
     
     <Design.DataContext><vm:OverlayEditorWindowViewModel/></Design.DataContext>
