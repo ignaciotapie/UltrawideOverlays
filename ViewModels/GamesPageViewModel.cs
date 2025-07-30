@@ -175,6 +175,11 @@ namespace UltrawideOverlays.ViewModels
                 GameName = value.Name;
                 GameExecutablePath = value.Path;
             }
+            else
+            {
+                GameName = string.Empty;
+                GameExecutablePath = string.Empty;
+            }
         }
 
         partial void OnSearchBoxTextChanged(string value)
