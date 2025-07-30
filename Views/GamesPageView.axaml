@@ -107,21 +107,21 @@
                         </Grid>
                     </Grid>
 
-                    <StackPanel Grid.Row="2" Spacing="20" VerticalAlignment="Bottom">
+                    <StackPanel IsVisible="{Binding GameExecutablePath, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" Grid.Row="2" Spacing="20" VerticalAlignment="Bottom">
                         <Rectangle Classes="Separator"></Rectangle>
                         <Label Classes="Title" Margin="0,0,0,-20" >Game Configuration</Label>
                         <Grid Grid.Row="1" ColumnDefinitions="*, 10, *">
                             <StackPanel>
                                 <Label>Game Name</Label>
-                                <TextBox Watermark="Enter game name..." Text="{Binding GameName, Mode=TwoWay}"></TextBox>
+                                <TextBox x:Name="GameNameTextBox" Watermark="Enter game name..." Text="{Binding GameName, Mode=TwoWay}"></TextBox>
                             </StackPanel>
                             <StackPanel Grid.Column="2">
                                 <Label>Link to Overlay</Label>
-                                <mxe:ComboBoxEditor Height="40" Watermark="Select overlay.." IsEnabled="{Binding GameName, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" SelectedItem="{Binding SelectedOverlay}" DisplayMember="Name" ValueMember="Name" ItemsSource="{Binding Overlays}"/>
+                                <mxe:ComboBoxEditor x:Name="OverlayComboBox" Height="40" Watermark="Select overlay.." IsEnabled="{Binding GameName, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" SelectedItem="{Binding SelectedOverlay}" DisplayMember="Name" ValueMember="Name" ItemsSource="{Binding Overlays}"/>
                             </StackPanel>
                         </Grid>
                         <StackPanel Grid.Row="2" Spacing="10" Orientation="Horizontal">
-                            <Button Classes="Primary Blue" Width="150" HorizontalContentAlignment="Center" Command="{Binding MakeNewGameCommand}">
+                            <Button Classes="Primary Blue" Width="150" HorizontalContentAlignment="Center" Click="LinkButton_Click" Command="{Binding MakeNewGameCommand}">
                                 <Button.Content>
                                     <StackPanel Orientation="Horizontal">
                                         <Image Classes="TabIcon">

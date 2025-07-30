@@ -71,4 +71,18 @@ public partial class GamesPageView : UserControl
             }
         }
     }
+
+    private void LinkButton_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    {
+        if (string.IsNullOrEmpty(GameNameTextBox.Text)) 
+        {
+            GameNameTextBox.Focus();
+            return;
+        }
+        if (OverlayComboBox.SelectedItem == null) 
+        {
+            OverlayComboBox.Focus();
+            return;
+        }
+    }
 }
