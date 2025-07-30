@@ -66,17 +66,20 @@ namespace UltrawideOverlays.ViewModels
             LoadDataAsync();
         }
 
+        ~HomePageViewModel()
+        {
+            Debug.WriteLine("HomePageViewModel finalized!");
+        }
+
+        ///////////////////////////////////////////
+        /// PRIVATE FUNCTIONS
+        ///////////////////////////////////////////
         private void ActivityTriggeredHandler(ActivityLogModel obj)
         {
             if (obj.Type == ActivityLogType.Overlays && obj.Action == ActivityLogAction.Viewed)
             {
                 LastOverlayUsed = _activityService.GetLastOverlayUsed();
             }
-        }
-
-        ~HomePageViewModel()
-        {
-            Debug.WriteLine("HomePageViewModel finalized!");
         }
 
         private async Task LoadDataAsync()

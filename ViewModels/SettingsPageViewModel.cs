@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using UltrawideOverlays.Enums;
@@ -38,6 +39,10 @@ namespace UltrawideOverlays.ViewModels
         [ObservableProperty]
         private SingleSettingModel _quickOverlayHotkey;
 
+        ///////////////////////////////////////////
+        /// CONSTRUCTOR
+        ///////////////////////////////////////////
+
         public SettingsPageViewModel()
         {
             Page = Enums.ApplicationPageViews.SettingsPage;
@@ -48,6 +53,10 @@ namespace UltrawideOverlays.ViewModels
         {
             Debug.WriteLine("SettingsPageViewModel finalized!");
         }
+
+        ///////////////////////////////////////////
+        /// PUBLIC FUNCTIONS
+        ///////////////////////////////////////////
 
         public SettingsPageViewModel(SettingsDataService settingsService)
         {
@@ -78,6 +87,10 @@ namespace UltrawideOverlays.ViewModels
             }
         }
 
+        ///////////////////////////////////////////
+        /// PRIVATE FUNCTIONS
+        ///////////////////////////////////////////
+
         private void UpdatePageSettings(SettingsDataModel value)
         {
             if (value == null)
@@ -98,6 +111,12 @@ namespace UltrawideOverlays.ViewModels
             OpacityDownHotkey = value.SettingsDictionary[SettingsNames.OpacityDownHotkey];
             QuickOverlayHotkey = value.SettingsDictionary[SettingsNames.OpenMiniOverlayManager];
         }
+
+
+        ///////////////////////////////////////////
+        /// COMMANDS
+        ///////////////////////////////////////////
+
 
         [RelayCommand]
         private async Task SaveSettings()

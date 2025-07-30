@@ -23,6 +23,10 @@ namespace UltrawideOverlays.ViewModels
 
         private readonly PageFactory? factory;
 
+        ///////////////////////////////////////////
+        /// CONSTRUCTOR
+        ///////////////////////////////////////////
+
         /// <summary>
         /// Design-time only constructor
         /// </summary>
@@ -41,6 +45,10 @@ namespace UltrawideOverlays.ViewModels
             factory = PFactory;
             NavigateToHomePage();
         }
+
+        ///////////////////////////////////////////
+        /// COMMANDS
+        ///////////////////////////////////////////
 
         [RelayCommand]
         private void NavigateToHomePage()

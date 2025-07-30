@@ -54,25 +54,27 @@ public partial class OverlayEditorWindowView : Window
         AddHandler(KeyDownEvent, KeyDownHandler);
     }
 
-    private void PositionProperties()
+    ///////////////////////////////////////////
+    /// OVERRIDE FUNCTIONS
+    ///////////////////////////////////////////
+    protected override void OnDataContextChanged(EventArgs e)
     {
-        //TODO: Make screen agnostic
-        var screen = Screens.Primary;
-        if (screen == null) return;
-        if (!Design.IsDesignMode) DragPanel.SetPosition(PropertiesBorder, new Point(screen.Bounds.Center.X - 400, screen.Bounds.Center.Y - 300));
+        base.OnDataContextChanged(e);
+
+        if (DataContext is OverlayEditorWindowViewModel vm)
+        {
+            if (vmInstance != null)
+            {
+                vmInstance.PropertyChanging -= DataContext_PropertyChanging;
+                vmInstance.PropertyChanged -= DataContext_PropertyChanged;
+            }
+            vmInstance = vm;
+
+            vmInstance.PropertyChanging += DataContext_PropertyChanging;
+            vmInstance.PropertyChanged += DataContext_PropertyChanged;
+        }
     }
 
-    private void OnPropertyChanged(object? sender, AvaloniaPropertyChangedEventArgs e)
-    {
-        if (e.Property == Window.WindowStateProperty)
-        {
-            PositionProperties();
-        }
-        else if (e.Property == Window.BoundsProperty)
-        {
-            PositionProperties();
-        }
-    }
 
     ///////////////////////////////////////////
     /// KEY HANDLERS
@@ -116,27 +118,6 @@ public partial class OverlayEditorWindowView : Window
 
 
     ///////////////////////////////////////////
-    /// OVERRIDE FUNCTIONS
-    ///////////////////////////////////////////
-    protected override void OnDataContextChanged(EventArgs e)
-    {
-        base.OnDataContextChanged(e);
-
-        if (DataContext is OverlayEditorWindowViewModel vm)
-        {
-            if (vmInstance != null)
-            {
-                vmInstance.PropertyChanging -= DataContext_PropertyChanging;
-                vmInstance.PropertyChanged -= DataContext_PropertyChanged;
-            }
-            vmInstance = vm;
-
-            vmInstance.PropertyChanging += DataContext_PropertyChanging;
-            vmInstance.PropertyChanged += DataContext_PropertyChanged;
-        }
-    }
-
-    ///////////////////////////////////////////
     /// PRIVATE FUNCTIONS
     ///////////////////////////////////////////
     private void DataContext_PropertyChanging(object? sender, PropertyChangingEventArgs e)
@@ -156,11 +137,26 @@ public partial class OverlayEditorWindowView : Window
             modelImageDictionary[vmInstance.Selected].IsSelected = true;
         }
     }
+    private void PositionProperties()
+    {
+        //TODO: Make screen agnostic
+        var screen = Screens.Primary;
+        if (screen == null) return;
+        if (!Design.IsDesignMode) DragPanel.SetPosition(PropertiesBorder, new Point(screen.Bounds.Center.X - 400, screen.Bounds.Center.Y - 300));
+    }
 
+    private void OnPropertyChanged(object? sender, AvaloniaPropertyChangedEventArgs e)
+    {
+        if (e.Property == Window.WindowStateProperty)
+        {
+            PositionProperties();
+        }
+        else if (e.Property == Window.BoundsProperty)
+        {
+            PositionProperties();
+        }
+    }
 
-    ///////////////////////////////////////////
-    /// PRIVATE FUNCTIONS
-    ///////////////////////////////////////////
     private void OnLoaded(object? sender, RoutedEventArgs e)
     {
         vmInstance = DataContext as OverlayEditorWindowViewModel;

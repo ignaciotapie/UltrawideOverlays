@@ -99,6 +99,26 @@ namespace UltrawideOverlays.ViewModels
             ConfigureGrid();
         }
 
+        ///////////////////////////////////////////
+        /// OVERRIDE FUNCTIONS
+        ///////////////////////////////////////////
+        partial void OnSelectedChanged(ImageModel? oldValue, ImageModel? newValue)
+        {
+            Debug.WriteLine($"Image selected changed from {oldValue?.ImageName} to {newValue?.ImageName}");
+            if (newValue != null)
+            {
+                PropertiesEnabled = true;
+            }
+            else
+            {
+                PropertiesEnabled = false;
+            }
+        }
+
+        ///////////////////////////////////////////
+        /// PRIVATE FUNCTIONS
+        ///////////////////////////////////////////
+
         private async Task ConfigureGrid()
         {
             var settingsSize = await _settingsDataService.LoadSettingAsync(SettingsNames.GridSize);
@@ -128,19 +148,6 @@ namespace UltrawideOverlays.ViewModels
             }
 
             return output;
-        }
-
-        partial void OnSelectedChanged(ImageModel? oldValue, ImageModel? newValue)
-        {
-            Debug.WriteLine($"Image selected changed from {oldValue?.ImageName} to {newValue?.ImageName}");
-            if (newValue != null)
-            {
-                PropertiesEnabled = true;
-            }
-            else
-            {
-                PropertiesEnabled = false;
-            }
         }
 
         private void ImagesCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)

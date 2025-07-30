@@ -52,6 +52,10 @@ namespace UltrawideOverlays.ViewModels
         private OverlayDataService _overlayService;
         private GamesDataService _gamesService;
 
+        ///////////////////////////////////////////
+        /// CONSTRUCTOR
+        ///////////////////////////////////////////
+
         /// <summary>
         /// Design-only constructor
         /// </summary>
@@ -120,10 +124,6 @@ namespace UltrawideOverlays.ViewModels
             };
         }
 
-
-        ///////////////////////////////////////////
-        /// CONSTRUCTOR
-        ///////////////////////////////////////////
         public GamesPageViewModel(PageFactory PFactory, ProcessDataService processService, OverlayDataService overlayService, GamesDataService gamesService)
         {
             Page = Enums.ApplicationPageViews.GamesPage;
@@ -142,26 +142,6 @@ namespace UltrawideOverlays.ViewModels
         ~GamesPageViewModel()
         {
             Debug.WriteLine("GamesPageViewModel finalized!");
-        }
-
-        private async Task LoadProcessesAsync()
-        {
-            var processList = await _processService.LoadAllProcessesAsync();
-
-            if (processList != null)
-            {
-                Processes = new ObservableCollection<ProcessDataModel>(processList);
-            }
-        }
-
-        private async Task LoadGamesAsync()
-        {
-            Games = new ObservableCollection<GamesModel>(await _gamesService.LoadAllGamesAsync());
-        }
-
-        private async Task LoadOverlaysAsync()
-        {
-            Overlays = new ObservableCollection<OverlayDataModel>(await _overlayService.LoadAllOverlaysAsync());
         }
 
         ///////////////////////////////////////////
@@ -207,6 +187,30 @@ namespace UltrawideOverlays.ViewModels
                     SelectedGame = null;
                 }
             }
+        }
+
+
+        ///////////////////////////////////////////
+        /// PRIVATE FUNCTIONS
+        ///////////////////////////////////////////
+        private async Task LoadProcessesAsync()
+        {
+            var processList = await _processService.LoadAllProcessesAsync();
+
+            if (processList != null)
+            {
+                Processes = new ObservableCollection<ProcessDataModel>(processList);
+            }
+        }
+
+        private async Task LoadGamesAsync()
+        {
+            Games = new ObservableCollection<GamesModel>(await _gamesService.LoadAllGamesAsync());
+        }
+
+        private async Task LoadOverlaysAsync()
+        {
+            Overlays = new ObservableCollection<OverlayDataModel>(await _overlayService.LoadAllOverlaysAsync());
         }
 
         ///////////////////////////////////////////

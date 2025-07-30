@@ -20,6 +20,10 @@ namespace UltrawideOverlays.ViewModels
         private readonly WindowFactory WindowFactory;
         private readonly HotKeyService HotKeyService;
 
+        ///////////////////////////////////////////
+        /// CONSTRUCTOR
+        ///////////////////////////////////////////
+
         public AppViewModel(SettingsDataService settingsService, HotKeyService hotKeyService, WindowFactory windowFactory)
         {
             SettingsService = settingsService;
@@ -32,6 +36,10 @@ namespace UltrawideOverlays.ViewModels
 
             HotKeyService.HotKeyPressed += HotKeyPressed;
         }
+
+        ///////////////////////////////////////////
+        /// PRIVATE FUNCTIONS
+        ///////////////////////////////////////////
 
         private void HotKeyPressed(object? sender, string e)
         {

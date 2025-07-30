@@ -10,6 +10,11 @@ namespace UltrawideOverlays.Views;
 
 public partial class GamesPageView : UserControl
 {
+
+    ///////////////////////////////////////////
+    /// CONSTRUCTOR
+    ///////////////////////////////////////////
+
     public GamesPageView()
     {
         InitializeComponent();
@@ -17,6 +22,10 @@ public partial class GamesPageView : UserControl
         DragDropRectangle.AddHandler(DragDrop.DragOverEvent, DragOver);
         DragDropRectangle.AddHandler(DragDrop.DropEvent, Drop);
     }
+
+    ///////////////////////////////////////////
+    /// PRIVATE FUNCTIONS
+    ///////////////////////////////////////////
 
     private void DragOver(object? sender, DragEventArgs e)
     {

@@ -31,6 +31,10 @@ namespace UltrawideOverlays.ViewModels
 
         public ObservableCollection<OverlayDataModel> Overlays { get; }
 
+        ///////////////////////////////////////////
+        /// CONSTRUCTOR
+        ///////////////////////////////////////////
+
         /// <summary>
         /// Design-only constructor
         /// </summary>
@@ -54,6 +58,10 @@ namespace UltrawideOverlays.ViewModels
             Debug.WriteLine("OverlaysPageViewModel finalized!");
         }
 
+        ///////////////////////////////////////////
+        /// PUBLIC FUNCTIONS
+        ///////////////////////////////////////////
+
         public OverlaysPageViewModel(OverlayDataService service, WindowFactory WFactory)
         {
             Page = Enums.ApplicationPageViews.OverlaysPage;
@@ -65,6 +73,10 @@ namespace UltrawideOverlays.ViewModels
 
             LoadOverlaysAsync();
         }
+
+        ///////////////////////////////////////////
+        /// OVERRIDE FUNCTIONS
+        ///////////////////////////////////////////
 
         partial void OnSearchBoxTextChanged(string value)
         {
@@ -104,6 +116,46 @@ namespace UltrawideOverlays.ViewModels
             {
                 SelectedOverlayIndex = -1; // No overlay selected
             }
+        }
+
+        ///////////////////////////////////////////
+        /// PRIVATE FUNCTIONS
+        ///////////////////////////////////////////
+        private async void LoadOverlaysAsync()
+        {
+            try
+            {
+                var overlays = await overlayDataService.LoadAllOverlaysAsync();
+                if (overlays != null)
+                {
+                    Overlays.Clear();
+                    foreach (var overlay in overlays)
+                    {
+                        Overlays.Add(overlay);
+                    }
+                    //Default to first overlay
+                    if (Overlays.Count > 0)
+                    {
+                        SelectedOverlayIndex = 0;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                // Log or handle error
+                System.Diagnostics.Debug.WriteLine($"Error loading overlays: {ex.Message}");
+            }
+        }
+        private void OverlayWindowClosed(object? sender, EventArgs e)
+        {
+            if (sender is Window window)
+            {
+                window.Closed -= OverlayWindowClosed;
+                window.DataContext = null;
+            }
+
+            PathToCachedBitmapConverter.Instance.ClearCache();
+            LoadOverlaysAsync();
         }
 
         ///////////////////////////////////////////
@@ -155,47 +207,6 @@ namespace UltrawideOverlays.ViewModels
             {
                 overlayDataService.DeleteOverlayAsync(overlayToDelete);
             }
-        }
-
-        ///////////////////////////////////////////
-        /// PRIVATE FUNCTIONS
-        ///////////////////////////////////////////
-
-        private async void LoadOverlaysAsync()
-        {
-            try
-            {
-                var overlays = await overlayDataService.LoadAllOverlaysAsync();
-                if (overlays != null)
-                {
-                    Overlays.Clear();
-                    foreach (var overlay in overlays)
-                    {
-                        Overlays.Add(overlay);
-                    }
-                    //Default to first overlay
-                    if (Overlays.Count > 0)
-                    {
-                        SelectedOverlayIndex = 0;
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                // Log or handle error
-                System.Diagnostics.Debug.WriteLine($"Error loading overlays: {ex.Message}");
-            }
-        }
-        private void OverlayWindowClosed(object? sender, EventArgs e)
-        {
-            if (sender is Window window)
-            {
-                window.Closed -= OverlayWindowClosed;
-                window.DataContext = null;
-            }
-
-            PathToCachedBitmapConverter.Instance.ClearCache();
-            LoadOverlaysAsync();
         }
     }
 }

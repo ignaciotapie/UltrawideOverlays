@@ -31,6 +31,10 @@ namespace UltrawideOverlays.ViewModels
         private readonly FocusMonitorService FocusMonitorService;
         private readonly WindowFactory WindowFactory;
 
+        ///////////////////////////////////////////
+        /// CONSTRUCTOR
+        ///////////////////////////////////////////
+
         /// <summary>
         /// Design-only constructor
         /// </summary>
@@ -50,6 +54,10 @@ namespace UltrawideOverlays.ViewModels
             FindApp();
         }
 
+        ///////////////////////////////////////////
+        /// PRIVATE FUNCTIONS
+        ///////////////////////////////////////////
+
         private async void LoadData()
         {
             Overlays = await OverlayService.LoadAllOverlaysAsync();
@@ -67,6 +75,19 @@ namespace UltrawideOverlays.ViewModels
                 SelectedOverlay = Overlays.FirstOrDefault(o => o.Name.Equals(game.OverlayName, StringComparison.OrdinalIgnoreCase));
             }
         }
+
+        private void OnOverlayEditorWindowClosed(object? sender, EventArgs e)
+        {
+            if (sender is Window window)
+            {
+                window.Closed -= OnOverlayEditorWindowClosed;
+                LoadData();
+            }
+        }
+
+        ///////////////////////////////////////////
+        /// COMMANDS
+        ///////////////////////////////////////////
 
         [RelayCommand]
         private async void AddGame(object parameter)
@@ -107,15 +128,6 @@ namespace UltrawideOverlays.ViewModels
             }
 
             window.Closed += OnOverlayEditorWindowClosed;
-        }
-
-        private void OnOverlayEditorWindowClosed(object? sender, EventArgs e)
-        {
-            if (sender is Window window)
-            {
-                window.Closed -= OnOverlayEditorWindowClosed;
-                LoadData();
-            }
         }
     }
 }

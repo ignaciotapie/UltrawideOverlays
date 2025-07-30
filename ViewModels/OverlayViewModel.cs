@@ -24,6 +24,10 @@ namespace UltrawideOverlays.ViewModels
         private readonly HotKeyService HotKeyService;
         private readonly ActivityDataService ActivityDataService;
 
+        ///////////////////////////////////////////
+        /// CONSTRUCTOR
+        ///////////////////////////////////////////
+
         /// <summary>
         /// Design-time constructor
         /// </summary>
@@ -59,6 +63,10 @@ namespace UltrawideOverlays.ViewModels
             FocusMonitorService.FocusChanged -= FocusChangedHandler;
             HotKeyService.HotKeyPressed -= HotkeyPressedHandler;
         }
+
+        ///////////////////////////////////////////
+        /// PRIVATE FUNCTIONS
+        ///////////////////////////////////////////
 
         private void HotkeyPressedHandler(object? sender, string e)
         {
