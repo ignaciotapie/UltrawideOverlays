@@ -1,4 +1,5 @@
 ﻿using Avalonia;
+using Avalonia.Controls;
 using Avalonia.Data.Converters;
 using Avalonia.Media.Imaging;
 using System;
@@ -54,7 +55,7 @@ namespace UltrawideOverlays.Converters
         public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
         {
             if (value is not string path || string.IsNullOrWhiteSpace(path))
-                return AvaloniaProperty.UnsetValue;
+                return Application.Current?.FindResource("ClippingMaskBitmap") ?? AvaloniaProperty.UnsetValue;
 
             try
             {

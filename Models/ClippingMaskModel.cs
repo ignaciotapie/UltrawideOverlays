@@ -19,7 +19,7 @@ namespace UltrawideOverlays.Models
         ///////////////////////////////////////////
         /// CONSTRUCTOR
         ///////////////////////////////////////////
-        public ClippingMaskModel() : base(System.AppDomain.CurrentDomain.BaseDirectory + "Assets/Images/clipping-mask.png", "ClippingMask")
+        public ClippingMaskModel() : base("", "ClippingMask")
         {
             base.ImageProperties.Width = 0;
             base.ImageProperties.Height = 0;
@@ -27,7 +27,7 @@ namespace UltrawideOverlays.Models
             base.ImageProperties.IsDraggable = false;
         }
 
-        public ClippingMaskModel(Geometry geo) : base(System.AppDomain.CurrentDomain.BaseDirectory + "Assets/Images/clipping-mask.png", "ClippingMask")
+        public ClippingMaskModel(Geometry geo) : base("", "ClippingMask")
         {
             base.ImageProperties.Width = (int)geo.Bounds.Width;
             base.ImageProperties.Height = (int)geo.Bounds.Height;

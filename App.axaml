@@ -7,7 +7,6 @@
              xmlns:theme="clr-namespace:Eremex.AvaloniaUI.Themes.DeltaDesign;assembly=Eremex.Avalonia.Themes.DeltaDesign"
              RequestedThemeVariant="Dark"
              x:DataType="vm:AppViewModel">
-             <!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
 
     <Application.DataTemplates>
         <locators:ViewLocator/>
@@ -57,7 +56,7 @@
         <SvgSource x:Key="UpArrowIcon">/Assets/Images/up-arrow-icon.svg</SvgSource>
         <SvgSource x:Key="DownArrowIcon">/Assets/Images/down-arrow-icon.svg</SvgSource>
         <SvgSource x:Key="PencilIcon">/Assets/Images/pencil-icon.svg</SvgSource>
-        <Image x:Key="ClippingMask">/Assets/Images/clipping-mask.png</Image>
+        <Bitmap x:Key="ClippingMaskBitmap">/Assets/Images/clipping-mask.png</Bitmap>
 
         <!-- Fonts-->
         <FontFamily x:Key="PrimaryFont">/Assets/Fonts#Cairo</FontFamily>

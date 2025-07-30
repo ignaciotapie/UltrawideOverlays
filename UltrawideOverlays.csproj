@@ -23,10 +23,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <AvaloniaResource Remove="Assets\Images\clipping-mask.png" />
-  </ItemGroup>
-
-  <ItemGroup>
     <None Remove="Assets\Fonts\Cairo.ttf" />
     <None Remove="Assets\Images\add-icon.svg" />
     <None Remove="Assets\Images\clipping-mask.png" />
@@ -47,12 +43,6 @@
     <None Remove="Assets\Images\tv-icon-white.svg" />
     <None Remove="Assets\Images\up-arrow-icon.svg" />
     <None Remove="Assets\Images\up-arrow-top-icon.svg" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <EmbeddedResource Include="Assets\Images\clipping-mask.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </EmbeddedResource>
   </ItemGroup>
 
    <ItemGroup>
@@ -79,6 +69,12 @@
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.3" />
     <PackageReference Include="System.Drawing.Common" Version="9.0.6" />
     <PackageReference Include="System.Reactive" Version="6.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <AvaloniaResource Update="Assets\Images\clipping-mask.png">
+      <CopyToOutputDirectory></CopyToOutputDirectory>
+    </AvaloniaResource>
   </ItemGroup>
 
   <ItemGroup>
