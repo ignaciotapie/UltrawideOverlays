@@ -17,6 +17,23 @@ namespace UltrawideOverlays.CustomControls
         public Border? border;
         private bool disposedValue;
 
+        private static readonly BoxShadows boxShadow = new BoxShadows(new BoxShadow
+        {
+            Color = Colors.DodgerBlue,
+            Blur = 5,
+            Spread = 3,
+            OffsetX = 0,
+            OffsetY = 0
+        });
+        private static readonly BoxShadows invisibleShadow = new BoxShadows(new BoxShadow
+        {
+            Color = Colors.Transparent,
+            Blur = 0,
+            Spread = 0,
+            OffsetX = 0,
+            OffsetY = 0
+        });
+
         public SelectableImage(ImageModel im)
         {
             ImageModel = im;
@@ -31,7 +48,7 @@ namespace UltrawideOverlays.CustomControls
                 Focusable = false,
                 HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Left,
                 VerticalAlignment = Avalonia.Layout.VerticalAlignment.Top,
-                Stretch = Stretch.Fill //TODO: Add stretch options
+                Stretch = Stretch.Fill
             };
             image.Bind(Image.SourceProperty, new Binding("ImagePath")
             {
@@ -89,30 +106,7 @@ namespace UltrawideOverlays.CustomControls
         private void UpdateSelectionVisual()
         {
             if (border == null) return;
-            if (IsSelected == true)
-            {
-                border.BoxShadow = new BoxShadows(
-                    new BoxShadow
-                    {
-                        Color = Colors.DodgerBlue,
-                        Blur = 5,
-                        Spread = 3,
-                        OffsetX = 0,
-                        OffsetY = 0
-                    });
-            }
-            else
-            {
-                border.BoxShadow = new BoxShadows(
-                    new BoxShadow
-                    {
-                        Color = Colors.Transparent,
-                        Blur = 0,
-                        Spread = 0,
-                        OffsetX = 0,
-                        OffsetY = 0
-                    });
-            }
+            border.BoxShadow = IsSelected ? boxShadow : invisibleShadow;
         }
 
         private void RefreshBitmap()

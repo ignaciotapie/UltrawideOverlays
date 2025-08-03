@@ -17,6 +17,14 @@
         <vm:MainWindowViewModel/>
     </Design.DataContext>
 
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceInclude Source="/Resources/MainWindowResources.axaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
+
     <Grid RowDefinitions="32, *" ColumnDefinitions="220, *">
         <Border Grid.ColumnSpan="2" Grid.RowSpan="2" IsHitTestVisible="False" Background="{DynamicResource PrimaryColor}" CornerRadius="10,10,0,0"/>
         <!-- Tab Section-->

@@ -1,0 +1,6 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <!-- Add Resources Here -->
+    <SvgSource x:Key="UploadIcon">/Assets/Images/upload-icon.svg</SvgSource>
+    <SvgSource x:Key="LinkIcon">/Assets/Images/link-icon.svg</SvgSource>
+</ResourceDictionary>

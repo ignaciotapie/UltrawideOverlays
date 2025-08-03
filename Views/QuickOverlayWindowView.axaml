@@ -17,6 +17,14 @@
         Icon="avares://UltrawideOverlays/Assets/Images/tv-icon.ico"
         Title="QuickOverlayWindowView">
 
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceInclude Source="/Resources/QuickOverlayWindowResources.axaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
+
     <Window.Styles>
         <Style Selector="Border.Light">
             <Style.Animations>

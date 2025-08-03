@@ -39,6 +39,8 @@ public static class ImageRenderer
                         ctx.DrawImage(image, new Rect(positionX, positionY, props.Width, props.Height));
                     }
                 }
+
+                image.Dispose();
             }
         }
         return bitmap;

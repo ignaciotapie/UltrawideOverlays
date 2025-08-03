@@ -2,7 +2,6 @@
 using CommunityToolkit.Mvvm.Input;
 using System;
 using System.Collections.ObjectModel;
-using System.Diagnostics;
 using System.Threading.Tasks;
 using UltrawideOverlays.Models;
 using UltrawideOverlays.Services;
@@ -68,7 +67,7 @@ namespace UltrawideOverlays.ViewModels
 
         ~HomePageViewModel()
         {
-            Debug.WriteLine("HomePageViewModel finalized!");
+            _activityService.ActivityTriggered -= ActivityTriggeredHandler;
         }
 
         ///////////////////////////////////////////

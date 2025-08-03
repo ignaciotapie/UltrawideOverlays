@@ -13,6 +13,14 @@
     <Design.DataContext>
         <vm:OverlaysPageViewModel/>
     </Design.DataContext>
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceInclude Source="/Resources/OverlaysPageResources.axaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+    
     <UserControl.Styles>
         <Style Selector="ListBoxItem">
             <Setter Property="BorderBrush" Value="{DynamicResource PrimaryAccent}"/>

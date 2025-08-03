@@ -147,7 +147,6 @@ namespace UltrawideOverlays.ViewModels
         ///////////////////////////////////////////
         /// OVERRIDE FUNCTIONS
         ///////////////////////////////////////////
-
         partial void OnSelectedProcessChanged(ProcessDataModel value)
         {
             if (value != null)
@@ -189,7 +188,6 @@ namespace UltrawideOverlays.ViewModels
             }
         }
 
-
         ///////////////////////////////////////////
         /// PRIVATE FUNCTIONS
         ///////////////////////////////////////////
@@ -216,8 +214,6 @@ namespace UltrawideOverlays.ViewModels
         ///////////////////////////////////////////
         /// COMMANDS
         ///////////////////////////////////////////
-
-
         [RelayCommand]
         private void RefreshProcesses()
         {

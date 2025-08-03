@@ -1,0 +1,14 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <!-- Add Resources Here -->
+    <SvgSource x:Key="CopyIcon">/Assets/Images/copy-icon.svg</SvgSource>
+    <SvgSource x:Key="DeleteIcon">/Assets/Images/delete-icon.svg</SvgSource>
+    <SvgSource x:Key="ResizeWidthIcon">/Assets/Images/resize-width-icon.svg</SvgSource>
+    <SvgSource x:Key="ResizeHeightIcon">/Assets/Images/resize-height-icon.svg</SvgSource>
+    <SvgSource x:Key="PlusIcon">/Assets/Images/plus-icon.svg</SvgSource>
+    <SvgSource x:Key="SaveIcon">/Assets/Images/save-icon.svg</SvgSource>
+    <SvgSource x:Key="UpArrowTopIcon">/Assets/Images/up-arrow-top-icon.svg</SvgSource>
+    <SvgSource x:Key="DownArrowBottomIcon">/Assets/Images/down-arrow-bottom-icon.svg</SvgSource>
+    <SvgSource x:Key="UpArrowIcon">/Assets/Images/up-arrow-icon.svg</SvgSource>
+    <SvgSource x:Key="DownArrowIcon">/Assets/Images/down-arrow-icon.svg</SvgSource>
+</ResourceDictionary>

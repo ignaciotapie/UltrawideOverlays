@@ -1,0 +1,21 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <!--  Color Definition  -->
+    <SolidColorBrush x:Key="PrimaryColor">#1a1a1a</SolidColorBrush>
+    <SolidColorBrush x:Key="SecondaryColor">#1b1d1e</SolidColorBrush>
+    <SolidColorBrush x:Key="PrimaryFontColor">#ffffff</SolidColorBrush>
+    <SolidColorBrush x:Key="SecondaryFontColor">#9ca39f</SolidColorBrush>
+    <SolidColorBrush x:Key="PrimaryAccent">#404040</SolidColorBrush>
+    <SolidColorBrush x:Key="SecondaryAccent">#e57228</SolidColorBrush>
+    <SolidColorBrush x:Key="LinkAccent">#459ff6</SolidColorBrush>
+    <SolidColorBrush x:Key="PrimaryBackground">#0f0f0f</SolidColorBrush>
+
+    <!-- Home Only Colors-->
+    <SolidColorBrush x:Key="GameColor">#048ca7</SolidColorBrush>
+    <SolidColorBrush x:Key="OverlayColor">#2c0a79</SolidColorBrush>
+    <SolidColorBrush x:Key="SettingsColor">#4ff0ba</SolidColorBrush>
+
+    <Bitmap x:Key="ClippingMaskBitmap">/Assets/Images/clipping-mask.png</Bitmap>
+
+    <FontFamily x:Key="PrimaryFont">/Assets/Fonts#Cairo</FontFamily>
+</ResourceDictionary>

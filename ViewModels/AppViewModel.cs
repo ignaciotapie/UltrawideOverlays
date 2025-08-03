@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using UltrawideOverlays.Enums;
@@ -31,10 +32,18 @@ namespace UltrawideOverlays.ViewModels
             WindowFactory = windowFactory;
             HotKeyService = hotKeyService;
 
-            SetUpTrayIcon();
-            SetUpStartUp();
+            _ = SetUpTrayIcon();
+            _ = SetUpStartUp();
 
             HotKeyService.HotKeyPressed += HotKeyPressed;
+        }
+
+        ~AppViewModel()
+        {
+            SettingsService.SettingsChanged -= SettingsChangedHandler;
+            HotKeyService.HotKeyPressed -= HotKeyPressed;
+
+            Debug.WriteLine("AppViewModel finalized!");
         }
 
         ///////////////////////////////////////////
@@ -43,15 +52,13 @@ namespace UltrawideOverlays.ViewModels
 
         private void HotKeyPressed(object? sender, string e)
         {
-            switch (e)
+            if (e == SettingsNames.OpenMiniOverlayManager)
             {
-                case SettingsNames.OpenMiniOverlayManager:
-                    Avalonia.Threading.Dispatcher.UIThread.Post(() =>
-                    {
-                        var miniOverlayManagerWindow = WindowFactory.CreateWindow(WindowViews.MiniOverlayManager);
-                        miniOverlayManagerWindow.Show();
-                    });
-                    break;
+                Avalonia.Threading.Dispatcher.UIThread.Post(() =>
+                {
+                    var miniOverlayManagerWindow = WindowFactory.CreateWindow(WindowViews.MiniOverlayManager);
+                    miniOverlayManagerWindow.Show();
+                });
             }
         }
 
@@ -59,40 +66,30 @@ namespace UltrawideOverlays.ViewModels
         {
             if (e.SettingsChanged.Any(s => s.Name == SettingsNames.MinimizeToTray))
             {
-                SetUpTrayIcon();
+                _ = SetUpTrayIcon();
             }
             if (e.SettingsChanged.Any(s => s.Name == SettingsNames.StartupEnabled))
             {
-                SetUpStartUp();
+                _ = SetUpStartUp();
             }
         }
 
         private async Task SetUpTrayIcon()
         {
             var setting = await SettingsService.LoadSettingAsync(SettingsNames.MinimizeToTray);
-
-            if (setting == SettingsBoolValues.True)
-            {
-                TrayEnabled = true;
-            }
-            else
-            {
-                TrayEnabled = false;
-            }
+            TrayEnabled = setting == SettingsBoolValues.True;
         }
 
         private async Task SetUpStartUp()
         {
             var setting = await SettingsService.LoadSettingAsync(SettingsNames.StartupEnabled);
+            bool enabled = setting == SettingsBoolValues.True;
 
-            if (setting == SettingsBoolValues.True)
+            if (enabled && !AutoStartUtil.IsAutostartEnabled())
             {
-                if (!AutoStartUtil.IsAutostartEnabled())
-                {
-                    AutoStartUtil.EnableAutostart();
-                }
+                AutoStartUtil.EnableAutostart();
             }
-            else if (AutoStartUtil.IsAutostartEnabled())
+            else if (!enabled && AutoStartUtil.IsAutostartEnabled())
             {
                 AutoStartUtil.DisableAutostart();
             }

@@ -31,6 +31,8 @@ namespace UltrawideOverlays.Models
         {
             base.ImageProperties.Width = (int)geo.Bounds.Width;
             base.ImageProperties.Height = (int)geo.Bounds.Height;
+            base.ImageProperties.OriginalHeight = (int)geo.Bounds.Height;
+            base.ImageProperties.OriginalWidth = (int)geo.Bounds.Width;
             base.ImageProperties.Opacity = 0.3;
             base.ImageProperties.IsDraggable = false;
         }

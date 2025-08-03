@@ -31,6 +31,8 @@ namespace UltrawideOverlays.ViewModels
         private readonly FocusMonitorService FocusMonitorService;
         private readonly WindowFactory WindowFactory;
 
+        private Window? windowInstance;
+
         ///////////////////////////////////////////
         /// CONSTRUCTOR
         ///////////////////////////////////////////
@@ -78,11 +80,9 @@ namespace UltrawideOverlays.ViewModels
 
         private void OnOverlayEditorWindowClosed(object? sender, EventArgs e)
         {
-            if (sender is Window window)
-            {
-                window.Closed -= OnOverlayEditorWindowClosed;
-                LoadData();
-            }
+            windowInstance.Closed -= OnOverlayEditorWindowClosed;
+            windowInstance = null;
+            LoadData();
         }
 
         ///////////////////////////////////////////
@@ -121,13 +121,15 @@ namespace UltrawideOverlays.ViewModels
         [RelayCommand]
         private void OpenNewOverlayWindow()
         {
-            var window = WindowFactory.CreateWindow(Enums.WindowViews.OverlayEditorWindow);
-            if (window is Window w)
+            if (windowInstance != null && windowInstance.IsVisible)
             {
-                w.Show();
+                return;
             }
 
-            window.Closed += OnOverlayEditorWindowClosed;
+            windowInstance = WindowFactory.CreateWindow(Enums.WindowViews.OverlayEditorWindow);
+            windowInstance.Show();
+
+            windowInstance.Closed += OnOverlayEditorWindowClosed;
         }
     }
 }

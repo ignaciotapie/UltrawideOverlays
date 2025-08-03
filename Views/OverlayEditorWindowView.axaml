@@ -16,13 +16,19 @@
         x:Class="UltrawideOverlays.Views.OverlayEditorWindowView"
         DragDrop.AllowDrop="True"
         CanResize="False"
+        Focusable="True"
         Icon="avares://UltrawideOverlays/Assets/Images/tv-icon.ico"
         Title="OverlayEditorWindowView">
     
     <Design.DataContext><vm:OverlayEditorWindowViewModel/></Design.DataContext>
 
     <Window.Resources>
-        <converter:NumberToStringConverter x:Key="numberToStringConverter"/>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceInclude Source="/Resources/OverlayEditorWindowResources.axaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+
         <converter:NumberToColorConverter x:Key="numberToColorConverter"/>
 
         <ContextMenu x:Key="RightClickContext">
@@ -31,6 +37,8 @@
             <MenuItem Header="Move Up" Command="{Binding MoveUpOrderCommand}" CommandParameter="{Binding Selected}"/>
             <MenuItem Header="Move to Front" Command="{Binding MoveToTopOrderCommand}" CommandParameter="{Binding Selected}"/>
         </ContextMenu>
+        
+        <converter:NumberToRoundedNumber x:Key="numberToRoundedNumber"/>
     </Window.Resources>
 
     <Window.Styles>
@@ -83,7 +91,7 @@
                 <Border IsHitTestVisible="False" Background="{DynamicResource PrimaryBackground}" BorderBrush="{DynamicResource PrimaryAccent}" BorderThickness="2,2,2,0" CornerRadius="10,10,0,0" Padding="10,0">
                     <Label Classes="Title">Overlay Editor</Label>
                 </Border>
-                <Grid Grid.Row="1" ColumnDefinitions="*, 2, *, 2, *" Background="{DynamicResource PrimaryBackground}" RowDefinitions="Auto, *, Auto" Width="1000" Height="650" Margin="2,2,2,2">
+                <Grid Focusable="True" Grid.Row="1" ColumnDefinitions="*, 2, *, 2, *" Background="{DynamicResource PrimaryBackground}" RowDefinitions="Auto, *, Auto" Width="1000" Height="650" Margin="2,2,2,2">
                     <!-- Column 0: Images-->
                     <RelativePanel Margin="10,0">
                         <Label Classes="Primary" x:Name="ImageLabel">Images</Label>
@@ -176,7 +184,7 @@
                         <mxe:SpinEditor Grid.Row="3" x:Name="GridSize_TextBox" HorizontalContentAlignment="Center" Minimum="1" Value="{Binding PreviewSize}"></mxe:SpinEditor>
                         <Label Grid.Row="4">Opacity</Label>
                         <Slider Grid.Row="5" TickFrequency=".1" TickPlacement="TopLeft" IsSnapToTickEnabled="True" x:Name="GridOpacity_Slider" VerticalAlignment="Center" HorizontalAlignment="Stretch" Minimum="0" Maximum="1" Value="{Binding PreviewOpacity, Mode=TwoWay}"/>
-                        <mxe:SpinEditor Grid.Row="6" HorizontalAlignment="Left" Minimum="0" Increment="0.1" Value="{Binding PreviewOpacity}, Mode=TwoWay"></mxe:SpinEditor>
+                        <mxe:SpinEditor Grid.Row="6" HorizontalAlignment="Left" Minimum="0" Increment="0.1" Value="{Binding PreviewOpacity, Mode=TwoWay, Converter={StaticResource numberToRoundedNumber}, ConverterParameter=1}, Mode=TwoWay"></mxe:SpinEditor>
                         <Label Grid.Row="7" Classes="Primary" Margin="0,10,0,0">Erasing Mask</Label>
                         <mxe:ComboBoxEditor Width="260" HorizontalAlignment="Left" Grid.Row="8" DisplayMember="ImageName" SelectedItem="{Binding SelectedMaskType}" ValueMember="ImageName" Watermark="Select Mask Type..." ItemsSource="{Binding MaskTypes}"/>
                         <Button Grid.Row="8" HorizontalAlignment="Right" VerticalAlignment="Top" Click="AddClippingMaskButton_Click" ToolTip.Tip="Images won't show inside mask">Add</Button>
@@ -192,12 +200,12 @@
                         <mxe:SpinEditor Watermark="0" HorizontalContentAlignment="Left" Grid.Row="1" Grid.Column="1" Margin="0,0,10,0" Value="{Binding Selected.ImageProperties.PositionY}"></mxe:SpinEditor>
 
                         <Label Grid.Row="2">Width</Label>
-                        <mxe:SpinEditor Watermark="100" HorizontalContentAlignment="Left" Grid.Row="3" Margin="0,0,10,0" Value="{Binding Selected.ImageProperties.Width}"></mxe:SpinEditor>
+                        <mxe:SpinEditor Watermark="100" HorizontalContentAlignment="Left" Grid.Row="3" Margin="0,0,10,0" Value="{Binding Selected.ImageProperties.Width, Mode=TwoWay, Converter={StaticResource numberToRoundedNumber}, ConverterParameter=2}"></mxe:SpinEditor>
                         <Label Grid.Row="2" Grid.Column="1">Height</Label>
-                        <mxe:SpinEditor Watermark="100" HorizontalContentAlignment="Left" Grid.Row="3" Grid.Column="1" Margin="0,0,10,0" Value="{Binding Selected.ImageProperties.Height}"></mxe:SpinEditor>
+                        <mxe:SpinEditor Watermark="100" HorizontalContentAlignment="Left" Grid.Row="3" Grid.Column="1" Margin="0,0,10,0" Value="{Binding Selected.ImageProperties.Height, Mode=TwoWay, Converter={StaticResource numberToRoundedNumber}, ConverterParameter=2}"></mxe:SpinEditor>
 
                         <Label Grid.Row="4">Scale</Label>
-                        <Slider Margin="0,0,10,0" Grid.Row="5" Grid.ColumnSpan="2" IsSnapToTickEnabled="True" TickFrequency=".5" TickPlacement="TopLeft" Minimum="0" Maximum="5" Value="{Binding Selected.ImageProperties.Scale}"></Slider>
+                        <Slider Margin="0,0,10,0" Grid.Row="5" Grid.ColumnSpan="2" IsSnapToTickEnabled="True" TickFrequency=".5" TickPlacement="TopLeft" Minimum="0" Maximum="5" Value="{Binding Selected.ImageProperties.Scale, Mode=TwoWay, Converter={StaticResource numberToRoundedNumber}, ConverterParameter=2}"></Slider>
                         <mxe:SpinEditor Grid.Row="6" HorizontalAlignment="Left" Minimum="0" Increment="0.1" Value="{Binding Selected.ImageProperties.Scale, Mode=TwoWay}"></mxe:SpinEditor>
                         <Label Grid.Row="7" >H-Mirror</Label>
                         <ToggleSwitch Grid.Row="7" HorizontalAlignment="Right" IsChecked="{Binding Selected.ImageProperties.IsHMirrored, Mode=TwoWay}"/>
@@ -205,7 +213,7 @@
                         <ToggleSwitch Grid.Row="7" Grid.Column="1" HorizontalAlignment="Right" IsChecked="{Binding Selected.ImageProperties.IsVMirrored, Mode=TwoWay}"/>
 
                         <Label Grid.Row="8">Opacity</Label>
-                        <Slider Margin="0,0,10,0" Grid.Row="9" Grid.ColumnSpan="2" IsSnapToTickEnabled="True" TickFrequency=".1" TickPlacement="TopLeft" x:Name="ImageOpacity_Slider" Value="{Binding Selected.ImageProperties.Opacity, Mode=TwoWay}" HorizontalAlignment="Stretch" Minimum="0" Maximum="1" />
+                        <Slider Margin="0,0,10,0" Grid.Row="9" Grid.ColumnSpan="2" IsSnapToTickEnabled="True" TickFrequency=".1" TickPlacement="TopLeft" x:Name="ImageOpacity_Slider" Value="{Binding Selected.ImageProperties.Opacity, Mode=TwoWay, Converter={StaticResource numberToRoundedNumber}, ConverterParameter=2}" HorizontalAlignment="Stretch" Minimum="0" Maximum="1" />
                         <mxe:SpinEditor Grid.Row="10" HorizontalAlignment="Left" Increment="0.1" Minimum="0" Maximum="1" Value="{Binding Selected.ImageProperties.Opacity, Mode=TwoWay}"></mxe:SpinEditor>
 
                         <Label Grid.Row="11">Visible</Label>

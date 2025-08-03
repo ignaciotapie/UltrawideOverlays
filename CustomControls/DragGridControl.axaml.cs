@@ -105,19 +105,6 @@ namespace UltrawideOverlays.CustomControls
             base.OnPropertyChanged(change);
         }
 
-        protected override Size ArrangeOverride(Size finalSize)
-        {
-            foreach (var child in Children)
-            {
-                if (child is Control control)
-                {
-                    var pos = DragPanel.GetPosition(control);
-                    control.Arrange(new Rect(pos, control.DesiredSize));
-                }
-            }
-            return finalSize;
-        }
-
         protected override void OnInitialized()
         {
             base.OnInitialized();

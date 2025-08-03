@@ -71,11 +71,11 @@ namespace UltrawideOverlays
             var dbProvider = new DatabaseProvider();
             collection.AddSingleton(dbProvider);
             //Data services
-            collection.AddTransient<OverlayDataService>();
-            collection.AddTransient<GamesDataService>();
-            collection.AddTransient<ProcessDataService>();
+            collection.AddSingleton<OverlayDataService>();
+            collection.AddSingleton<GamesDataService>();
+            collection.AddSingleton<ProcessDataService>();
             collection.AddSingleton<ActivityDataService>();
-            collection.AddTransient<GeneralDataService>();
+            collection.AddSingleton<GeneralDataService>();
             collection.AddSingleton<SettingsDataService>();
             //TODO: Global hotkey service...
             HotKeyService hkservice = new HotKeyService();

@@ -16,11 +16,6 @@ namespace UltrawideOverlays.Services
 
         private readonly nint NULL_WINDOW_HANDLE = IntPtr.Zero;
 
-        public HotKeyService()
-        {
-            RegisterHotKeys();
-        }
-
         public void Dispose()
         {
             if (_disposed)
@@ -36,7 +31,7 @@ namespace UltrawideOverlays.Services
             Dispose();
         }
 
-        private void RegisterHotKeys()
+        public void RegisterHotKeys()
         {
             if (_hotkeyThread != null)
                 return;
@@ -68,6 +63,21 @@ namespace UltrawideOverlays.Services
 
             _hotkeyThread.IsBackground = true;
             _hotkeyThread.Start();
+        }
+
+        public void UnregisterHotKeys()
+        {
+            _cancelToken?.Cancel();
+            _hotkeyThread?.Join();
+
+            HotKeysUtils.UnregisterHotKey(NULL_WINDOW_HANDLE, HotKeysUtils.HOTKEY_UNIQUEID.ToggleOverlay);
+            HotKeysUtils.UnregisterHotKey(NULL_WINDOW_HANDLE, HotKeysUtils.HOTKEY_UNIQUEID.OpacityUp);
+            HotKeysUtils.UnregisterHotKey(NULL_WINDOW_HANDLE, HotKeysUtils.HOTKEY_UNIQUEID.OpacityDown);
+            HotKeysUtils.UnregisterHotKey(NULL_WINDOW_HANDLE, HotKeysUtils.HOTKEY_UNIQUEID.OpenMiniOverlayManager);
+
+            _hotkeyThread = null;
+            _cancelToken?.Dispose();
+            _cancelToken = null;
         }
 
         private void RegisterAllHotKeys()
@@ -115,21 +125,6 @@ namespace UltrawideOverlays.Services
                 Debug.WriteLine($"Hotkey triggered: {hotkey}");
                 HotKeyPressed?.Invoke(this, hotkey);
             }
-        }
-
-        private void UnregisterHotKeys()
-        {
-            _cancelToken?.Cancel();
-            _hotkeyThread?.Join();
-
-            HotKeysUtils.UnregisterHotKey(NULL_WINDOW_HANDLE, HotKeysUtils.HOTKEY_UNIQUEID.ToggleOverlay);
-            HotKeysUtils.UnregisterHotKey(NULL_WINDOW_HANDLE, HotKeysUtils.HOTKEY_UNIQUEID.OpacityUp);
-            HotKeysUtils.UnregisterHotKey(NULL_WINDOW_HANDLE, HotKeysUtils.HOTKEY_UNIQUEID.OpacityDown);
-            HotKeysUtils.UnregisterHotKey(NULL_WINDOW_HANDLE, HotKeysUtils.HOTKEY_UNIQUEID.OpenMiniOverlayManager);
-
-            _hotkeyThread = null;
-            _cancelToken?.Dispose();
-            _cancelToken = null;
         }
     }
 }

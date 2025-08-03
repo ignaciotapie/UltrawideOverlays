@@ -1,0 +1,9 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <!-- Add Resources Here -->
+    <SvgSource x:Key="OverlayLogoColored">/Assets/Images/overlay-logo-colored.svg</SvgSource>
+    <SvgSource x:Key="GamesLogoColored">/Assets/Images/joystick-logo-colored.svg</SvgSource>
+    <SvgSource x:Key="TrashIcon">/Assets/Images/trash-icon.svg</SvgSource>
+    <SvgSource x:Key="AddIcon">/Assets/Images/add-icon.svg</SvgSource>
+    <SvgSource x:Key="SaveIcon">/Assets/Images/save-icon.svg</SvgSource>
+</ResourceDictionary>

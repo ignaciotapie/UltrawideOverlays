@@ -23,9 +23,9 @@ namespace UltrawideOverlays.Converters
 
         //Configuration
         private const int MaxCacheSize = 15; //Maximum number of items
-        private const long MaxMemoryBytes = 50 * 1024 * 1024;
-        private readonly TimeSpan _inactivityTimeout = TimeSpan.FromMinutes(1); //Flag bitmap as disposable after X mins unused
-        private readonly TimeSpan _cleanupTimePeriod = TimeSpan.FromMinutes(1); //Cleanup interval
+        private const long MaxMemoryBytes = 100 * 1024 * 1024;
+        private readonly TimeSpan _inactivityTimeout = TimeSpan.FromSeconds(30); //Flag bitmap as disposable after X mins unused
+        private readonly TimeSpan _cleanupTimePeriod = TimeSpan.FromSeconds(10); //Cleanup interval
 
         private class CacheEntry
         {
@@ -55,7 +55,13 @@ namespace UltrawideOverlays.Converters
         public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
         {
             if (value is not string path || string.IsNullOrWhiteSpace(path))
-                return Application.Current?.FindResource("ClippingMaskBitmap") ?? AvaloniaProperty.UnsetValue;
+            {
+                if (Application.Current?.TryFindResource("ClippingMaskBitmap", out object? resource) == true)
+                {
+                    return resource as Bitmap;
+                }
+                return AvaloniaProperty.UnsetValue;
+            }
 
             try
             {

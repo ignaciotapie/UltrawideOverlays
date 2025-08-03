@@ -17,49 +17,11 @@
     </Application.Name>
 
     <Application.Resources>
-        <!--  Color Definition  -->
-        <SolidColorBrush x:Key="PrimaryColor">#1a1a1a</SolidColorBrush>
-        <SolidColorBrush x:Key="SecondaryColor">#1b1d1e</SolidColorBrush>
-        <SolidColorBrush x:Key="PrimaryFontColor">#ffffff</SolidColorBrush>
-        <SolidColorBrush x:Key="SecondaryFontColor">#9ca39f</SolidColorBrush>
-        <SolidColorBrush x:Key="PrimaryAccent">#404040</SolidColorBrush>
-        <SolidColorBrush x:Key="SecondaryAccent">#e57228</SolidColorBrush>
-        <SolidColorBrush x:Key="LinkAccent">#459ff6</SolidColorBrush>
-        <SolidColorBrush x:Key="PrimaryBackground">#0f0f0f</SolidColorBrush>
-        
-         <!-- Home Only Colors-->
-        <SolidColorBrush x:Key="GameColor">#048ca7</SolidColorBrush>
-        <SolidColorBrush x:Key="OverlayColor">#2c0a79</SolidColorBrush>
-        <SolidColorBrush x:Key="SettingsColor">#4ff0ba</SolidColorBrush>
-        
-         <!-- Images and Icons-->
-        <SvgSource x:Key="TvLogo">/Assets/Images/tv-icon-white.svg</SvgSource>
-        <SvgSource x:Key="SettingLogo">/Assets/Images/settings-icon.svg</SvgSource>
-        <SvgSource x:Key="SettingLogoColored">/Assets/Images/settings-icon-colored.svg</SvgSource>
-        <SvgSource x:Key="HomeLogo">/Assets/Images/home-logo.svg</SvgSource>
-        <SvgSource x:Key="OverlayLogo">/Assets/Images/overlay-logo.svg</SvgSource>
-        <SvgSource x:Key="OverlayLogoColored">/Assets/Images/overlay-logo-colored.svg</SvgSource>
-        <SvgSource x:Key="GamesLogo">/Assets/Images/joystick-logo.svg</SvgSource>
-        <SvgSource x:Key="GamesLogoColored">/Assets/Images/joystick-logo-colored.svg</SvgSource>
-        <SvgSource x:Key="CopyIcon">/Assets/Images/copy-icon.svg</SvgSource>
-        <SvgSource x:Key="DeleteIcon">/Assets/Images/delete-icon.svg</SvgSource>
-        <SvgSource x:Key="UploadIcon">/Assets/Images/upload-icon.svg</SvgSource>
-        <SvgSource x:Key="ResizeWidthIcon">/Assets/Images/resize-width-icon.svg</SvgSource>
-        <SvgSource x:Key="ResizeHeightIcon">/Assets/Images/resize-height-icon.svg</SvgSource>
-        <SvgSource x:Key="PlusIcon">/Assets/Images/plus-icon.svg</SvgSource>
-        <SvgSource x:Key="LinkIcon">/Assets/Images/link-icon.svg</SvgSource>
-        <SvgSource x:Key="TrashIcon">/Assets/Images/trash-icon.svg</SvgSource>
-        <SvgSource x:Key="AddIcon">/Assets/Images/add-icon.svg</SvgSource>
-        <SvgSource x:Key="SaveIcon">/Assets/Images/save-icon.svg</SvgSource>
-        <SvgSource x:Key="UpArrowTopIcon">/Assets/Images/up-arrow-top-icon.svg</SvgSource>
-        <SvgSource x:Key="DownArrowBottomIcon">/Assets/Images/down-arrow-bottom-icon.svg</SvgSource>
-        <SvgSource x:Key="UpArrowIcon">/Assets/Images/up-arrow-icon.svg</SvgSource>
-        <SvgSource x:Key="DownArrowIcon">/Assets/Images/down-arrow-icon.svg</SvgSource>
-        <SvgSource x:Key="PencilIcon">/Assets/Images/pencil-icon.svg</SvgSource>
-        <Bitmap x:Key="ClippingMaskBitmap">/Assets/Images/clipping-mask.png</Bitmap>
-
-        <!-- Fonts-->
-        <FontFamily x:Key="PrimaryFont">/Assets/Fonts#Cairo</FontFamily>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <MergeResourceInclude Source="/Resources/AppResources.axaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
     </Application.Resources>
   
     <Application.Styles>

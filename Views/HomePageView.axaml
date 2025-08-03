@@ -24,6 +24,12 @@
         </Style>
     </UserControl.Styles>
     <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceInclude Source="/Resources/HomePageResources.axaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+
         <converters:ActivityTypeToIconSource x:Key="activityIconConverter"/>
     </UserControl.Resources>
 

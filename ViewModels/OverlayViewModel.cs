@@ -48,6 +48,7 @@ namespace UltrawideOverlays.ViewModels
             SettingsDataService = settingsDataService;
             HotKeyService = hotKeyService;
             ActivityDataService = activityService;
+            HotKeyService.RegisterHotKeys();
 
             ImageOpacity = 1;
             IsOverlayEnabled = true;
@@ -59,6 +60,7 @@ namespace UltrawideOverlays.ViewModels
         ~OverlayViewModel()
         {
             Debug.WriteLine("OverlayViewModel finalized!");
+            HotKeyService.UnregisterHotKeys();
 
             FocusMonitorService.FocusChanged -= FocusChangedHandler;
             HotKeyService.HotKeyPressed -= HotkeyPressedHandler;
@@ -95,8 +97,8 @@ namespace UltrawideOverlays.ViewModels
                 var overlay = await OverlayDataService.LoadOverlayAsync(game.OverlayName);
                 if (overlay != null)
                 {
-                    ActivityDataService.SaveActivity(new ActivityLogModel(System.DateTime.Now, ActivityLogType.Overlays, ActivityLogAction.Viewed, overlay.Name));
                     ImageSource = overlay.Path;
+                    ActivityDataService.SaveActivity(new ActivityLogModel(System.DateTime.Now, ActivityLogType.Overlays, ActivityLogAction.Viewed, overlay.Name));
                 }
                 else
                 {

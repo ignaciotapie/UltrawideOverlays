@@ -13,6 +13,14 @@
         <vm:GamesPageViewModel/>
     </Design.DataContext>
 
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceInclude Source="/Resources/GamesPageResources.axaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+
     <UserControl.Styles>
         <Style Selector="Button">
             <Setter Property="VerticalContentAlignment" Value="Center"/>

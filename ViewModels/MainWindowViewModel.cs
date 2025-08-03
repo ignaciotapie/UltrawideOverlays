@@ -37,6 +37,7 @@ namespace UltrawideOverlays.ViewModels
 
         ~MainWindowViewModel()
         {
+            CurrentPage = null;
             Debug.WriteLine("MainWindowViewModel finalized!");
         }
 
