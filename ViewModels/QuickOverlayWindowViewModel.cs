@@ -56,6 +56,11 @@ namespace UltrawideOverlays.ViewModels
             FindApp();
         }
 
+        ~QuickOverlayWindowViewModel()
+        {
+            Dispose();
+        }
+
         ///////////////////////////////////////////
         /// PRIVATE FUNCTIONS
         ///////////////////////////////////////////
@@ -125,11 +130,21 @@ namespace UltrawideOverlays.ViewModels
             {
                 return;
             }
-
+            //TODO: This is violating MVVM, VM shouldn't interfere with views, we can ask the App to open it but not to influence it...
             windowInstance = WindowFactory.CreateWindow(Enums.WindowViews.OverlayEditorWindow);
             windowInstance.Show();
 
             windowInstance.Closed += OnOverlayEditorWindowClosed;
+        }
+
+        public override void Dispose()
+        {
+            if (windowInstance != null)
+            {
+                windowInstance.Closed -= OnOverlayEditorWindowClosed;
+                windowInstance.DataContext = null;
+                windowInstance = null;
+            }
         }
     }
 }

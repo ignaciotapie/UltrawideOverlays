@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using System;
 using System.Diagnostics;
 using UltrawideOverlays.Enums;
 using UltrawideOverlays.Factories;
@@ -37,14 +38,21 @@ namespace UltrawideOverlays.ViewModels
 
         ~MainWindowViewModel()
         {
-            CurrentPage = null;
-            Debug.WriteLine("MainWindowViewModel finalized!");
+            Dispose();
         }
 
         public MainWindowViewModel(PageFactory PFactory)
         {
             factory = PFactory;
             NavigateToHomePage();
+        }
+
+        partial void OnCurrentPageChanged(PageViewModel? oldValue, PageViewModel? newValue)
+        {
+            if (oldValue != null)
+            {
+                oldValue.Dispose();
+            }
         }
 
         ///////////////////////////////////////////
@@ -104,6 +112,13 @@ namespace UltrawideOverlays.ViewModels
 
             CurrentPage = factory.GetPageViewModel(Enums.ApplicationPageViews.SettingsPage);
             pageEnum = Enums.ApplicationPageViews.SettingsPage;
+        }
+
+        public override void Dispose()
+        {
+            CurrentPage = null;
+            Debug.WriteLine("MainWindowViewModel finalized!");
+            GC.SuppressFinalize(this);
         }
     }
 }

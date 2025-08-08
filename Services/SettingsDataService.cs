@@ -37,7 +37,7 @@ namespace UltrawideOverlays.Services
         {
             var db = await _provider.GetDatabaseAsync();
 
-            return db.Settings.Clone() as SettingsDataModel;
+            return db.Settings.Clone();
         }
 
         public async Task SaveSettingsAsync(SettingsDataModel newSettings)
@@ -67,7 +67,7 @@ namespace UltrawideOverlays.Services
             var oldSettings = await LoadSettingsAsync();
 
             //Grab a clone of oldSettings and update this newer one.
-            var newSettings = oldSettings.Clone() as SettingsDataModel;
+            var newSettings = oldSettings.Clone();
             newSettings.AddOrUpdate(setting.Name, setting);
 
             await SaveSettingsAsync(newSettings);

@@ -3,11 +3,8 @@ using System;
 
 namespace UltrawideOverlays.Models
 {
-    public class ModelBase : ObservableObject, ICloneable
+    public abstract class ModelBase : ObservableObject, ICloneable
     {
-        public virtual object Clone()
-        {
-            return MemberwiseClone();
-        }
+        public abstract object Clone();
     }
 }

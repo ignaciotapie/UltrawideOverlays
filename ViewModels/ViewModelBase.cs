@@ -1,8 +1,10 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using System;
 
 namespace UltrawideOverlays.ViewModels
 {
-    public class ViewModelBase : ObservableObject
+    public abstract class ViewModelBase : ObservableObject, IDisposable
     {
+        public abstract void Dispose();
     }
 }

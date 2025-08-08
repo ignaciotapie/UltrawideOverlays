@@ -6,6 +6,7 @@
              xmlns:cc="using:UltrawideOverlays.CustomControls"
              xmlns:converters="using:UltrawideOverlays.Converters"
              xmlns:models="using:UltrawideOverlays.Models"
+             xmlns:wrappers="using:UltrawideOverlays.Wrappers"
              mc:Ignorable="d" d:DesignWidth="1200" d:DesignHeight="1000"
              Background="{DynamicResource PrimaryBackground}"
              x:DataType="vm:OverlaysPageViewModel"
@@ -74,7 +75,7 @@
                             <Grid>
                                 <cc:VisualGrid Color="#16212c" GridSize="20">
                                 </cc:VisualGrid>
-                                <cc:ScalableImage VerticalAlignment="Center" Source="{Binding SelectedOverlay.Path, Converter={x:Static converters:PathToCachedBitmapConverter.Instance}}"/>
+                                <cc:ScalableImage VerticalAlignment="Center" Source="{Binding SelectedOverlayImage.ImageSource}"/>
                             </Grid>
                         </Border>
                     </Border>

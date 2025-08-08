@@ -102,5 +102,30 @@ namespace UltrawideOverlays.Models
 
         [ObservableProperty]
         private int _zIndex = 0;
+
+        public override string ToString()
+        {
+            return $"ImagePropertiesModel: Position=({PositionX}, {PositionY}), Size=({Width}x{Height}), Scale={Scale}, " +
+                   $"Mirroring=({IsHMirrored}, {IsVMirrored}), Opacity={Opacity}, Visible={IsVisible}, Draggable={IsDraggable}, ZIndex={ZIndex}";
+        }
+
+        public override ImagePropertiesModel Clone()
+        {
+            return new ImagePropertiesModel
+            {
+                Position = this.Position,
+                OriginalWidth = this.OriginalWidth,
+                OriginalHeight = this.OriginalHeight,
+                Width = this.Width,
+                Height = this.Height,
+                Scale = this.Scale,
+                IsHMirrored = this.IsHMirrored,
+                IsVMirrored = this.IsVMirrored,
+                Opacity = this.Opacity,
+                IsVisible = this.IsVisible,
+                IsDraggable = this.IsDraggable,
+                ZIndex = this.ZIndex
+            };
+        }
     }
 }

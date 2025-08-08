@@ -12,5 +12,16 @@ namespace UltrawideOverlays.Models
         public string Path { get; set; }
 
         public uint ProcessId { get; set; }
+
+        public override object Clone()
+        {
+            return new ProcessDataModel
+            {
+                Name = this.Name,
+                Icon = this.Icon,
+                Path = this.Path,
+                ProcessId = this.ProcessId
+            };
+        }
     }
 }

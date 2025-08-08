@@ -5,10 +5,11 @@ using System;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
-using UltrawideOverlays.Converters;
+using UltrawideOverlays.Decorator;
 using UltrawideOverlays.Factories;
 using UltrawideOverlays.Models;
 using UltrawideOverlays.Services;
+using UltrawideOverlays.Wrappers;
 
 namespace UltrawideOverlays.ViewModels
 {
@@ -24,10 +25,14 @@ namespace UltrawideOverlays.ViewModels
         private int _selectedOverlayIndex;
 
         [ObservableProperty]
+        private OverlayWrapper? _selectedOverlayImage;
+
+        [ObservableProperty]
         private string _searchBoxText;
 
-        private readonly WindowFactory? factory;
-        private readonly OverlayDataService? overlayDataService;
+        private readonly WindowFactory? WindowFactory;
+        private readonly OverlayDataService? OverlayDataService;
+        private readonly ImageWrapperDecorator? WrapperDecorator;
 
         public ObservableCollection<OverlayDataModel> Overlays { get; }
 
@@ -55,21 +60,22 @@ namespace UltrawideOverlays.ViewModels
 
         ~OverlaysPageViewModel()
         {
-            Debug.WriteLine("OverlaysPageViewModel finalized!");
+            Dispose();
         }
 
         ///////////////////////////////////////////
         /// PUBLIC FUNCTIONS
         ///////////////////////////////////////////
 
-        public OverlaysPageViewModel(OverlayDataService service, WindowFactory WFactory)
+        public OverlaysPageViewModel(OverlayDataService service, WindowFactory WFactory, ImageWrapperDecorator wrapperDecorator, ImageCacheService cacheService)
         {
             Page = Enums.ApplicationPageViews.OverlaysPage;
             PageName = "Overlays";
 
             Overlays = new ObservableCollection<OverlayDataModel>();
-            factory = WFactory;
-            overlayDataService = service;
+            WindowFactory = WFactory;
+            OverlayDataService = service;
+            WrapperDecorator = wrapperDecorator;
 
             LoadOverlaysAsync();
         }
@@ -108,13 +114,19 @@ namespace UltrawideOverlays.ViewModels
 
         partial void OnSelectedOverlayChanged(OverlayDataModel? value)
         {
+            if (SelectedOverlayImage != null)
+            {
+                SelectedOverlayImage.Dispose();
+            }
             if (value != null)
             {
                 SelectedOverlayIndex = Overlays.IndexOf(value);
+                SelectedOverlayImage = WrapperDecorator?.CreateOverlayWrapper(value, value.Path);
             }
             else
             {
                 SelectedOverlayIndex = -1; // No overlay selected
+                SelectedOverlayImage = null;
             }
         }
 
@@ -125,7 +137,7 @@ namespace UltrawideOverlays.ViewModels
         {
             try
             {
-                var overlays = await overlayDataService.LoadAllOverlaysAsync();
+                var overlays = await OverlayDataService.LoadAllOverlaysAsync();
                 if (overlays != null)
                 {
                     Overlays.Clear();
@@ -151,10 +163,8 @@ namespace UltrawideOverlays.ViewModels
             if (sender is Window window)
             {
                 window.Closed -= OverlayWindowClosed;
-                window.DataContext = null;
             }
 
-            PathToCachedBitmapConverter.Instance.ClearCache();
             LoadOverlaysAsync();
         }
 
@@ -165,12 +175,12 @@ namespace UltrawideOverlays.ViewModels
         [RelayCommand]
         private void AddNewButton()
         {
-            if (factory == null)
+            if (WindowFactory == null)
             {
                 return;
             }
 
-            var window = factory.CreateWindow(Enums.WindowViews.OverlayEditorWindow);
+            var window = WindowFactory.CreateWindow(Enums.WindowViews.OverlayEditorWindow);
             window.Show();
 
             window.Closed += OverlayWindowClosed;
@@ -179,13 +189,13 @@ namespace UltrawideOverlays.ViewModels
         [RelayCommand]
         private void EditButton()
         {
-            if (factory == null) return;
+            if (WindowFactory == null) return;
             if (SelectedOverlayIndex < 0 || SelectedOverlayIndex >= Overlays.Count)
             {
                 return; // No overlay selected
             }
 
-            var window = factory.CreateWindow(Enums.WindowViews.OverlayEditorWindow, Overlays[SelectedOverlayIndex]);
+            var window = WindowFactory.CreateWindow(Enums.WindowViews.OverlayEditorWindow, Overlays[SelectedOverlayIndex]);
             window.Show();
 
             window.Closed += OverlayWindowClosed;
@@ -199,14 +209,28 @@ namespace UltrawideOverlays.ViewModels
                 return; // No overlay selected
             }
 
+            var wrapperToDelete = SelectedOverlayImage;
             var overlayToDelete = Overlays[SelectedOverlayIndex];
-            Overlays.RemoveAt(SelectedOverlayIndex);
 
-            // Optionally, you can also delete the overlay from the database
-            if (overlayDataService != null)
+            Overlays.RemoveAt(SelectedOverlayIndex);
+            wrapperToDelete.Dispose();
+
+            if (OverlayDataService != null)
             {
-                overlayDataService.DeleteOverlayAsync(overlayToDelete);
+                OverlayDataService.DeleteOverlayAsync(overlayToDelete);
             }
+        }
+
+        public override void Dispose()
+        {
+            if (SelectedOverlayImage != null)
+            {
+                SelectedOverlayImage.Dispose();
+                SelectedOverlayImage = null;
+            }
+            GC.SuppressFinalize(this);
+
+            Debug.WriteLine("OverlaysPageViewModel finalized!");
         }
     }
 }

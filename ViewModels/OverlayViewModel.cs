@@ -1,15 +1,17 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using System.Diagnostics;
+using UltrawideOverlays.Decorator;
 using UltrawideOverlays.Enums;
 using UltrawideOverlays.Models;
 using UltrawideOverlays.Services;
+using UltrawideOverlays.Wrappers;
 
 namespace UltrawideOverlays.ViewModels
 {
     public partial class OverlayViewModel : ViewModelBase
     {
         [ObservableProperty]
-        private string? _imageSource;
+        private OverlayWrapper? _selectedOverlay;
 
         [ObservableProperty]
         private double? _imageOpacity;
@@ -23,6 +25,8 @@ namespace UltrawideOverlays.ViewModels
         private readonly SettingsDataService SettingsDataService;
         private readonly HotKeyService HotKeyService;
         private readonly ActivityDataService ActivityDataService;
+
+        private readonly ImageWrapperDecorator imageWrapperDecorator;
 
         ///////////////////////////////////////////
         /// CONSTRUCTOR
@@ -40,7 +44,8 @@ namespace UltrawideOverlays.ViewModels
                                 SettingsDataService settingsDataService,
                                 FocusMonitorService focusMonitorService,
                                 HotKeyService hotKeyService,
-                                ActivityDataService activityService)
+                                ActivityDataService activityService,
+                                ImageWrapperDecorator wrapperDecorator)
         {
             OverlayDataService = overlayDataService;
             FocusMonitorService = focusMonitorService;
@@ -48,6 +53,7 @@ namespace UltrawideOverlays.ViewModels
             SettingsDataService = settingsDataService;
             HotKeyService = hotKeyService;
             ActivityDataService = activityService;
+            imageWrapperDecorator = wrapperDecorator;
             HotKeyService.RegisterHotKeys();
 
             ImageOpacity = 1;
@@ -59,11 +65,7 @@ namespace UltrawideOverlays.ViewModels
 
         ~OverlayViewModel()
         {
-            Debug.WriteLine("OverlayViewModel finalized!");
-            HotKeyService.UnregisterHotKeys();
-
-            FocusMonitorService.FocusChanged -= FocusChangedHandler;
-            HotKeyService.HotKeyPressed -= HotkeyPressedHandler;
+            Dispose();
         }
 
         ///////////////////////////////////////////
@@ -97,23 +99,25 @@ namespace UltrawideOverlays.ViewModels
                 var overlay = await OverlayDataService.LoadOverlayAsync(game.OverlayName);
                 if (overlay != null)
                 {
-                    ImageSource = overlay.Path;
+                    SelectedOverlay = imageWrapperDecorator.CreateOverlayWrapper(overlay, overlay.Path);
                     ActivityDataService.SaveActivity(new ActivityLogModel(System.DateTime.Now, ActivityLogType.Overlays, ActivityLogAction.Viewed, overlay.Name));
                 }
                 else
                 {
-                    ImageSource = null; // No overlay found for this game
+                    if (SelectedOverlay != null) SelectedOverlay.Dispose();
+                    SelectedOverlay = null; // No overlay found for this game
                 }
             }
             else
             {
-                ImageSource = null; // No game found for this file path
+                if (SelectedOverlay != null) SelectedOverlay.Dispose();
+                SelectedOverlay = null; // No game found for this file path
             }
         }
 
         private void DecreaseOverlayOpacity()
         {
-            if (ImageSource != null && ImageOpacity.HasValue && ImageOpacity >= 0.1)
+            if (SelectedOverlay != null && ImageOpacity.HasValue && ImageOpacity >= 0.1)
             {
                 ImageOpacity -= 0.1;
             }
@@ -121,7 +125,7 @@ namespace UltrawideOverlays.ViewModels
 
         private void IncreaseOverlayOpacity()
         {
-            if (ImageSource != null && ImageOpacity.HasValue && ImageOpacity <= 0.9)
+            if (SelectedOverlay != null && ImageOpacity.HasValue && ImageOpacity <= 0.9)
             {
                 ImageOpacity += 0.1;
             }
@@ -129,10 +133,25 @@ namespace UltrawideOverlays.ViewModels
 
         private void ToggleOverlay()
         {
-            if (ImageSource != null)
+            if (SelectedOverlay != null)
             {
                 IsOverlayEnabled = !IsOverlayEnabled;
             }
+        }
+
+        public override void Dispose()
+        {
+            Debug.WriteLine("OverlayViewModel finalized!");
+            HotKeyService.UnregisterHotKeys();
+
+            if (SelectedOverlay != null)
+            {
+                SelectedOverlay.Dispose();
+                SelectedOverlay = null;
+            }
+
+            FocusMonitorService.FocusChanged -= FocusChangedHandler;
+            HotKeyService.HotKeyPressed -= HotkeyPressedHandler;
         }
     }
 }

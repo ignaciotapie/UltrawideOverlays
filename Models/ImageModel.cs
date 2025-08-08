@@ -48,9 +48,19 @@ namespace UltrawideOverlays.Models
             }
         }
 
+        public override string ToString()
+        {
+            return $"ImageModel: {ImageName} ({ImagePath}) - Properties: {ImageProperties.ToString()}";
+        }
+
         public override ImageModel Clone()
         {
-            return new ImageModel(ImagePath, ImageName, ImageProperties.Clone() as ImagePropertiesModel);
+            return new ImageModel
+            {
+                ImagePath = this.ImagePath,
+                ImageName = this.ImageName,
+                ImageProperties = ImageProperties.Clone()
+            };
         }
     }
 }

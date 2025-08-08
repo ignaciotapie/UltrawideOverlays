@@ -141,7 +141,7 @@ namespace UltrawideOverlays.ViewModels
 
         ~GamesPageViewModel()
         {
-            Debug.WriteLine("GamesPageViewModel finalized!");
+            Dispose();
         }
 
         ///////////////////////////////////////////
@@ -291,6 +291,12 @@ namespace UltrawideOverlays.ViewModels
                     SelectedProcess = null;
                 }
             }
+        }
+
+        public override void Dispose()
+        {
+            Debug.WriteLine("GamesPageViewModel finalized!");
+            GC.SuppressFinalize(this);
         }
     }
 }

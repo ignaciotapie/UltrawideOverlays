@@ -118,7 +118,8 @@ namespace UltrawideOverlays.Services
                 default:
                     hotkey = null;
                     break;
-            };
+            }
+            ;
 
             if (hotkey != null)
             {

@@ -15,7 +15,7 @@
     <SolidColorBrush x:Key="OverlayColor">#2c0a79</SolidColorBrush>
     <SolidColorBrush x:Key="SettingsColor">#4ff0ba</SolidColorBrush>
 
-    <Bitmap x:Key="ClippingMaskBitmap">/Assets/Images/clipping-mask.png</Bitmap>
+    <Bitmap x:Key="ClippingMask">/Assets/Images/clipping-mask.png</Bitmap>
 
     <FontFamily x:Key="PrimaryFont">/Assets/Fonts#Cairo</FontFamily>
 </ResourceDictionary>

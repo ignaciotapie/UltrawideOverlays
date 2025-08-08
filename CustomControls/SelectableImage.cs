@@ -3,18 +3,20 @@ using Avalonia.Controls;
 using Avalonia.Data;
 using Avalonia.Layout;
 using Avalonia.Media;
+using System;
 using System.ComponentModel;
+using System.Diagnostics;
 using UltrawideOverlays.Converters;
 using UltrawideOverlays.Models;
 using UltrawideOverlays.Utils;
+using UltrawideOverlays.Wrappers;
 
 namespace UltrawideOverlays.CustomControls
 {
-    public class SelectableImage : SelectableItemBase
+    public class SelectableImage : SelectableItemBase, IDisposable
     {
         public readonly ImageModel? ImageModel;
         public Image? image;
-        public Border? border;
         private bool disposedValue;
 
         private static readonly BoxShadows boxShadow = new BoxShadows(new BoxShadow
@@ -34,10 +36,10 @@ namespace UltrawideOverlays.CustomControls
             OffsetY = 0
         });
 
-        public SelectableImage(ImageModel im)
+        public SelectableImage(ImageWrapper wrapper)
         {
-            ImageModel = im;
-            DataContext = im;
+            ImageModel = wrapper.Model as ImageModel;
+            DataContext = wrapper;
             Background = Brushes.Transparent;
             HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Left;
             VerticalAlignment = Avalonia.Layout.VerticalAlignment.Top;
@@ -50,35 +52,22 @@ namespace UltrawideOverlays.CustomControls
                 VerticalAlignment = Avalonia.Layout.VerticalAlignment.Top,
                 Stretch = Stretch.Fill
             };
-            image.Bind(Image.SourceProperty, new Binding("ImagePath")
+            image.Bind(Image.SourceProperty, new Binding("ImageSource")
             {
-                Converter = PathToCachedBitmapConverter.Instance,
-                Mode = BindingMode.OneWay
+                Converter = new NullToImageConverter()
             });
 
-            image.Bind(Image.WidthProperty, new Binding("ImageProperties.Width", BindingMode.TwoWay));
-            image.Bind(Image.HeightProperty, new Binding("ImageProperties.Height", BindingMode.TwoWay));
-            image.Bind(Image.OpacityProperty, new Binding("ImageProperties.Opacity", BindingMode.TwoWay));
-            image.Bind(Image.IsVisibleProperty, new Binding("ImageProperties.IsVisible", BindingMode.TwoWay));
+            image.Bind(Image.WidthProperty, new Binding("Model.ImageProperties.Width", BindingMode.TwoWay));
+            image.Bind(Image.HeightProperty, new Binding("Model.ImageProperties.Height", BindingMode.TwoWay));
+            image.Bind(Image.OpacityProperty, new Binding("Model.ImageProperties.Opacity", BindingMode.TwoWay));
+            image.Bind(Image.IsVisibleProperty, new Binding("Model.ImageProperties.IsVisible", BindingMode.TwoWay));
 
-            Bind(ToolTip.TipProperty, new Binding("ImageName"));
-            Bind(DragPanel.DraggableProperty, new Binding("ImageProperties.IsDraggable", BindingMode.TwoWay));
-            Bind(DragPanel.PositionProperty, new Binding("ImageProperties.Position", BindingMode.TwoWay));
-            Bind(ZIndexProperty, new Binding("ImageProperties.ZIndex", BindingMode.TwoWay));
+            Bind(ToolTip.TipProperty, new Binding("Model.ImageName"));
+            Bind(DragPanel.DraggableProperty, new Binding("Model.ImageProperties.IsDraggable", BindingMode.TwoWay));
+            Bind(DragPanel.PositionProperty, new Binding("Model.ImageProperties.Position", BindingMode.TwoWay));
+            Bind(ZIndexProperty, new Binding("Model.ImageProperties.ZIndex", BindingMode.TwoWay));
 
-            border = new Border
-            {
-                Child = image,
-                IsHitTestVisible = false,
-                Background = Brushes.Transparent,
-                Padding = new Thickness(0),
-                CornerRadius = new CornerRadius(0),
-                BorderThickness = new Thickness(0),
-                HorizontalAlignment = HorizontalAlignment.Left,
-                VerticalAlignment = VerticalAlignment.Top
-            };
-
-            Child = border;
+            Child = image;
         }
 
 
@@ -87,16 +76,23 @@ namespace UltrawideOverlays.CustomControls
         ///////////////////////////////////////////
         private void ImageModelPropertiesPropertyChange(object? sender, PropertyChangedEventArgs e)
         {
+            Debug.WriteLine($"ImageModelProperties Changed, properties: {sender.ToString()}");
             if (e.PropertyName == nameof(ImagePropertiesModel.IsHMirrored) ||
                 e.PropertyName == nameof(ImagePropertiesModel.IsVMirrored) ||
                 e.PropertyName == nameof(ImagePropertiesModel.Scale))
             {
                 UpdateTransform();
             }
+            if (e.PropertyName == nameof(ImagePropertiesModel.Width) ||
+                e.PropertyName == nameof(ImagePropertiesModel.Height))
+            {
+                InvalidateMeasure();
+            }
         }
 
         private void ImageModelPropertyChange(object? sender, PropertyChangedEventArgs e)
         {
+            Debug.WriteLine($"ImageModel Changed, properties: {sender.ToString()}");
             if (e.PropertyName == nameof(ImageModel.ImagePath) ||
                 e.PropertyName == nameof(ImageModel.ImageName))
             {
@@ -105,8 +101,7 @@ namespace UltrawideOverlays.CustomControls
         }
         private void UpdateSelectionVisual()
         {
-            if (border == null) return;
-            border.BoxShadow = IsSelected ? boxShadow : invisibleShadow;
+            BoxShadow = IsSelected ? boxShadow : invisibleShadow;
         }
 
         private void RefreshBitmap()
@@ -144,12 +139,12 @@ namespace UltrawideOverlays.CustomControls
 
         protected override Size MeasureOverride(Size availableSize)
         {
-            return LayoutHelper.MeasureChild(Child, availableSize, new Thickness(0), new Thickness(0));
+            return LayoutHelper.MeasureChild(Child, new Size(ImageModel.ImageProperties.Width, ImageModel.ImageProperties.Height), new Thickness(0), new Thickness(0));
         }
 
         protected override Size ArrangeOverride(Size finalSize)
         {
-            return LayoutHelper.ArrangeChild(Child, finalSize, new Thickness(0), new Thickness(0));
+            return LayoutHelper.ArrangeChild(Child, new Size(ImageModel.ImageProperties.Width, ImageModel.ImageProperties.Height), new Thickness(0), new Thickness(0));
         }
 
         protected override void OnItemSelectedChanged(bool isSelected)
@@ -168,7 +163,7 @@ namespace UltrawideOverlays.CustomControls
             RenderTransform = new MatrixTransform(mirroringMatrix);
         }
 
-        public new void Dispose()
+        public void Dispose()
         {
             if (!disposedValue)
             {
@@ -179,14 +174,14 @@ namespace UltrawideOverlays.CustomControls
                     ImageModel.PropertyChanged -= ImageModelPropertyChange;
 
                 image = null;
-                border = null;
                 Child = null;
 
                 ClearValue(ToolTip.TipProperty);
 
                 disposedValue = true;
+                (DataContext as ImageWrapper)?.Dispose();
+                DataContext = null;
             }
-            base.Dispose();
         }
     }
 }

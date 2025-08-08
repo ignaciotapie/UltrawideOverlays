@@ -10,9 +10,11 @@ namespace UltrawideOverlays.Services
     public class OverlayDataService
     {
         private readonly DatabaseProvider _provider;
-        public OverlayDataService(DatabaseProvider db)
+        private readonly ImageCacheService _cacheService;
+        public OverlayDataService(DatabaseProvider db, ImageCacheService cacheService)
         {
             _provider = db;
+            _cacheService = cacheService;
         }
         public async Task<ICollection<OverlayDataModel>> LoadAllOverlaysAsync()
         {
@@ -41,6 +43,8 @@ namespace UltrawideOverlays.Services
             if (createImage)
             {
                 tasks.Add(db.SaveBitmapFromOverlayAsync(overlay));
+
+                _cacheService.InvalidateCache(overlay.Path);
             }
 
             tasks.Add(db.SaveAsync(overlay, DatabaseFiles.Overlays, true));

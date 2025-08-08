@@ -43,12 +43,12 @@ namespace UltrawideOverlays.Models
             }
         }
 
-        public override object Clone()
+        public override SettingsDataModel Clone()
         {
             var clone = new SettingsDataModel();
             foreach (var setting in SettingsDictionary)
             {
-                clone.AddOrUpdate(setting.Key, setting.Value.Clone() as SingleSettingModel);
+                clone.AddOrUpdate(setting.Key, setting.Value.Clone());
             }
             return clone;
         }

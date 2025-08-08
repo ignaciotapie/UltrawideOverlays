@@ -27,10 +27,7 @@ public partial class OverlayView : Window
         this.Height = Screens.Primary.Bounds.Height;
         this.CanResize = false;
 
-        Bind(ImageSourceExistsProperty, new Binding("ImageSource")
-        {
-            Converter = Avalonia.Data.Converters.StringConverters.IsNotNullOrEmpty
-        });
+        Bind(ImageSourceExistsProperty, new Binding("IsOverlayEnabled"));
     }
 
     ///////////////////////////////////////////

@@ -6,7 +6,7 @@ using Avalonia.Markup.Xaml;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Linq;
-using UltrawideOverlays.Converters;
+using UltrawideOverlays.Decorator;
 using UltrawideOverlays.Enums;
 using UltrawideOverlays.Factories;
 using UltrawideOverlays.Services;
@@ -36,8 +36,9 @@ namespace UltrawideOverlays
                     case Enums.WindowViews.OverlayEditorWindow:
                         return new OverlayEditorWindowView
                         {
-                            DataContext = new OverlayEditorWindowViewModel(provider.GetRequiredService<OverlayDataService>(), provider.GetRequiredService<SettingsDataService>(), args)
+                            DataContext = new OverlayEditorWindowViewModel(provider.GetRequiredService<OverlayDataService>(), provider.GetRequiredService<SettingsDataService>(), provider.GetRequiredService<ImageWrapperDecorator>(), args)
                         };
+
                     case Enums.WindowViews.MainWindow:
                         var window = new MainWindow
                         {
@@ -74,22 +75,21 @@ namespace UltrawideOverlays
             collection.AddSingleton<OverlayDataService>();
             collection.AddSingleton<GamesDataService>();
             collection.AddSingleton<ProcessDataService>();
-            collection.AddSingleton<ActivityDataService>();
             collection.AddSingleton<GeneralDataService>();
-            collection.AddSingleton<SettingsDataService>();
-            //TODO: Global hotkey service...
-            HotKeyService hkservice = new HotKeyService();
-            collection.AddSingleton<HotKeyService>(hkservice);
 
-            var focusMonitorService = new FocusMonitorService();
-            collection.AddSingleton(focusMonitorService);
+            collection.AddSingleton<ActivityDataService>();
+            collection.AddSingleton<SettingsDataService>();
+            collection.AddSingleton<ImageCacheService>();
+            collection.AddSingleton<HotKeyService>();
+            collection.AddSingleton<FocusMonitorService>();
 
             //Factories
-            collection.AddTransient<PageFactory>();
-            collection.AddTransient<WindowFactory>();
+            collection.AddSingleton<PageFactory>();
+            collection.AddSingleton<WindowFactory>();
+            collection.AddSingleton<ImageWrapperDecorator>();
 
             //ViewModel factories
-            collection.AddTransient<Func<Enums.ApplicationPageViews, PageViewModel>>(x => pageName => pageName switch
+            collection.AddSingleton<Func<Enums.ApplicationPageViews, PageViewModel>>(x => pageName => pageName switch
             {
                 Enums.ApplicationPageViews.HomePage => x.GetRequiredService<HomePageViewModel>(),
                 Enums.ApplicationPageViews.OverlaysPage => x.GetRequiredService<OverlaysPageViewModel>(),
@@ -98,10 +98,10 @@ namespace UltrawideOverlays
                 _ => throw new InvalidOperationException($"No ViewModel found for {pageName}")
             });
 
-            collection.AddTransient<Func<Enums.WindowViews, object?, Window>>(x => (windowEnum, args) => CreateWindow(x, windowEnum, args));
+            collection.AddSingleton<Func<Enums.WindowViews, object?, Window>>(x => (windowEnum, args) => CreateWindow(x, windowEnum, args));
 
             //Main Window
-            collection.AddSingleton<AppViewModel>();
+            collection.AddTransient<AppViewModel>();
             collection.AddTransient<MainWindowViewModel>();
             //PageViewModels
             collection.AddTransient<HomePageViewModel>();
@@ -196,8 +196,6 @@ namespace UltrawideOverlays
                     {
                         mainWindow.Hide();
                     }
-
-                    PathToCachedBitmapConverter.Instance.ClearCache();
                 }
             }
         }

@@ -1,29 +1,42 @@
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Data;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Platform.Storage;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Collections.Specialized;
-using System.ComponentModel;
 using System.Linq;
-using UltrawideOverlays.Converters;
 using UltrawideOverlays.CustomControls;
-using UltrawideOverlays.Models;
 using UltrawideOverlays.Utils;
-using UltrawideOverlays.ViewModels;
+using UltrawideOverlays.Wrappers;
 
 namespace UltrawideOverlays.Views;
 
 public partial class OverlayEditorWindowView : Window
 {
-    private DragGridControl dragGridControl;
-    private Dictionary<ImageModel, SelectableImage> modelImageDictionary;
+    public static readonly StyledProperty<object?> SelectedProperty =
+        AvaloniaProperty.Register<OverlayEditorWindowView, object?>(nameof(Selected));
+    public object? Selected
+    {
+        get => GetValue(SelectedProperty);
+        set => SetValue(SelectedProperty, value);
+    }
 
-    private ImageModel? copiedImageModel;
-    private OverlayEditorWindowViewModel? vmInstance;
+    public static readonly StyledProperty<ObservableCollection<ImageWrapper>> ItemsSourceProperty =
+        AvaloniaProperty.Register<OverlayEditorWindowView, ObservableCollection<ImageWrapper>>(nameof(ItemsSourceProperty));
+
+    public ObservableCollection<ImageWrapper> ItemsSource
+    {
+        get => GetValue(ItemsSourceProperty);
+        set => SetValue(ItemsSourceProperty, value);
+    }
+
+    private DragGridControl dragGridControl;
+    private Dictionary<object?, SelectableImage> modelImageDictionary;
 
     ///////////////////////////////////////////
     /// CONSTRUCTOR
@@ -31,7 +44,6 @@ public partial class OverlayEditorWindowView : Window
     public OverlayEditorWindowView()
     {
         InitializeComponent();
-        PositionProperties();
 
         //TODO: Make screen agnostic
         var screen = Screens.Primary;
@@ -43,55 +55,62 @@ public partial class OverlayEditorWindowView : Window
         }
 
         dragGridControl = MainDragGrid;
-        modelImageDictionary = new Dictionary<ImageModel, SelectableImage>();
+        modelImageDictionary = [];
 
+        PositionProperties();
+        SetBindings();
+    }
+
+    private void SetBindings()
+    {
+        Bind(ItemsSourceProperty, new Binding("Images"));
+        Bind(SelectedProperty, new Binding("Selected")
+        {
+            Mode = BindingMode.TwoWay
+        });
         AddHandler(DragDrop.DropEvent, Drop);
         AddHandler(DragDrop.DragOverEvent, DragOver);
-        Loaded += OnLoaded;
-        Unloaded += OnUnloaded;
-        PropertyChanged += OnPropertyChanged;
 
-        AddHandler(KeyDownEvent, KeyDownHandler);
+        ItemsSourceProperty.Changed.Subscribe((args) =>
+        {
+            HandleItemsSource(args);
+        });
+        SelectedProperty.Changed.Subscribe((args) =>
+        {
+            HandleImageSelection(args);
+        });
+        Window.WindowStateProperty.Changed.Subscribe((args) =>
+        {
+            PositionProperties();
+        });
+        Window.BoundsProperty.Changed.Subscribe((args) =>
+        {
+            PositionProperties();
+        });
+
+        Unloaded += OnUnloaded;
     }
 
     ///////////////////////////////////////////
     /// OVERRIDE FUNCTIONS
     ///////////////////////////////////////////
-    protected override void OnDataContextChanged(EventArgs e)
+    protected override void OnPointerPressed(PointerPressedEventArgs e)
     {
-        base.OnDataContextChanged(e);
-
-        if (DataContext is OverlayEditorWindowViewModel vm)
+        base.OnPointerPressed(e);
+        if (e.Source is SelectableItemBase control)
         {
-            if (vmInstance != null)
-            {
-                vmInstance.PropertyChanging -= DataContext_PropertyChanging;
-                vmInstance.PropertyChanged -= DataContext_PropertyChanged;
-            }
-            vmInstance = vm;
-
-            vmInstance.PropertyChanging += DataContext_PropertyChanging;
-            vmInstance.PropertyChanged += DataContext_PropertyChanged;
+            Selected = control.DataContext;
         }
     }
-
 
     ///////////////////////////////////////////
     /// KEY HANDLERS
     ///////////////////////////////////////////
-    private void KeyDownHandler(object? sender, KeyEventArgs e)
+    protected override void OnKeyDown(KeyEventArgs e)
     {
         if (e.Key == Key.Delete)
         {
-            DeleteButton_Click(sender, e);
-        }
-        else if (e.Key == Key.C && e.KeyModifiers == KeyModifiers.Control)
-        {
-            CopySelected();
-        }
-        else if (e.Key == Key.V && e.KeyModifiers == KeyModifiers.Control)
-        {
-            PasteSelected();
+            CommandUtils.ExecuteBoundCommand(this, "RemoveImageModelCommand");
         }
     }
 
@@ -111,7 +130,7 @@ public partial class OverlayEditorWindowView : Window
     {
         var files = e.Data.GetFiles();
         e.DragEffects &= DragDropEffects.Copy;
-        AnalyzeIfValidImageFromDrop(files);
+        DragDropResult(files);
 
         e.Handled = true;
     }
@@ -120,23 +139,29 @@ public partial class OverlayEditorWindowView : Window
     ///////////////////////////////////////////
     /// PRIVATE FUNCTIONS
     ///////////////////////////////////////////
-    private void DataContext_PropertyChanging(object? sender, PropertyChangingEventArgs e)
+
+    private void HandleImageSelection(AvaloniaPropertyChangedEventArgs<object> change)
     {
-        if (e.PropertyName == nameof(OverlayEditorWindowViewModel.Selected))
+        if (change.OldValue.Value != null && modelImageDictionary.TryGetValue(change.OldValue.Value, out var oldSelectedImage))
         {
-            if (vmInstance.Selected == null) return;
-            modelImageDictionary[vmInstance.Selected].IsSelected = false;
+            oldSelectedImage.IsSelected = false;
+        }
+        if (change.NewValue.Value != null && modelImageDictionary.TryGetValue(change.NewValue.Value, out var newSelectedImage))
+        {
+            newSelectedImage.IsSelected = true;
         }
     }
 
-    private void DataContext_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+    private void HandleItemsSource(AvaloniaPropertyChangedEventArgs<ObservableCollection<ImageWrapper>> change)
     {
-        if (e.PropertyName == nameof(OverlayEditorWindowViewModel.Selected))
+        if (change.OldValue.Value != null) change.OldValue.Value.CollectionChanged -= ImageCollectionChanged;
+        if (change.NewValue.Value != null)
         {
-            if (vmInstance.Selected == null) return;
-            modelImageDictionary[vmInstance.Selected].IsSelected = true;
+            change.NewValue.Value.CollectionChanged += ImageCollectionChanged;
+            GenerateImages(change.NewValue.Value);
         }
     }
+
     private void PositionProperties()
     {
         //TODO: Make screen agnostic
@@ -145,73 +170,6 @@ public partial class OverlayEditorWindowView : Window
         if (!Design.IsDesignMode) DragPanel.SetPosition(PropertiesBorder, new Point(screen.Bounds.Center.X - 400, screen.Bounds.Center.Y - 300));
     }
 
-    private void OnPropertyChanged(object? sender, AvaloniaPropertyChangedEventArgs e)
-    {
-        if (e.Property == Window.WindowStateProperty)
-        {
-            PositionProperties();
-        }
-        else if (e.Property == Window.BoundsProperty)
-        {
-            PositionProperties();
-        }
-    }
-
-    private void OnLoaded(object? sender, RoutedEventArgs e)
-    {
-        vmInstance = DataContext as OverlayEditorWindowViewModel;
-
-        vmInstance.Images.CollectionChanged += ImageCollectionChanged;
-        GenerateImages(vmInstance.Images);
-    }
-
-    private void OnUnloaded(object? sender, RoutedEventArgs e)
-    {
-        if (vmInstance == null) return;
-        vmInstance.Images.CollectionChanged -= ImageCollectionChanged;
-
-        foreach (ImageModel im in vmInstance!.Images)
-        {
-            DisposeImageModel(im);
-        }
-
-        foreach (var image in modelImageDictionary.Values)
-        {
-            image.ItemSelectedChanged -= OnSelectableImageSelected;
-            image.Dispose();
-        }
-
-        vmInstance.PropertyChanging -= DataContext_PropertyChanging;
-        vmInstance.PropertyChanged -= DataContext_PropertyChanged;
-        PropertyChanged -= OnPropertyChanged;
-
-        modelImageDictionary.Clear();
-        PathToCachedBitmapConverter.Instance.ClearCache();
-        vmInstance = null;
-        DataContext = null;
-
-        Loaded -= OnLoaded;
-        Unloaded -= OnUnloaded;
-    }
-
-    private void PasteSelected()
-    {
-        if (copiedImageModel != null)
-        {
-            if (vmInstance != null && vmInstance.DuplicateImageModelCommand.CanExecute(copiedImageModel))
-            {
-                vmInstance.DuplicateImageModelCommand.Execute(copiedImageModel);
-            }
-        }
-    }
-    private void CopySelected()
-    {
-        var selectedControl = vmInstance.Selected;
-        if (selectedControl != null)
-        {
-            copiedImageModel = selectedControl;
-        }
-    }
     private void ImageCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
         if (e.Action == NotifyCollectionChangedAction.Add)
@@ -226,7 +184,7 @@ public partial class OverlayEditorWindowView : Window
         {
             foreach (var im in modelImageDictionary.Keys.ToList())
             {
-                DisposeImageModel(im);
+                DisposeImageWrapper(im);
             }
         }
     }
@@ -235,19 +193,17 @@ public partial class OverlayEditorWindowView : Window
     {
         if (images != null)
         {
-            foreach (ImageModel im in images)
+            foreach (ImageWrapper im in images)
             {
-                DisposeImageModel(im);
+                DisposeImageWrapper(im);
             }
         }
     }
 
-    private void DisposeImageModel(ImageModel im)
+    private void DisposeImageWrapper(object? im)
     {
         if (modelImageDictionary.TryGetValue(im, out var image))
         {
-            image.ItemSelectedChanged -= OnSelectableImageSelected;
-
             if (image.Parent is Panel parent)
             {
                 parent.Children.Remove(image);
@@ -261,29 +217,17 @@ public partial class OverlayEditorWindowView : Window
     private void GenerateImages(IList? images)
     {
         if (images == null) return;
-        foreach (ImageModel im in images)
+        foreach (ImageWrapper im in images)
         {
             if (modelImageDictionary.ContainsKey(im)) continue; // Skip if the same exact ImageModel already exists
             var image = new SelectableImage(im);
             modelImageDictionary.Add(im, image);
 
-            image.ItemSelectedChanged += OnSelectableImageSelected;
-
             dragGridControl.Children.Add(image);
         }
     }
 
-    private void OnSelectableImageSelected(object? sender, object e)
-    {
-        var image = sender as SelectableImage;
-        var im = image != null ? image.ImageModel : null;
-
-        if (im == null) return;
-
-        vmInstance.SelectImageCommand.Execute(im);
-    }
-
-    private void AnalyzeIfValidImageFromDrop(IEnumerable<IStorageItem>? storageItems)
+    private void DragDropResult(IEnumerable<IStorageItem>? storageItems)
     {
         if (storageItems != null)
         {
@@ -304,26 +248,7 @@ public partial class OverlayEditorWindowView : Window
 
     private void AddImagesToViewModel(IEnumerable<Uri> imageFilePaths)
     {
-        if (vmInstance != null && vmInstance.AddImageModelCommand.CanExecute(null))
-        {
-            vmInstance.AddImageModelCommand.Execute(imageFilePaths);
-        }
-    }
-
-    private void DuplicateButton_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
-    {
-        if (vmInstance != null)
-        {
-            vmInstance.DuplicateImageModelCommand.Execute(null);
-        }
-    }
-
-    private void DeleteButton_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
-    {
-        if (vmInstance != null)
-        {
-            vmInstance.RemoveImageModelCommand.Execute(null);
-        }
+        CommandUtils.ExecuteBoundCommand(this, "AddImageModelCommand", imageFilePaths);
     }
 
     private void AcceptButton_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
@@ -342,11 +267,9 @@ public partial class OverlayEditorWindowView : Window
         var pixelSize = new PixelSize((int)Bounds.Width, (int)Bounds.Height);
         var overlayName = OverlayNameBox.Text;
 
-        if (vmInstance != null && vmInstance.CreateOverlayCommand.CanExecute(pixelSize))
-        {
-            vmInstance.CreateOverlayCommand.Execute(pixelSize);
-            CloseWindow();
-        }
+        CommandUtils.ExecuteBoundCommand(this, "CreateOverlayCommand", pixelSize);
+
+        CloseWindow();
     }
 
     private void CancelButton_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
@@ -361,28 +284,21 @@ public partial class OverlayEditorWindowView : Window
 
     private void AddClippingMaskButton_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
     {
-        if (vmInstance != null && vmInstance.AddClippingMaskCommand.CanExecute(Screens.Primary?.Bounds.Size))
-        {
-            vmInstance.AddClippingMaskCommand.Execute(Screens.Primary?.Bounds.Size);
-        }
+        CommandUtils.ExecuteBoundCommand(this, "AddClippingMaskCommand", Screens.Primary?.Bounds.Size);
     }
 
     private void MirrorPositionButtonX_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
     {
-        if (vmInstance != null)
-        {
-            var pixelSize = new PixelSize((int)Bounds.Width, (int)Bounds.Height);
-            vmInstance.MirrorPositionXCommand.Execute(pixelSize);
-        }
+        var pixelSize = new PixelSize((int)Bounds.Width, (int)Bounds.Height);
+
+        CommandUtils.ExecuteBoundCommand(this, "MirrorPositionXCommand", pixelSize);
     }
 
     private void MirrorPositionButtonY_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
     {
-        if (vmInstance != null)
-        {
-            var pixelSize = new PixelSize((int)Bounds.Width, (int)Bounds.Height);
-            vmInstance.MirrorPositionYCommand.Execute(pixelSize);
-        }
+        var pixelSize = new PixelSize((int)Bounds.Width, (int)Bounds.Height);
+
+        CommandUtils.ExecuteBoundCommand(this, "MirrorPositionYCommand", pixelSize);
     }
 
     private async void AddButton_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
@@ -393,8 +309,9 @@ public partial class OverlayEditorWindowView : Window
         var patternsString = "Image Files" + string.Join("; ", patterns);
 
         //Like in GamesView, this should be done with a provider that gives a reference to the window where the filedialog needs to open.
-        //I swear it's just cause I'm lazy and it's not worth it for keeping a clean MVVM, taking into account that the OverlayEditor already needed a lot of non-standard code.
+        //I'm lazy and it's not worth it for keeping a clean MVVM, taking into account that the OverlayEditor already needed a lot of non-standard code.
         //https://docs.avaloniaui.net/docs/basics/user-interface/file-dialogs
+
         var files = await topLevel.StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
         {
             Title = "Add Images",
@@ -423,5 +340,25 @@ public partial class OverlayEditorWindowView : Window
                 AddImagesToViewModel(imageFilePaths);
             }
         }
+    }
+
+    private void OnUnloaded(object? sender, RoutedEventArgs e)
+    {
+        foreach (var image in modelImageDictionary)
+        {
+            image.Value.Dispose();
+        }
+
+        RemoveHandler(DragDrop.DropEvent, Drop);
+        RemoveHandler(DragDrop.DragOverEvent, DragOver);
+
+        if (ItemsSource != null) ItemsSource.CollectionChanged -= ImageCollectionChanged;
+        ItemsSource = null;
+        Selected = null;
+        dragGridControl = null;
+
+        modelImageDictionary.Clear();
+
+        Unloaded -= OnUnloaded;
     }
 }

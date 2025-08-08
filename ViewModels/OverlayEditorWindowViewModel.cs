@@ -7,17 +7,19 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Threading.Tasks;
+using UltrawideOverlays.Decorator;
 using UltrawideOverlays.Enums;
 using UltrawideOverlays.Models;
 using UltrawideOverlays.Services;
 using UltrawideOverlays.Utils;
+using UltrawideOverlays.Wrappers;
 
 namespace UltrawideOverlays.ViewModels
 {
     public partial class OverlayEditorWindowViewModel : ViewModelBase
     {
         [ObservableProperty]
-        private ObservableCollection<ImageModel> _images;
+        private ObservableCollection<ImageWrapper> _images;
 
         [ObservableProperty]
         private bool _previewEnabled;
@@ -32,7 +34,7 @@ namespace UltrawideOverlays.ViewModels
         private string _previewColor;
 
         [ObservableProperty]
-        private ImageModel? _selected;
+        private ImageWrapper? _selected;
 
         [ObservableProperty]
         private Boolean _propertiesEnabled;
@@ -41,16 +43,17 @@ namespace UltrawideOverlays.ViewModels
         private string? _overlayName;
 
         [ObservableProperty]
-        private ObservableCollection<ClippingMaskModel> _maskTypes;
+        private ObservableCollection<ImageWrapper> _maskTypes;
 
         [ObservableProperty]
-        private ClippingMaskModel? _selectedMaskType;
+        private ImageWrapper? _selectedMaskType;
 
         [ObservableProperty]
         private bool _canCreateOverlay;
 
         private readonly OverlayDataService _overlayDataService;
         private readonly SettingsDataService _settingsDataService;
+        private readonly ImageWrapperDecorator _wrapperDecorator;
 
         ///////////////////////////////////////////
         /// CONSTRUCTOR
@@ -59,52 +62,52 @@ namespace UltrawideOverlays.ViewModels
         ///Design-only constructor
         public OverlayEditorWindowViewModel()
         {
-            Images =
-                [
-                    new ImageModel("", "Example Image 1"),
-                ];
-
-            MaskTypes = GetMaskTypes();
         }
 
-        ~OverlayEditorWindowViewModel()
-        {
-            Debug.WriteLine("OverlayEditorWindowViewModel finalized!");
-        }
-
-        public OverlayEditorWindowViewModel(OverlayDataService overlayService, SettingsDataService settingsService, Object? args = null)
+        public OverlayEditorWindowViewModel(OverlayDataService overlayService, SettingsDataService settingsService, ImageWrapperDecorator wrapperDecorator, Object? args = null)
         {
             _overlayDataService = overlayService;
             _settingsDataService = settingsService;
+            _wrapperDecorator = wrapperDecorator;
 
             Images = [];
             Images.CollectionChanged += ImagesCollectionChanged;
 
             if (args is OverlayDataModel existingModel)
             {
-                OverlayName = existingModel.Name;
-                for (int i = 0; i < existingModel.ImageModels.Count; i++)
-                {
-                    var image = existingModel.ImageModels[i];
-                    Images.Add(image);
-                }
-                for (int i = 0; i < existingModel.ClippingMaskModels.Count; i++)
-                {
-                    var image = existingModel.ClippingMaskModels[i];
-                    Images.Add(image);
-                }
+                LoadExistingOverlay(existingModel);
             }
 
             MaskTypes = GetMaskTypes();
             ConfigureGrid();
         }
 
+        ~OverlayEditorWindowViewModel()
+        {
+            Dispose();
+        }
+
+        private void LoadExistingOverlay(OverlayDataModel existingModel)
+        {
+            OverlayName = existingModel.Name;
+            for (int i = 0; i < existingModel.ImageModels.Count; i++)
+            {
+                var image = existingModel.ImageModels[i].Clone();
+                Images.Add(_wrapperDecorator.CreateImageWrapper(image, image.ImagePath));
+            }
+            for (int i = 0; i < existingModel.ClippingMaskModels.Count; i++)
+            {
+                var image = existingModel.ClippingMaskModels[i].Clone();
+                Images.Add(_wrapperDecorator.CreateImageWrapper(image, image.ImagePath));
+            }
+        }
+
         ///////////////////////////////////////////
         /// OVERRIDE FUNCTIONS
         ///////////////////////////////////////////
-        partial void OnSelectedChanged(ImageModel? oldValue, ImageModel? newValue)
+        partial void OnSelectedChanged(ImageWrapper? oldValue, ImageWrapper? newValue)
         {
-            Debug.WriteLine($"Image selected changed from {oldValue?.ImageName} to {newValue?.ImageName}");
+            Debug.WriteLine($"Image selected changed from {oldValue?.ToString()} to {newValue?.ToString()}");
             if (newValue != null)
             {
                 PropertiesEnabled = true;
@@ -138,13 +141,13 @@ namespace UltrawideOverlays.ViewModels
             }
         }
 
-        private ObservableCollection<ClippingMaskModel>? GetMaskTypes()
+        private ObservableCollection<ImageWrapper>? GetMaskTypes()
         {
-            var output = new ObservableCollection<ClippingMaskModel>();
+            var output = new ObservableCollection<ImageWrapper>();
             for (int i = 0; i < (int)ClippingMaskType.Amount; i++)
             {
                 var mask = ClippingMaskModel.GetMaskByType(0, 0, (ClippingMaskType)i);
-                output.Add(mask);
+                output.Add(_wrapperDecorator.CreateImageWrapper(mask, mask.ImagePath));
             }
 
             return output;
@@ -153,10 +156,13 @@ namespace UltrawideOverlays.ViewModels
         private void ImagesCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
         {
             CanCreateOverlay = Images.Count > 0;
-            //Update ZIndex
-            foreach (ImageModel image in Images)
+            // Update ZIndex
+            for (int i = 0; i < Images.Count; i++)
             {
-                image.ImageProperties.ZIndex = Images.IndexOf(image);
+                if (Images[i].Model is ImageModel imageModel)
+                {
+                    imageModel.ImageProperties.ZIndex = i;
+                }
             }
         }
 
@@ -164,7 +170,7 @@ namespace UltrawideOverlays.ViewModels
         {
             Images.Move(currentIndex, newIndex);
 
-            SelectImage(Images[newIndex]);
+            Selected = Images[newIndex];
         }
 
 
@@ -181,7 +187,7 @@ namespace UltrawideOverlays.ViewModels
                 {
                     var newImage = new ImageModel(uri.LocalPath, FileHandlerUtil.GetFileName(uri));
                     newImage.ImageProperties.ZIndex = Images.Count;
-                    Images.Add(newImage);
+                    Images.Add(_wrapperDecorator.CreateImageWrapper(newImage, newImage.ImagePath));
                 }
                 catch (Exception ex)
                 {
@@ -197,16 +203,14 @@ namespace UltrawideOverlays.ViewModels
         {
             if (Selected != null)
             {
-                Images.Remove(Selected);
+                var wrapperToRemove = Selected;
                 Selected = null;
+
+                Images.Remove(wrapperToRemove);
+
+                wrapperToRemove.Dispose();
             }
             CanCreateOverlay = Images.Count > 0;
-        }
-
-        [RelayCommand]
-        public void SelectImage(ImageModel im)
-        {
-            Selected = im;
         }
 
         [RelayCommand]
@@ -214,9 +218,10 @@ namespace UltrawideOverlays.ViewModels
         {
             if (Selected != null)
             {
-                var newImage = Selected.Clone();
+                var model = Selected.Model.Clone();
+                var newImage = _wrapperDecorator.CreateImageWrapper(model, model.ImagePath);
                 Images.Add(newImage);
-                SelectImage(newImage);
+                Selected = newImage;
             }
         }
 
@@ -238,19 +243,19 @@ namespace UltrawideOverlays.ViewModels
 
             for (int i = 0; i < Images.Count; i++)
             {
-                if (Images[i] is ClippingMaskModel clippingMask)
+                if (Images[i].Model is ClippingMaskModel clippingMask)
                 {
                     overlay.ClippingMaskModels.Add(clippingMask);
                 }
                 else
                 {
-                    overlay.ImageModels.Add(Images[i]);
+                    overlay.ImageModels.Add(Images[i].Model);
                 }
             }
 
             overlay.NumberOfImages = overlay.ImageModels.Count + overlay.ClippingMaskModels.Count;
 
-            _ = _overlayDataService.SaveOverlayAsync(overlay);
+            _overlayDataService.SaveOverlayAsync(overlay);
         }
 
         [RelayCommand]
@@ -258,11 +263,11 @@ namespace UltrawideOverlays.ViewModels
         {
             if (SelectedMaskType == null) return;
 
-            var clippingMask = SelectedMaskType;
+            var clippingMask = SelectedMaskType.Model;
             clippingMask.ImageProperties.PositionX = (MonitorSize.Width - clippingMask.ImageProperties.Width) / 2.0;
             clippingMask.ImageProperties.PositionY = (MonitorSize.Height - clippingMask.ImageProperties.Height) / 2.0;
 
-            Images.Add(clippingMask);
+            Images.Add(_wrapperDecorator.CreateImageWrapper(clippingMask, clippingMask.ImagePath));
         }
 
         [RelayCommand]
@@ -271,16 +276,18 @@ namespace UltrawideOverlays.ViewModels
             if (Selected == null) return;
 
             double centerX = bounds.Width / 2.0;
-            double imageCenterX = Selected.ImageProperties.PositionX + Selected.ImageProperties.Width / 2.0;
+            var imageProperties = Selected.Model?.ImageProperties;
+            if (imageProperties == null) return;
+            double imageCenterX = imageProperties.PositionX + imageProperties.Width / 2.0;
 
             // Distance from image center to canvas center
             double distanceFromCenter = imageCenterX - centerX;
 
             // Mirror the center and reposition the top-left corner accordingly
             double newCenterX = centerX - distanceFromCenter;
-            double newPositionX = newCenterX - Selected.ImageProperties.Width / 2.0;
+            double newPositionX = newCenterX - imageProperties.Width / 2.0;
 
-            Selected.ImageProperties.Position = new Point(newPositionX, Selected.ImageProperties.PositionY);
+            imageProperties.Position = new Point(newPositionX, imageProperties.PositionY);
         }
 
         [RelayCommand]
@@ -289,25 +296,28 @@ namespace UltrawideOverlays.ViewModels
             if (Selected == null) return;
 
             double centerY = bounds.Height / 2.0;
-            double imageCenterY = Selected.ImageProperties.PositionY + Selected.ImageProperties.Height / 2.0;
+            var imageProperties = Selected.Model?.ImageProperties;
+            if (imageProperties == null) return;
+
+            double imageCenterY = imageProperties.PositionY + imageProperties.Height / 2.0;
 
             // Distance from image center to canvas center
             double distanceFromCenter = imageCenterY - centerY;
 
             // Mirror the center and reposition the top-left corner accordingly
             double newCenterY = centerY - distanceFromCenter;
-            double newPositionY = newCenterY - Selected.ImageProperties.Height / 2.0;
+            double newPositionY = newCenterY - imageProperties.Height / 2.0;
 
-            Selected.ImageProperties.Position = new Point(Selected.ImageProperties.PositionX, newPositionY);
+            imageProperties.Position = new Point(imageProperties.PositionX, newPositionY);
         }
 
         [RelayCommand]
-        public void MoveUpOrder(ImageModel? imageModel)
+        public void MoveUpOrder(ImageWrapper? wrapper)
         {
-            if (imageModel == null || Images.Count < 2 || !Images.Contains(imageModel))
+            if (wrapper == null || Images.Count < 2 || !Images.Contains(wrapper))
                 return;
 
-            int currentIndex = Images.IndexOf(imageModel);
+            int currentIndex = Images.IndexOf(wrapper);
             if (currentIndex > 0)
             {
                 MoveIndexOfImage(currentIndex, currentIndex - 1);
@@ -315,12 +325,12 @@ namespace UltrawideOverlays.ViewModels
         }
 
         [RelayCommand]
-        public void MoveDownOrder(ImageModel? imageModel)
+        public void MoveDownOrder(ImageWrapper? wrapper)
         {
-            if (imageModel == null || Images.Count < 2 || !Images.Contains(imageModel))
+            if (wrapper == null || Images.Count < 2 || !Images.Contains(wrapper))
                 return;
 
-            int currentIndex = Images.IndexOf(imageModel);
+            int currentIndex = Images.IndexOf(wrapper);
             if (currentIndex < Images.Count - 1)
             {
                 MoveIndexOfImage(currentIndex, currentIndex + 1);
@@ -328,12 +338,12 @@ namespace UltrawideOverlays.ViewModels
         }
 
         [RelayCommand]
-        public void MoveToTopOrder(ImageModel? imageModel)
+        public void MoveToTopOrder(ImageWrapper? wrapper)
         {
-            if (imageModel == null || Images.Count < 2 || !Images.Contains(imageModel))
+            if (wrapper == null || Images.Count < 2 || !Images.Contains(wrapper))
                 return;
 
-            int currentIndex = Images.IndexOf(imageModel);
+            int currentIndex = Images.IndexOf(wrapper);
             if (currentIndex > 0)
             {
                 MoveIndexOfImage(currentIndex, 0);
@@ -341,16 +351,41 @@ namespace UltrawideOverlays.ViewModels
         }
 
         [RelayCommand]
-        public void MoveToBottomOrder(ImageModel? imageModel)
+        public void MoveToBottomOrder(ImageWrapper? wrapper)
         {
-            if (imageModel == null || Images.Count < 2 || !Images.Contains(imageModel))
+            if (wrapper == null || Images.Count < 2 || !Images.Contains(wrapper))
                 return;
 
-            int currentIndex = Images.IndexOf(imageModel);
+            int currentIndex = Images.IndexOf(wrapper);
             if (currentIndex < Images.Count - 1)
             {
                 MoveIndexOfImage(currentIndex, Images.Count - 1);
             }
+        }
+
+        public override void Dispose()
+        {
+            Images.CollectionChanged -= ImagesCollectionChanged;
+            foreach (var image in Images)
+            {
+                image.Dispose();
+            }
+            foreach (var mask in MaskTypes)
+            {
+                mask.Dispose();
+            }
+            Images.Clear();
+            MaskTypes.Clear();
+
+            Selected?.Dispose();
+            Selected = null;
+
+            SelectedMaskType?.Dispose();
+            SelectedMaskType = null;
+
+            Debug.WriteLine("OverlayEditorWindowViewModel disposed!");
+
+            GC.SuppressFinalize(this);
         }
     }
 }

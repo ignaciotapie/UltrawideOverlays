@@ -50,7 +50,7 @@ namespace UltrawideOverlays.ViewModels
 
         ~SettingsPageViewModel()
         {
-            Debug.WriteLine("SettingsPageViewModel finalized!");
+            Dispose();
         }
 
         ///////////////////////////////////////////
@@ -78,7 +78,7 @@ namespace UltrawideOverlays.ViewModels
             if (SettingsData != null)
             {
                 //Return clone so there's no memory sharing between new settings and saved
-                await SettingsDataService.SaveSettingsAsync(SettingsData.Clone() as SettingsDataModel);
+                await SettingsDataService.SaveSettingsAsync(SettingsData.Clone());
             }
             else
             {
@@ -129,23 +129,9 @@ namespace UltrawideOverlays.ViewModels
             SettingsData = SettingsDataService.LoadDefaultSettings();
         }
 
-        //TODO: add hotkey rebinding
-        //[RelayCommand]
-        //private async void EditHotkey(object obj) 
-        //{
-        //    if (obj is string hotkey) 
-        //    {
-        //        switch (hotkey)
-        //        {
-        //            case "OpacityUp":
-        //                break;
-        //            case "OpacityDown":
-        //                break;
-        //            case "Toggle":
-        //            default:
-        //                break;
-        //        }
-        //    }
-        //}
+        public override void Dispose()
+        {
+            Debug.WriteLine("SettingsPageViewModel finalized!");
+        }
     }
 }

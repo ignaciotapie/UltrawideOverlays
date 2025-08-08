@@ -2,6 +2,7 @@
 using CommunityToolkit.Mvvm.Input;
 using System;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using UltrawideOverlays.Models;
 using UltrawideOverlays.Services;
@@ -67,7 +68,7 @@ namespace UltrawideOverlays.ViewModels
 
         ~HomePageViewModel()
         {
-            _activityService.ActivityTriggered -= ActivityTriggeredHandler;
+            Dispose();
         }
 
         ///////////////////////////////////////////
@@ -103,6 +104,13 @@ namespace UltrawideOverlays.ViewModels
         private void NavigateToOverlaysPage()
         {
             GoToOverlaysTab?.Invoke(this, EventArgs.Empty);
+        }
+
+        public override void Dispose()
+        {
+            _activityService.ActivityTriggered -= ActivityTriggeredHandler;
+
+            Debug.WriteLine("HomePageViewModel finalized!");
         }
     }
 }

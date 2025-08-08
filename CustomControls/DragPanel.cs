@@ -1,6 +1,7 @@
 ﻿using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
+using Avalonia.Interactivity;
 using System;
 using System.Collections.Specialized;
 using System.Diagnostics;
@@ -10,7 +11,6 @@ namespace UltrawideOverlays.CustomControls
     public class DragPanel : Panel
     {
         private Control? _draggedControl;
-        private SelectableItemBase? _selectableControl;
         private Point _dragOffset;
         private Point _initialPosition;
 
@@ -58,19 +58,13 @@ namespace UltrawideOverlays.CustomControls
             PointerMoved += OnPointerMoved;
             PointerReleased += OnPointerReleased;
             Children.CollectionChanged += OnChildrenChanged;
+
+            Unloaded += OnUnloadedHandler;
         }
 
-        ///////////////////////////////////////////
-        /// OVERRIDE FUNCTIONS
-        ///////////////////////////////////////////
-
-        protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
+        private void OnUnloadedHandler(object? sender, RoutedEventArgs e)
         {
-            base.OnAttachedToVisualTree(e);
-        }
-
-        protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
-        {
+            Unloaded -= OnUnloadedHandler;
             PointerPressed -= OnPointerPressed;
             PointerMoved -= OnPointerMoved;
             PointerReleased -= OnPointerReleased;
@@ -84,9 +78,12 @@ namespace UltrawideOverlays.CustomControls
                 }
             }
 
-            base.OnDetachedFromVisualTree(e);
+            _draggedControl = null;
         }
 
+        ///////////////////////////////////////////
+        /// OVERRIDE FUNCTIONS
+        ///////////////////////////////////////////
         protected override Size ArrangeOverride(Size finalSize)
         {
             for (int i = 0; i < Children.Count; i++)
@@ -192,13 +189,6 @@ namespace UltrawideOverlays.CustomControls
                 _initialPosition = controlPos;
                 _draggedControl.Focus();
 
-                if (control is SelectableItemBase selectableItem && _selectableControl != selectableItem)
-                {
-                    if (_selectableControl != null) { _selectableControl.IsSelected = false; }
-                    _selectableControl = selectableItem;
-                    selectableItem.IsSelected = true;
-                }
-
                 e.Pointer.Capture(this);
             }
         }
@@ -233,6 +223,7 @@ namespace UltrawideOverlays.CustomControls
             }
             e.Pointer.Capture(null);
         }
+
         private void SnapToGrid(Control control)
         {
             if (SnappingGridSize != null && GetSnapToGrid(control))

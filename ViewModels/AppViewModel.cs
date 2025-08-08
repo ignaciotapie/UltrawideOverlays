@@ -12,9 +12,6 @@ namespace UltrawideOverlays.ViewModels
     public partial class AppViewModel : ViewModelBase
     {
         [ObservableProperty]
-        private string _iconPath;
-
-        [ObservableProperty]
         private bool _trayEnabled;
 
         private readonly SettingsDataService SettingsService;
@@ -40,10 +37,6 @@ namespace UltrawideOverlays.ViewModels
 
         ~AppViewModel()
         {
-            SettingsService.SettingsChanged -= SettingsChangedHandler;
-            HotKeyService.HotKeyPressed -= HotKeyPressed;
-
-            Debug.WriteLine("AppViewModel finalized!");
         }
 
         ///////////////////////////////////////////
@@ -93,6 +86,15 @@ namespace UltrawideOverlays.ViewModels
             {
                 AutoStartUtil.DisableAutostart();
             }
+        }
+
+        //Shouldn't be ever called lmao
+        public override void Dispose()
+        {
+            SettingsService.SettingsChanged -= SettingsChangedHandler;
+            HotKeyService.HotKeyPressed -= HotKeyPressed;
+
+            Debug.WriteLine("AppViewModel finalized!");
         }
     }
 }
