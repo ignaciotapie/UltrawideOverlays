@@ -1,4 +1,5 @@
-﻿using Avalonia.Controls;
+﻿using Avalonia;
+using Avalonia.Controls;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using System;
@@ -13,7 +14,6 @@ namespace UltrawideOverlays.ViewModels
 {
     public partial class QuickOverlayWindowViewModel : ViewModelBase
     {
-
         [ObservableProperty]
         private ICollection<OverlayDataModel> _overlays;
 
@@ -26,10 +26,10 @@ namespace UltrawideOverlays.ViewModels
         [ObservableProperty]
         private string _appPath;
 
-        private readonly GamesDataService GamesService;
-        private readonly OverlayDataService OverlayService;
-        private readonly FocusMonitorService FocusMonitorService;
-        private readonly WindowFactory WindowFactory;
+        private GamesDataService GamesService;
+        private OverlayDataService OverlayService;
+        private FocusMonitorService FocusMonitorService;
+        private WindowFactory WindowFactory;
 
         private Window? windowInstance;
 
@@ -133,7 +133,6 @@ namespace UltrawideOverlays.ViewModels
             //TODO: This is violating MVVM, VM shouldn't interfere with views, we can ask the App to open it but not to influence it...
             windowInstance = WindowFactory.CreateWindow(Enums.WindowViews.OverlayEditorWindow);
             windowInstance.Show();
-
             windowInstance.Closed += OnOverlayEditorWindowClosed;
         }
 
@@ -145,6 +144,11 @@ namespace UltrawideOverlays.ViewModels
                 windowInstance.DataContext = null;
                 windowInstance = null;
             }
+
+            FocusMonitorService = null;
+            OverlayService = null;
+            GamesService = null;
+            WindowFactory = null;
         }
     }
 }

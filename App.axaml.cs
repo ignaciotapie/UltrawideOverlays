@@ -84,12 +84,12 @@ namespace UltrawideOverlays
             collection.AddSingleton<FocusMonitorService>();
 
             //Factories
-            collection.AddSingleton<PageFactory>();
-            collection.AddSingleton<WindowFactory>();
+            collection.AddTransient<PageFactory>();
+            collection.AddTransient<WindowFactory>();
             collection.AddSingleton<ImageWrapperDecorator>();
 
             //ViewModel factories
-            collection.AddSingleton<Func<Enums.ApplicationPageViews, PageViewModel>>(x => pageName => pageName switch
+            collection.AddTransient<Func<Enums.ApplicationPageViews, PageViewModel>>(x => pageName => pageName switch
             {
                 Enums.ApplicationPageViews.HomePage => x.GetRequiredService<HomePageViewModel>(),
                 Enums.ApplicationPageViews.OverlaysPage => x.GetRequiredService<OverlaysPageViewModel>(),
@@ -98,7 +98,7 @@ namespace UltrawideOverlays
                 _ => throw new InvalidOperationException($"No ViewModel found for {pageName}")
             });
 
-            collection.AddSingleton<Func<Enums.WindowViews, object?, Window>>(x => (windowEnum, args) => CreateWindow(x, windowEnum, args));
+            collection.AddTransient<Func<Enums.WindowViews, object?, Window>>(x => (windowEnum, args) => CreateWindow(x, windowEnum, args));
 
             //Main Window
             collection.AddTransient<AppViewModel>();

@@ -16,6 +16,10 @@ namespace UltrawideOverlays.Converters
             {
                 return Math.Round(d, digits);
             }
+            if (value == null) 
+            {
+                return 0;
+            }
             return value;
         }
 

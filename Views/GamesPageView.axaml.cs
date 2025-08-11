@@ -1,3 +1,4 @@
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
@@ -21,6 +22,17 @@ public partial class GamesPageView : UserControl
 
         DragDropRectangle.AddHandler(DragDrop.DragOverEvent, DragOver);
         DragDropRectangle.AddHandler(DragDrop.DropEvent, Drop);
+    }
+
+    ///////////////////////////////////////////
+    /// OVERRIDE FUNCTIONS
+    ///////////////////////////////////////////
+
+    protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
+    {
+        DragDropRectangle.RemoveHandler(DragDrop.DragOverEvent, DragOver);
+        DragDropRectangle.RemoveHandler(DragDrop.DropEvent, Drop);
+        base.OnDetachedFromVisualTree(e);
     }
 
     ///////////////////////////////////////////

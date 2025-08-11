@@ -30,9 +30,9 @@ namespace UltrawideOverlays.ViewModels
         [ObservableProperty]
         private string _searchBoxText;
 
-        private readonly WindowFactory? WindowFactory;
-        private readonly OverlayDataService? OverlayDataService;
-        private readonly ImageWrapperDecorator? WrapperDecorator;
+        private WindowFactory? WindowFactory;
+        private OverlayDataService? OverlayDataService;
+        private ImageWrapperDecorator? WrapperDecorator;
 
         public ObservableCollection<OverlayDataModel> Overlays { get; }
 
@@ -163,6 +163,7 @@ namespace UltrawideOverlays.ViewModels
             if (sender is Window window)
             {
                 window.Closed -= OverlayWindowClosed;
+                (window.DataContext as IDisposable)?.Dispose();
             }
 
             LoadOverlaysAsync();
@@ -228,6 +229,13 @@ namespace UltrawideOverlays.ViewModels
                 SelectedOverlayImage.Dispose();
                 SelectedOverlayImage = null;
             }
+
+            SelectedOverlay = null;
+
+            WindowFactory = null;
+            OverlayDataService = null;
+            WrapperDecorator = null;
+
             GC.SuppressFinalize(this);
 
             Debug.WriteLine("OverlaysPageViewModel finalized!");

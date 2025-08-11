@@ -14,9 +14,9 @@ namespace UltrawideOverlays.ViewModels
         [ObservableProperty]
         private bool _trayEnabled;
 
-        private readonly SettingsDataService SettingsService;
-        private readonly WindowFactory WindowFactory;
-        private readonly HotKeyService HotKeyService;
+        private SettingsDataService SettingsService;
+        private WindowFactory WindowFactory;
+        private HotKeyService HotKeyService;
 
         ///////////////////////////////////////////
         /// CONSTRUCTOR

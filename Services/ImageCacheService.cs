@@ -22,6 +22,8 @@ namespace UltrawideOverlays.Services
             public void UpdateLastAccessTime() => LastAccessTime = DateTime.UtcNow;
 
             public bool IsInvalidated { get; internal set; } = false;
+
+            public bool IsDisposed = false;
             public void Invalidate()
             {
                 IsInvalidated = true;
@@ -45,7 +47,11 @@ namespace UltrawideOverlays.Services
 
             public void Dispose()
             {
+                if (IsDisposed) { return; }
+
+                IsDisposed = true;
                 Bitmap.Dispose();
+                Bitmap = null;
                 GC.SuppressFinalize(this);
             }
         }

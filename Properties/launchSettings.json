@@ -2,7 +2,8 @@
   "profiles": {
     "UltrawideOverlays": {
       "commandName": "Project",
-      "hotReloadEnabled": false
+      "hotReloadEnabled": false,
+      "nativeDebugging": false
     }
   }
 }

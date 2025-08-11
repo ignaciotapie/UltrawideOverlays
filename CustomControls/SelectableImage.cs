@@ -6,6 +6,7 @@ using Avalonia.Media;
 using System;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Reactive.Disposables;
 using UltrawideOverlays.Converters;
 using UltrawideOverlays.Models;
 using UltrawideOverlays.Utils;
@@ -15,9 +16,10 @@ namespace UltrawideOverlays.CustomControls
 {
     public class SelectableImage : SelectableItemBase, IDisposable
     {
-        public readonly ImageModel? ImageModel;
+        public ImageModel? ImageModel;
         public Image? image;
         private bool disposedValue;
+        private CompositeDisposable disposables;
 
         private static readonly BoxShadows boxShadow = new BoxShadows(new BoxShadow
         {
@@ -40,10 +42,13 @@ namespace UltrawideOverlays.CustomControls
         {
             ImageModel = wrapper.Model as ImageModel;
             DataContext = wrapper;
+            disposables = new CompositeDisposable();
+
             Background = Brushes.Transparent;
             HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Left;
             VerticalAlignment = Avalonia.Layout.VerticalAlignment.Top;
             RenderTransformOrigin = RelativePoint.TopLeft;
+            IsHitTestVisible = true;
             image = new Image
             {
                 IsHitTestVisible = false,
@@ -52,24 +57,29 @@ namespace UltrawideOverlays.CustomControls
                 VerticalAlignment = Avalonia.Layout.VerticalAlignment.Top,
                 Stretch = Stretch.Fill
             };
-            image.Bind(Image.SourceProperty, new Binding("ImageSource")
+            disposables.Add(image.Bind(Image.SourceProperty, new Binding("ImageSource")
             {
                 Converter = new NullToImageConverter()
-            });
+            }));
 
-            image.Bind(Image.WidthProperty, new Binding("Model.ImageProperties.Width", BindingMode.TwoWay));
-            image.Bind(Image.HeightProperty, new Binding("Model.ImageProperties.Height", BindingMode.TwoWay));
-            image.Bind(Image.OpacityProperty, new Binding("Model.ImageProperties.Opacity", BindingMode.TwoWay));
-            image.Bind(Image.IsVisibleProperty, new Binding("Model.ImageProperties.IsVisible", BindingMode.TwoWay));
-
-            Bind(ToolTip.TipProperty, new Binding("Model.ImageName"));
-            Bind(DragPanel.DraggableProperty, new Binding("Model.ImageProperties.IsDraggable", BindingMode.TwoWay));
-            Bind(DragPanel.PositionProperty, new Binding("Model.ImageProperties.Position", BindingMode.TwoWay));
-            Bind(ZIndexProperty, new Binding("Model.ImageProperties.ZIndex", BindingMode.TwoWay));
+            disposables.Add(image.Bind(Image.WidthProperty, new Binding("Model.ImageProperties.Width", BindingMode.TwoWay)));
+            disposables.Add(image.Bind(Image.HeightProperty, new Binding("Model.ImageProperties.Height", BindingMode.TwoWay)));
+            disposables.Add(image.Bind(Image.OpacityProperty, new Binding("Model.ImageProperties.Opacity", BindingMode.TwoWay)));
+            disposables.Add(image.Bind(Image.IsVisibleProperty, new Binding("Model.ImageProperties.IsVisible", BindingMode.TwoWay)));
+            disposables.Add(Bind(ToolTip.TipProperty, new Binding("Model.ImageName")));
+            disposables.Add(Bind(DragPanel.DraggableProperty, new Binding("Model.ImageProperties.IsDraggable", BindingMode.TwoWay)));
+            disposables.Add(Bind(DragPanel.PositionProperty, new Binding("Model.ImageProperties.Position", BindingMode.TwoWay)));
+            disposables.Add(Bind(ZIndexProperty, new Binding("Model.ImageProperties.ZIndex", BindingMode.TwoWay)));
 
             Child = image;
-        }
 
+            if (ImageModel?.ImageProperties is ImagePropertiesModel props)
+            {
+                props.PropertyChanged += ImageModelPropertiesPropertyChange;
+                UpdateTransform();
+            }
+            ImageModel.PropertyChanged += ImageModelPropertyChange;
+        }
 
         ///////////////////////////////////////////
         /// HANDLERS
@@ -115,25 +125,12 @@ namespace UltrawideOverlays.CustomControls
         ///////////////////////////////////////////
         protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
         {
-            // Listen for mirror or scale changes
-            if (ImageModel?.ImageProperties is ImagePropertiesModel props)
-            {
-                props.PropertyChanged += ImageModelPropertiesPropertyChange;
-                UpdateTransform(); //Initial transform update
-            }
-            ImageModel.PropertyChanged += ImageModelPropertyChange;
             UpdateSelectionVisual();
 
             base.OnAttachedToVisualTree(e);
         }
         protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
         {
-            // Listen for mirror or scale changes
-            if (ImageModel?.ImageProperties is ImagePropertiesModel props)
-            {
-                props.PropertyChanged -= ImageModelPropertiesPropertyChange;
-            }
-            ImageModel.PropertyChanged -= ImageModelPropertyChange;
             base.OnDetachedFromVisualTree(e);
         }
 
@@ -167,6 +164,7 @@ namespace UltrawideOverlays.CustomControls
         {
             if (!disposedValue)
             {
+                disposedValue = true;
                 if (ImageModel?.ImageProperties is ImagePropertiesModel props)
                     props.PropertyChanged -= ImageModelPropertiesPropertyChange;
 
@@ -178,9 +176,12 @@ namespace UltrawideOverlays.CustomControls
 
                 ClearValue(ToolTip.TipProperty);
 
-                disposedValue = true;
+                disposables.Dispose();
+
                 (DataContext as ImageWrapper)?.Dispose();
                 DataContext = null;
+
+                base.Dispose();
             }
         }
     }

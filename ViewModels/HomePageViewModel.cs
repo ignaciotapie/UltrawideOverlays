@@ -21,10 +21,10 @@ namespace UltrawideOverlays.ViewModels
         private string _lastOverlayUsed;
 
         [ObservableProperty]
-        private ObservableCollection<ActivityLogModel> _activities;
+        private ObservableCollection<ActivityLogModel>? _activities;
 
-        private readonly GeneralDataService _generalService;
-        private readonly ActivityDataService _activityService;
+        private GeneralDataService _generalService;
+        private ActivityDataService _activityService;
 
         public event EventHandler? GoToGamesTab;
         public event EventHandler? GoToOverlaysTab;
@@ -109,6 +109,11 @@ namespace UltrawideOverlays.ViewModels
         public override void Dispose()
         {
             _activityService.ActivityTriggered -= ActivityTriggeredHandler;
+
+            Activities.Clear();
+            Activities = null;
+            _generalService = null;
+            _activityService = null;
 
             Debug.WriteLine("HomePageViewModel finalized!");
         }

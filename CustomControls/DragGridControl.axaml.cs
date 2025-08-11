@@ -59,6 +59,9 @@ namespace UltrawideOverlays.CustomControls
             set => SetValue(GridOpacityProperty, value);
         }
 
+        private DragPanel? _dragPanel;
+        private VisualGrid? _visualGrid;
+
         ///////////////////////////////////////////
         /// CONSTRUCTOR
         ///////////////////////////////////////////
@@ -66,6 +69,10 @@ namespace UltrawideOverlays.CustomControls
         public DragGridControl()
         {
             InitializeComponent();
+
+            // Namescope is created by InitializeComponent, so resolve once here
+            _dragPanel = this.FindControl<DragPanel>("DragPanelLayout");
+            _visualGrid = this.FindControl<VisualGrid>("VisualGrid");
         }
 
         ///////////////////////////////////////////
@@ -80,26 +87,25 @@ namespace UltrawideOverlays.CustomControls
             }
             else if (change.Property == GridOpacityProperty)
             {
-                // Update the grid opacity of the DragPanelLayout
-                if (DragPanelLayout != null)
+                if (_visualGrid != null)
                 {
-                    VisualGrid.Opacity = (double)change.NewValue!;
+                    _visualGrid.Opacity = (double)change.NewValue!;
                 }
             }
             else if (change.Property == ColorProperty)
             {
                 // Update the grid brush of the DragPanelLayout
-                if (VisualGrid != null && change.NewValue != null)
+                if (_visualGrid != null && change.NewValue != null)
                 {
-                    VisualGrid.Color = (Color)change.NewValue;
+                    _visualGrid.Color = (Color)change.NewValue;
                 }
             }
             else if (change.Property == PreviewProperty)
             {
                 // Update the grid preview of the DragPanelLayout
-                if (VisualGrid != null)
+                if (_visualGrid != null)
                 {
-                    VisualGrid.Preview = (bool)change.NewValue!;
+                    _visualGrid.Preview = (bool)change.NewValue!;
                 }
             }
             base.OnPropertyChanged(change);
@@ -112,13 +118,15 @@ namespace UltrawideOverlays.CustomControls
             // Clone the list first to avoid modifying it while iterating
             var toMove = this.Children
                 .Where(c => c is Control control && control is not DragPanel)
-                .ToList(); // this is the key
+                .ToList();
 
             foreach (var control in toMove)
             {
-                this.Children.Remove(control);              // remove from self
-                DragPanelLayout.Children.Add(control);      // add to target layout
+                this.Children.Remove(control);
+                _dragPanel?.Children.Add(control);
             }
+
+            toMove.Clear();
         }
 
         /// <summary>
@@ -130,7 +138,7 @@ namespace UltrawideOverlays.CustomControls
         {
             base.ChildrenChanged(sender, e);
 
-            if (e.NewItems == null || DragPanelLayout == null)
+            if (e.NewItems == null || _dragPanel == null)
                 return;
 
             // Clone the items
@@ -142,8 +150,19 @@ namespace UltrawideOverlays.CustomControls
             foreach (var control in newControls)
             {
                 this.Children.Remove(control);
-                DragPanelLayout.Children.Add(control);
+                _dragPanel.Children.Add(control);
             }
+        }
+
+        protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
+        {
+            base.OnDetachedFromVisualTree(e);
+
+            _dragPanel = null;
+            _visualGrid = null;
+
+            // Reset the properties
+            Color = null;
         }
 
         ///////////////////////////////////////////
@@ -153,13 +172,13 @@ namespace UltrawideOverlays.CustomControls
         private void UpdateGridSize(int value)
         {
             // Update the grid size of the DragPanelLayout
-            if (DragPanelLayout != null)
+            if (_dragPanel != null)
             {
-                DragPanelLayout.SnappingGridSize = value;
+                _dragPanel.SnappingGridSize = value;
             }
-            if (VisualGrid != null)
+            if (_visualGrid != null)
             {
-                VisualGrid.GridSize = value;
+                _visualGrid.GridSize = value;
             }
         }
     }

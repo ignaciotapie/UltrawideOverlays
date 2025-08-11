@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using UltrawideOverlays.Enums;
@@ -132,6 +133,19 @@ namespace UltrawideOverlays.ViewModels
         public override void Dispose()
         {
             Debug.WriteLine("SettingsPageViewModel finalized!");
+
+            SettingsDataService = null;
+            SettingsData = null;
+            GridSize = null;
+            GridOpacity = null;
+            GridColor = null;
+            StartUpEnabled = null;
+            MinimizeToTray = null;
+            ToggleOverlayHotkey = null;
+            OpacityUpHotkey = null;
+            OpacityDownHotkey = null;
+            QuickOverlayHotkey = null;
+            GC.SuppressFinalize(this);
         }
     }
 }

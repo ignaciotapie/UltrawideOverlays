@@ -31,14 +31,6 @@
         </ResourceDictionary>
 
         <converter:NumberToColorConverter x:Key="numberToColorConverter"/>
-
-        <ContextMenu x:Key="RightClickContext">
-            <MenuItem Header="Move to Back" Command="{Binding MoveToBottomOrderCommand}" CommandParameter="{Binding Selected}"/>
-            <MenuItem Header="Move Down" Command="{Binding MoveDownOrderCommand}" CommandParameter="{Binding Selected}"/>
-            <MenuItem Header="Move Up" Command="{Binding MoveUpOrderCommand}" CommandParameter="{Binding Selected}"/>
-            <MenuItem Header="Move to Front" Command="{Binding MoveToTopOrderCommand}" CommandParameter="{Binding Selected}"/>
-        </ContextMenu>
-        
         <converter:NumberToRoundedNumber x:Key="numberToRoundedNumber"/>
         <converter:NullToImageConverter x:Key="nullToImageConverter"/>
     </Window.Resources>

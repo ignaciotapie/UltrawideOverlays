@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using System;
 using System.Diagnostics;
 using UltrawideOverlays.Decorator;
 using UltrawideOverlays.Enums;
@@ -19,14 +20,14 @@ namespace UltrawideOverlays.ViewModels
         [ObservableProperty]
         private bool _isOverlayEnabled;
 
-        private readonly OverlayDataService OverlayDataService;
-        private readonly FocusMonitorService FocusMonitorService;
-        private readonly GamesDataService GamesDataService;
-        private readonly SettingsDataService SettingsDataService;
-        private readonly HotKeyService HotKeyService;
-        private readonly ActivityDataService ActivityDataService;
+        private OverlayDataService OverlayDataService;
+        private FocusMonitorService FocusMonitorService;
+        private GamesDataService GamesDataService;
+        private SettingsDataService SettingsDataService;
+        private HotKeyService HotKeyService;
+        private ActivityDataService ActivityDataService;
 
-        private readonly ImageWrapperDecorator imageWrapperDecorator;
+        private ImageWrapperDecorator imageWrapperDecorator;
 
         ///////////////////////////////////////////
         /// CONSTRUCTOR
@@ -152,6 +153,17 @@ namespace UltrawideOverlays.ViewModels
 
             FocusMonitorService.FocusChanged -= FocusChangedHandler;
             HotKeyService.HotKeyPressed -= HotkeyPressedHandler;
+            OverlayDataService = null!;
+            FocusMonitorService = null!;
+            GamesDataService = null!;
+            SettingsDataService = null!;
+            HotKeyService = null!;
+            ActivityDataService = null!;
+            imageWrapperDecorator = null!;
+            _selectedOverlay = null;
+            _imageOpacity = null;
+
+            GC.SuppressFinalize(this);
         }
     }
 }

@@ -51,9 +51,10 @@ namespace UltrawideOverlays.ViewModels
         [ObservableProperty]
         private bool _canCreateOverlay;
 
-        private readonly OverlayDataService _overlayDataService;
-        private readonly SettingsDataService _settingsDataService;
-        private readonly ImageWrapperDecorator _wrapperDecorator;
+        private OverlayDataService? _overlayDataService;
+        private SettingsDataService? _settingsDataService;
+        private ImageWrapperDecorator? _wrapperDecorator;
+        private bool isDisposed = false;
 
         ///////////////////////////////////////////
         /// CONSTRUCTOR
@@ -90,12 +91,12 @@ namespace UltrawideOverlays.ViewModels
         private void LoadExistingOverlay(OverlayDataModel existingModel)
         {
             OverlayName = existingModel.Name;
-            for (int i = 0; i < existingModel.ImageModels.Count; i++)
+            for (int i = 0; i < existingModel?.ImageModels?.Count; i++)
             {
                 var image = existingModel.ImageModels[i].Clone();
                 Images.Add(_wrapperDecorator.CreateImageWrapper(image, image.ImagePath));
             }
-            for (int i = 0; i < existingModel.ClippingMaskModels.Count; i++)
+            for (int i = 0; i < existingModel?.ClippingMaskModels?.Count; i++)
             {
                 var image = existingModel.ClippingMaskModels[i].Clone();
                 Images.Add(_wrapperDecorator.CreateImageWrapper(image, image.ImagePath));
@@ -179,19 +180,19 @@ namespace UltrawideOverlays.ViewModels
         ///////////////////////////////////////////
 
         [RelayCommand]
-        public void AddImageModel(IEnumerable<Uri> imageFilePaths)
+        public void AddImageModel(IEnumerable<String> imageFilePaths)
         {
-            foreach (var uri in imageFilePaths)
+            foreach (var imagePath in imageFilePaths)
             {
                 try
                 {
-                    var newImage = new ImageModel(uri.LocalPath, FileHandlerUtil.GetFileName(uri));
+                    var newImage = new ImageModel(imagePath, FileHandlerUtil.GetFileName(imagePath));
                     newImage.ImageProperties.ZIndex = Images.Count;
                     Images.Add(_wrapperDecorator.CreateImageWrapper(newImage, newImage.ImagePath));
                 }
                 catch (Exception ex)
                 {
-                    Debug.WriteLine($"Failed to add image model from path {uri.LocalPath}: {ex.Message}");
+                    Debug.WriteLine($"Failed to add image model from path {imagePath}: {ex.Message}");
                     continue;
                 }
             }
@@ -218,8 +219,8 @@ namespace UltrawideOverlays.ViewModels
         {
             if (Selected != null)
             {
-                var model = Selected.Model.Clone();
-                var newImage = _wrapperDecorator.CreateImageWrapper(model, model.ImagePath);
+                var model = Selected.Model?.Clone();
+                var newImage = _wrapperDecorator.CreateImageWrapper(model, model?.ImagePath);
                 Images.Add(newImage);
                 Selected = newImage;
             }
@@ -238,7 +239,8 @@ namespace UltrawideOverlays.ViewModels
                 Width = pixelSize.Width,
                 Height = pixelSize.Height,
                 LastModified = DateTime.Now,
-                LastUsed = DateTime.Now
+                LastUsed = DateTime.Now,
+                NumberOfImages = Images.Count
             };
 
             for (int i = 0; i < Images.Count; i++)
@@ -252,8 +254,6 @@ namespace UltrawideOverlays.ViewModels
                     overlay.ImageModels.Add(Images[i].Model);
                 }
             }
-
-            overlay.NumberOfImages = overlay.ImageModels.Count + overlay.ClippingMaskModels.Count;
 
             _overlayDataService.SaveOverlayAsync(overlay);
         }
@@ -365,6 +365,8 @@ namespace UltrawideOverlays.ViewModels
 
         public override void Dispose()
         {
+            if (isDisposed) return;
+            isDisposed = true;
             Images.CollectionChanged -= ImagesCollectionChanged;
             foreach (var image in Images)
             {
@@ -377,11 +379,25 @@ namespace UltrawideOverlays.ViewModels
             Images.Clear();
             MaskTypes.Clear();
 
+            Images = null;
+            MaskTypes = null;
+            OverlayName = null;
+            PreviewColor = null;
+            PreviewEnabled = false;
+            PreviewSize = 0;
+            PreviewOpacity = 0.0;
+            PropertiesEnabled = false;
+            CanCreateOverlay = false;
+
             Selected?.Dispose();
             Selected = null;
 
             SelectedMaskType?.Dispose();
             SelectedMaskType = null;
+
+            _overlayDataService = null;
+            _settingsDataService = null;
+            _wrapperDecorator = null;
 
             Debug.WriteLine("OverlayEditorWindowViewModel disposed!");
 

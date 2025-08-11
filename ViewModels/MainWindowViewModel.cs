@@ -21,8 +21,7 @@ namespace UltrawideOverlays.ViewModels
         private PageViewModel? _currentPage;
 
         private ApplicationPageViews? pageEnum = null;
-
-        private readonly PageFactory? factory;
+        private PageFactory? factory;
 
         ///////////////////////////////////////////
         /// CONSTRUCTOR
@@ -117,6 +116,8 @@ namespace UltrawideOverlays.ViewModels
         public override void Dispose()
         {
             CurrentPage = null;
+            factory = null;
+
             Debug.WriteLine("MainWindowViewModel finalized!");
             GC.SuppressFinalize(this);
         }

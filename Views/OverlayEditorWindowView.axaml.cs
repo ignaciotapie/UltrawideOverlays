@@ -1,15 +1,18 @@
 using Avalonia;
+using Avalonia.Collections;
 using Avalonia.Controls;
 using Avalonia.Data;
 using Avalonia.Input;
-using Avalonia.Interactivity;
 using Avalonia.Platform.Storage;
+using DynamicData;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.Diagnostics;
 using System.Linq;
+using System.Reactive.Disposables;
 using UltrawideOverlays.CustomControls;
 using UltrawideOverlays.Utils;
 using UltrawideOverlays.Wrappers;
@@ -27,16 +30,20 @@ public partial class OverlayEditorWindowView : Window
     }
 
     public static readonly StyledProperty<ObservableCollection<ImageWrapper>> ItemsSourceProperty =
-        AvaloniaProperty.Register<OverlayEditorWindowView, ObservableCollection<ImageWrapper>>(nameof(ItemsSourceProperty));
+        AvaloniaProperty.Register<OverlayEditorWindowView, ObservableCollection<ImageWrapper>>(nameof(ItemsSource));
 
     public ObservableCollection<ImageWrapper> ItemsSource
     {
         get => GetValue(ItemsSourceProperty);
         set => SetValue(ItemsSourceProperty, value);
     }
-
-    private DragGridControl dragGridControl;
-    private Dictionary<object?, SelectableImage> modelImageDictionary;
+    
+    private DragGridControl? dragGridControl;
+    private Dictionary<ImageWrapper?, SelectableImage> modelImageDictionary;
+    
+    //Disposables
+    private CompositeDisposable disposables;
+    private IDisposable? _itemsSourceSub;
 
     ///////////////////////////////////////////
     /// CONSTRUCTOR
@@ -54,7 +61,7 @@ public partial class OverlayEditorWindowView : Window
             Position = new PixelPoint(0, 0);
         }
 
-        dragGridControl = MainDragGrid;
+        dragGridControl = this.FindControl<DragGridControl>("MainDragGrid");
         modelImageDictionary = [];
 
         PositionProperties();
@@ -63,32 +70,25 @@ public partial class OverlayEditorWindowView : Window
 
     private void SetBindings()
     {
-        Bind(ItemsSourceProperty, new Binding("Images"));
-        Bind(SelectedProperty, new Binding("Selected")
-        {
-            Mode = BindingMode.TwoWay
-        });
         AddHandler(DragDrop.DropEvent, Drop);
         AddHandler(DragDrop.DragOverEvent, DragOver);
 
-        ItemsSourceProperty.Changed.Subscribe((args) =>
+        disposables = new CompositeDisposable();
+
+        disposables.Add(Bind(ItemsSourceProperty, new Binding("Images")));
+        disposables.Add(Bind(SelectedProperty, new Binding("Selected")
+        {
+            Mode = BindingMode.TwoWay
+        }));
+        
+        disposables.Add(ItemsSourceProperty.Changed.Subscribe((args) =>
         {
             HandleItemsSource(args);
-        });
-        SelectedProperty.Changed.Subscribe((args) =>
+        }));
+        disposables.Add(SelectedProperty.Changed.Subscribe((args) =>
         {
             HandleImageSelection(args);
-        });
-        Window.WindowStateProperty.Changed.Subscribe((args) =>
-        {
-            PositionProperties();
-        });
-        Window.BoundsProperty.Changed.Subscribe((args) =>
-        {
-            PositionProperties();
-        });
-
-        Unloaded += OnUnloaded;
+        }));
     }
 
     ///////////////////////////////////////////
@@ -101,6 +101,46 @@ public partial class OverlayEditorWindowView : Window
         {
             Selected = control.DataContext;
         }
+    }
+ 
+    protected override void OnClosed(EventArgs e)
+    {
+        base.OnClosed(e);
+
+        foreach (var kv in modelImageDictionary)
+        {
+            kv.Key.Dispose();
+            kv.Value.Dispose();
+        }
+        RemoveHandler(DragDrop.DropEvent, Drop);
+        RemoveHandler(DragDrop.DragOverEvent, DragOver);
+
+        _itemsSourceSub?.Dispose();
+        _itemsSourceSub = null;
+
+        if (ItemsSource != null)
+        {
+            foreach (var item in ItemsSource)
+            {
+                item.Dispose();
+            }
+        }
+
+        ItemsSource?.Clear();
+        ItemsSource = null;
+        
+        Selected = null;
+        dragGridControl = null;
+
+        if (disposables != null)
+        {
+            disposables.Dispose();
+        }
+        
+        (DataContext as IDisposable)?.Dispose();
+
+        modelImageDictionary.Clear();
+        modelImageDictionary = null;
     }
 
     ///////////////////////////////////////////
@@ -142,11 +182,11 @@ public partial class OverlayEditorWindowView : Window
 
     private void HandleImageSelection(AvaloniaPropertyChangedEventArgs<object> change)
     {
-        if (change.OldValue.Value != null && modelImageDictionary.TryGetValue(change.OldValue.Value, out var oldSelectedImage))
+        if (change.OldValue.Value != null && modelImageDictionary.TryGetValue(change.OldValue.Value as ImageWrapper, out var oldSelectedImage))
         {
             oldSelectedImage.IsSelected = false;
         }
-        if (change.NewValue.Value != null && modelImageDictionary.TryGetValue(change.NewValue.Value, out var newSelectedImage))
+        if (change.NewValue.Value != null && modelImageDictionary.TryGetValue(change.NewValue.Value as ImageWrapper, out var newSelectedImage))
         {
             newSelectedImage.IsSelected = true;
         }
@@ -154,11 +194,19 @@ public partial class OverlayEditorWindowView : Window
 
     private void HandleItemsSource(AvaloniaPropertyChangedEventArgs<ObservableCollection<ImageWrapper>> change)
     {
-        if (change.OldValue.Value != null) change.OldValue.Value.CollectionChanged -= ImageCollectionChanged;
-        if (change.NewValue.Value != null)
+        _itemsSourceSub?.Dispose();
+        _itemsSourceSub = null;
+
+        if (change.OldValue.HasValue && change.OldValue.Value is { } oldCol)
         {
-            change.NewValue.Value.CollectionChanged += ImageCollectionChanged;
-            GenerateImages(change.NewValue.Value);
+            foreach (var im in modelImageDictionary.Keys)
+                DisposeImageWrapper(im);
+        }
+
+        if (change.NewValue.HasValue && change.NewValue.Value is { } newCol)
+        {
+            _itemsSourceSub = newCol.WeakSubscribe(ImageCollectionChanged);
+            GenerateImages(newCol);
         }
     }
 
@@ -167,7 +215,6 @@ public partial class OverlayEditorWindowView : Window
         //TODO: Make screen agnostic
         var screen = Screens.Primary;
         if (screen == null) return;
-        if (!Design.IsDesignMode) DragPanel.SetPosition(PropertiesBorder, new Point(screen.Bounds.Center.X - 400, screen.Bounds.Center.Y - 300));
     }
 
     private void ImageCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
@@ -200,7 +247,7 @@ public partial class OverlayEditorWindowView : Window
         }
     }
 
-    private void DisposeImageWrapper(object? im)
+    private void DisposeImageWrapper(ImageWrapper? im)
     {
         if (modelImageDictionary.TryGetValue(im, out var image))
         {
@@ -208,7 +255,7 @@ public partial class OverlayEditorWindowView : Window
             {
                 parent.Children.Remove(image);
             }
-
+        
             modelImageDictionary.Remove(im);
             image.Dispose();
         }
@@ -222,8 +269,8 @@ public partial class OverlayEditorWindowView : Window
             if (modelImageDictionary.ContainsKey(im)) continue; // Skip if the same exact ImageModel already exists
             var image = new SelectableImage(im);
             modelImageDictionary.Add(im, image);
-
-            dragGridControl.Children.Add(image);
+        
+            dragGridControl?.Children.Add(image);
         }
     }
 
@@ -231,12 +278,12 @@ public partial class OverlayEditorWindowView : Window
     {
         if (storageItems != null)
         {
-            var imageFilePaths = new List<Uri>();
+            var imageFilePaths = new List<String>();
             foreach (var item in storageItems)
             {
                 if (FileHandlerUtil.IsValidImagePath(item.TryGetLocalPath()))
                 {
-                    imageFilePaths.Add(item.Path);
+                    imageFilePaths.Add(item.TryGetLocalPath());
                 }
             }
             if (imageFilePaths.Count > 0)
@@ -246,26 +293,20 @@ public partial class OverlayEditorWindowView : Window
         }
     }
 
-    private void AddImagesToViewModel(IEnumerable<Uri> imageFilePaths)
+    private void AddImagesToViewModel(IEnumerable<String> imageFilePaths)
     {
         CommandUtils.ExecuteBoundCommand(this, "AddImageModelCommand", imageFilePaths);
     }
 
     private void AcceptButton_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
     {
-        if (string.IsNullOrWhiteSpace(OverlayNameBox.Text))
-        {
-            OverlayNameBox.Focus();
-            return;
-        }
         if (modelImageDictionary.Count <= 0)
         {
-            Images_ListBox.Focus();
+            this.FindControl<ListBox>("Images_ListBox")?.Focus();
             return;
         }
 
         var pixelSize = new PixelSize((int)Bounds.Width, (int)Bounds.Height);
-        var overlayName = OverlayNameBox.Text;
 
         CommandUtils.ExecuteBoundCommand(this, "CreateOverlayCommand", pixelSize);
 
@@ -327,12 +368,12 @@ public partial class OverlayEditorWindowView : Window
 
         if (files.Count > 0)
         {
-            var imageFilePaths = new List<Uri>();
+            var imageFilePaths = new List<String>();
             foreach (var file in files)
             {
                 if (file.TryGetLocalPath() is { } localPath)
                 {
-                    imageFilePaths.Add(new Uri(localPath));
+                    imageFilePaths.Add(localPath);
                 }
             }
             if (imageFilePaths.Count > 0)
@@ -340,25 +381,5 @@ public partial class OverlayEditorWindowView : Window
                 AddImagesToViewModel(imageFilePaths);
             }
         }
-    }
-
-    private void OnUnloaded(object? sender, RoutedEventArgs e)
-    {
-        foreach (var image in modelImageDictionary)
-        {
-            image.Value.Dispose();
-        }
-
-        RemoveHandler(DragDrop.DropEvent, Drop);
-        RemoveHandler(DragDrop.DragOverEvent, DragOver);
-
-        if (ItemsSource != null) ItemsSource.CollectionChanged -= ImageCollectionChanged;
-        ItemsSource = null;
-        Selected = null;
-        dragGridControl = null;
-
-        modelImageDictionary.Clear();
-
-        Unloaded -= OnUnloaded;
     }
 }

@@ -296,6 +296,24 @@ namespace UltrawideOverlays.ViewModels
         public override void Dispose()
         {
             Debug.WriteLine("GamesPageViewModel finalized!");
+            Processes?.Clear();
+            Processes = null;
+
+            Games?.Clear();
+            Games = null;
+
+            Overlays?.Clear();
+            Overlays = null;
+
+            SelectedProcess = null;
+            SelectedOverlay = null;
+            SelectedGame = null;
+
+            _factory = null;
+            _processService = null;
+            _overlayService = null;
+            _gamesService = null;
+
             GC.SuppressFinalize(this);
         }
     }

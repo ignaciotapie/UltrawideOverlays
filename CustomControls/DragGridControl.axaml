@@ -8,8 +8,8 @@
              x:Class="UltrawideOverlays.CustomControls.DragGridControl"
              d:DesignWidth="800" d:DesignHeight="450" Background="Transparent">
 
-    <cc:DragPanel x:Name="DragPanelLayout">
-        <cc:VisualGrid x:Name="VisualGrid" IsHitTestVisible="False"/>
+    <cc:DragPanel Name="DragPanelLayout">
+        <cc:VisualGrid Name="VisualGrid" IsHitTestVisible="False"/>
     </cc:DragPanel>
     
 </Panel>
