@@ -127,8 +127,10 @@ namespace UltrawideOverlays
                 services = ConfigureServices();
 
                 var minimizeToTray = await services.GetRequiredService<SettingsDataService>().LoadSettingAsync(SettingsNames.MinimizeToTray);
+                var IsSilentStartUp = desktop.Args?.Contains(AutoStartUtil.SILENT_ARG);
+                var MinimizeToTray = minimizeToTray == SettingsBoolValues.False;
 
-                if (!desktop.Args.Contains(AutoStartUtil.SILENT_ARG) || minimizeToTray == SettingsBoolValues.False)
+                if (IsSilentStartUp == false || MinimizeToTray)
                 {
                     desktop.MainWindow = services.GetRequiredService<WindowFactory>().CreateWindow(Enums.WindowViews.MainWindow, null);
                     if (desktop.MainWindow != null)

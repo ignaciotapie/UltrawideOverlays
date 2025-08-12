@@ -12,5 +12,10 @@ namespace UltrawideOverlays.Wrappers
             Model = model;
             BitmapHandle = handle;
         }
+
+        public override string ToString()
+        {
+            return $"Model: {Model?.ToString()}, Handle: {BitmapHandle?.ToString()}, References: {BitmapHandle?.RefCount}";
+        }
     }
 }

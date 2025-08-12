@@ -54,6 +54,11 @@ namespace UltrawideOverlays.Services
                 Bitmap = null;
                 GC.SuppressFinalize(this);
             }
+
+            public override string ToString()
+            {
+                return $"Last Access Time: {LastAccessTime}, SizeBytes = {SizeBytes}, RefCount = {RefCount}";
+            }
         }
 
         private readonly Dictionary<string, CacheBitmapHandle> _cache;
@@ -104,7 +109,7 @@ namespace UltrawideOverlays.Services
             }
         }
 
-        public CacheBitmapHandle? AddImage(string path)
+        private CacheBitmapHandle? AddImage(string path)
         {
             lock (_lock)
             {

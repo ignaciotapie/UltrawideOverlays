@@ -15,13 +15,13 @@ namespace UltrawideOverlays.Decorator
 
         public ImageWrapper CreateImageWrapper(ImageModel? model, string imagePath)
         {
-            var handle = _imageService.AddImage(imagePath);
+            var handle = _imageService.AddOrGetHandle(imagePath);
             return new ImageWrapper(model, handle);
         }
 
         public OverlayWrapper CreateOverlayWrapper(OverlayDataModel? model, string imagePath)
         {
-            var handle = _imageService.AddImage(imagePath);
+            var handle = _imageService.AddOrGetHandle(imagePath);
             if (handle == null)
             {
                 throw new ArgumentException("Overlay not found in cache", nameof(imagePath));

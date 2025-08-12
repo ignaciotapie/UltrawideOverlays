@@ -101,17 +101,26 @@ namespace UltrawideOverlays.ViewModels
                 if (overlay != null)
                 {
                     SelectedOverlay = imageWrapperDecorator.CreateOverlayWrapper(overlay, overlay.Path);
-                    ActivityDataService.SaveActivity(new ActivityLogModel(System.DateTime.Now, ActivityLogType.Overlays, ActivityLogAction.Viewed, overlay.Name));
+                    Debug.WriteLine(SelectedOverlay.ToString());
+                    _ = ActivityDataService.SaveActivity(ActivityLogType.Overlays, ActivityLogAction.Viewed, overlay.Name);
                 }
                 else
                 {
-                    if (SelectedOverlay != null) SelectedOverlay.Dispose();
+                    if (SelectedOverlay != null)
+                    {
+                        SelectedOverlay.Dispose();
+                        Debug.WriteLine(SelectedOverlay.ToString());
+                    }
                     SelectedOverlay = null; // No overlay found for this game
                 }
             }
             else
             {
-                if (SelectedOverlay != null) SelectedOverlay.Dispose();
+                if (SelectedOverlay != null) 
+                { 
+                    SelectedOverlay.Dispose(); 
+                    Debug.WriteLine(SelectedOverlay.ToString());
+                }
                 SelectedOverlay = null; // No game found for this file path
             }
         }
@@ -120,6 +129,7 @@ namespace UltrawideOverlays.ViewModels
         {
             if (SelectedOverlay != null && ImageOpacity.HasValue && ImageOpacity >= 0.1)
             {
+                if (!IsOverlayEnabled) { IsOverlayEnabled = true; return; }
                 ImageOpacity -= 0.1;
             }
         }
@@ -128,6 +138,7 @@ namespace UltrawideOverlays.ViewModels
         {
             if (SelectedOverlay != null && ImageOpacity.HasValue && ImageOpacity <= 0.9)
             {
+                if (!IsOverlayEnabled) { IsOverlayEnabled = true; return; }
                 ImageOpacity += 0.1;
             }
         }
@@ -160,6 +171,7 @@ namespace UltrawideOverlays.ViewModels
             HotKeyService = null!;
             ActivityDataService = null!;
             imageWrapperDecorator = null!;
+
             _selectedOverlay = null;
             _imageOpacity = null;
 

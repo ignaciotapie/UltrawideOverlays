@@ -38,5 +38,10 @@ namespace UltrawideOverlays.Models
             LastModified = DateTime.Now;
             LastUsed = DateTime.Now;
         }
+
+        public override string ToString()
+        {
+            return Name;
+        }
     }
 }

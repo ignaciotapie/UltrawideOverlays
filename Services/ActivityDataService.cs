@@ -36,9 +36,10 @@ namespace UltrawideOverlays.Services
             return activities;
         }
 
-        public async Task SaveActivity(ActivityLogModel activity)
+        public async Task SaveActivity(ActivityLogType logType, ActivityLogAction logAction, string involvedName)
         {
             var db = await _provider.GetDatabaseAsync();
+            var activity = new ActivityLogModel(System.DateTime.Now, logType, logAction, involvedName);
 
             db.AddActivity(activity);
 
