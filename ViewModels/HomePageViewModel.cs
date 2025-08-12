@@ -29,6 +29,8 @@ namespace UltrawideOverlays.ViewModels
         public event EventHandler? GoToGamesTab;
         public event EventHandler? GoToOverlaysTab;
 
+        private bool isDisposed = false;
+
         ///////////////////////////////////////////
         /// CONSTRUCTOR
         ///////////////////////////////////////////
@@ -108,14 +110,18 @@ namespace UltrawideOverlays.ViewModels
 
         public override void Dispose()
         {
-            _activityService.ActivityTriggered -= ActivityTriggeredHandler;
+            if (!isDisposed) 
+            {
+                isDisposed = true;
+                _activityService.ActivityTriggered -= ActivityTriggeredHandler;
 
-            Activities.Clear();
-            Activities = null;
-            _generalService = null;
-            _activityService = null;
+                Activities.Clear();
+                Activities = null;
+                _generalService = null;
+                _activityService = null;
 
-            Debug.WriteLine("HomePageViewModel finalized!");
+                Debug.WriteLine("HomePageViewModel finalized!");
+            }
         }
     }
 }

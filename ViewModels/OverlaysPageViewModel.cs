@@ -33,6 +33,7 @@ namespace UltrawideOverlays.ViewModels
         private WindowFactory? WindowFactory;
         private OverlayDataService? OverlayDataService;
         private ImageWrapperDecorator? WrapperDecorator;
+        private bool isDisposed = false;
 
         public ObservableCollection<OverlayDataModel> Overlays { get; }
 
@@ -164,6 +165,7 @@ namespace UltrawideOverlays.ViewModels
             {
                 window.Closed -= OverlayWindowClosed;
                 (window.DataContext as IDisposable)?.Dispose();
+                window.DataContext = null;
             }
 
             LoadOverlaysAsync();
@@ -224,21 +226,25 @@ namespace UltrawideOverlays.ViewModels
 
         public override void Dispose()
         {
-            if (SelectedOverlayImage != null)
+            if (isDisposed) 
             {
-                SelectedOverlayImage.Dispose();
-                SelectedOverlayImage = null;
+                isDisposed = true;
+                if (SelectedOverlayImage != null)
+                {
+                    SelectedOverlayImage.Dispose();
+                    SelectedOverlayImage = null;
+                }
+
+                SelectedOverlay = null;
+
+                WindowFactory = null;
+                OverlayDataService = null;
+                WrapperDecorator = null;
+
+                GC.SuppressFinalize(this);
+
+                Debug.WriteLine("OverlaysPageViewModel finalized!");
             }
-
-            SelectedOverlay = null;
-
-            WindowFactory = null;
-            OverlayDataService = null;
-            WrapperDecorator = null;
-
-            GC.SuppressFinalize(this);
-
-            Debug.WriteLine("OverlaysPageViewModel finalized!");
         }
     }
 }

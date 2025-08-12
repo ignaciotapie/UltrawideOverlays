@@ -44,7 +44,6 @@ namespace UltrawideOverlays
                         {
                             DataContext = provider.GetRequiredService<MainWindowViewModel>()
                         };
-                        window.Closing += MainWindow_Closing;
                         window.Closed += MainWindow_Closed;
                         return window;
                     case Enums.WindowViews.OverlayWindow:
@@ -177,27 +176,18 @@ namespace UltrawideOverlays
             }
         }
 
-        private void MainWindow_Closed(object? sender, EventArgs e)
-        {
-            if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
-            {
-                QuitApp();
-            }
-        }
-
-        private async void MainWindow_Closing(object? sender, WindowClosingEventArgs e)
+        private async void MainWindow_Closed(object? sender, EventArgs e)
         {
             if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
             {
                 var settingsService = services.GetRequiredService<SettingsDataService>();
 
-                if (await settingsService.LoadSettingAsync(SettingsNames.MinimizeToTray) == SettingsBoolValues.True)
+                (desktop.MainWindow.DataContext as IDisposable)?.Dispose();
+                desktop.MainWindow = null;
+
+                if (await settingsService.LoadSettingAsync(SettingsNames.MinimizeToTray) == SettingsBoolValues.False)
                 {
-                    e.Cancel = true;
-                    if (sender is Window mainWindow)
-                    {
-                        mainWindow.Hide();
-                    }
+                    QuitApp();
                 }
             }
         }

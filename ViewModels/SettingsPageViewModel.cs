@@ -38,6 +38,7 @@ namespace UltrawideOverlays.ViewModels
         private SingleSettingModel _opacityDownHotkey;
         [ObservableProperty]
         private SingleSettingModel _quickOverlayHotkey;
+        private bool isDisposed = false;
 
         ///////////////////////////////////////////
         /// CONSTRUCTOR
@@ -132,6 +133,9 @@ namespace UltrawideOverlays.ViewModels
 
         public override void Dispose()
         {
+            if (isDisposed) return;
+
+            isDisposed = true;
             Debug.WriteLine("SettingsPageViewModel finalized!");
 
             SettingsDataService = null;

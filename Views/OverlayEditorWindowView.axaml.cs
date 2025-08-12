@@ -114,6 +114,7 @@ public partial class OverlayEditorWindowView : Window
         }
         RemoveHandler(DragDrop.DropEvent, Drop);
         RemoveHandler(DragDrop.DragOverEvent, DragOver);
+        DragDrop.SetAllowDrop(this, false);
 
         _itemsSourceSub?.Dispose();
         _itemsSourceSub = null;

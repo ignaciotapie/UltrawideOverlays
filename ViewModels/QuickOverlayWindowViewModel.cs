@@ -30,8 +30,9 @@ namespace UltrawideOverlays.ViewModels
         private OverlayDataService OverlayService;
         private FocusMonitorService FocusMonitorService;
         private WindowFactory WindowFactory;
-
         private Window? windowInstance;
+
+        private bool isDisposed = false;
 
         ///////////////////////////////////////////
         /// CONSTRUCTOR
@@ -138,6 +139,9 @@ namespace UltrawideOverlays.ViewModels
 
         public override void Dispose()
         {
+            if (isDisposed) return;
+
+            isDisposed = true;
             if (windowInstance != null)
             {
                 windowInstance.Closed -= OnOverlayEditorWindowClosed;

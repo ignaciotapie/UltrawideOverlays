@@ -52,6 +52,8 @@ namespace UltrawideOverlays.ViewModels
         private OverlayDataService _overlayService;
         private GamesDataService _gamesService;
 
+        private bool isDisposed = false;
+
         ///////////////////////////////////////////
         /// CONSTRUCTOR
         ///////////////////////////////////////////
@@ -295,26 +297,31 @@ namespace UltrawideOverlays.ViewModels
 
         public override void Dispose()
         {
-            Debug.WriteLine("GamesPageViewModel finalized!");
-            Processes?.Clear();
-            Processes = null;
+            if (isDisposed)
+            {
+                isDisposed = true;
 
-            Games?.Clear();
-            Games = null;
+                Debug.WriteLine("GamesPageViewModel finalized!");
+                Processes?.Clear();
+                Processes = null;
 
-            Overlays?.Clear();
-            Overlays = null;
+                Games?.Clear();
+                Games = null;
 
-            SelectedProcess = null;
-            SelectedOverlay = null;
-            SelectedGame = null;
+                Overlays?.Clear();
+                Overlays = null;
 
-            _factory = null;
-            _processService = null;
-            _overlayService = null;
-            _gamesService = null;
+                SelectedProcess = null;
+                SelectedOverlay = null;
+                SelectedGame = null;
 
-            GC.SuppressFinalize(this);
+                _factory = null;
+                _processService = null;
+                _overlayService = null;
+                _gamesService = null;
+
+                GC.SuppressFinalize(this);
+            }
         }
     }
 }
