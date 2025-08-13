@@ -33,3 +33,8 @@ UltrawideOverlays is a Windows desktop application designed to enhance the gamin
     *   `FocusMonitorService`: Uses the `UIAutomationClient` library to listen for window focus changes across the system, enabling automatic overlay activation.
     *   `HotKeyService`: Employs P/Invoke calls to `user32.dll` to register and handle global hotkeys, allowing for in-game control without needing to alt-tab.
     *   `Data Services`: A suite of services (`OverlayDataService`, `GamesDataService`, `SettingsDataService`) manage the loading and saving of application data.
+
+## Q&A
+
+*  **Q:** My overlay isn't shown on top of the game/window. 
+*  **A:** Game needs to be set to Borderless Windowed, it won't work wih Exclusive Fullscreen. You can use a utility like Borderless Gaming to make all games borderless
