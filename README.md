@@ -38,3 +38,6 @@ UltrawideOverlays is a Windows desktop application designed to enhance the gamin
 
 *  **Q:** My overlay isn't shown on top of the game/window. 
 *  **A:** Game needs to be set to Borderless Windowed, it won't work wih Exclusive Fullscreen. You can use a utility like Borderless Gaming to make all games borderless
+
+## Issues
+*  There's some memory leaks happening when changing windows, Overlay Editor seems to be the only one that closes after a while correctly. If the RAM usage gets high, restart the app.
