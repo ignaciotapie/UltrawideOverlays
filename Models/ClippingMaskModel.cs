@@ -19,15 +19,17 @@ namespace UltrawideOverlays.Models
         ///////////////////////////////////////////
         /// CONSTRUCTOR
         ///////////////////////////////////////////
-        public ClippingMaskModel() : base("", "ClippingMask")
+        public static string ClippingMaskImgPath = "";
+        public ClippingMaskModel() : base(ClippingMaskImgPath, "ClippingMask")
         {
             base.ImageProperties.Width = 0;
             base.ImageProperties.Height = 0;
             base.ImageProperties.Opacity = 0.3;
             base.ImageProperties.IsDraggable = false;
+            base.IsClippingMask = true;
         }
 
-        public ClippingMaskModel(Geometry geo) : base("", "ClippingMask")
+        public ClippingMaskModel(Geometry geo) : base(ClippingMaskImgPath, "ClippingMask")
         {
             base.ImageProperties.Width = (int)geo.Bounds.Width;
             base.ImageProperties.Height = (int)geo.Bounds.Height;
@@ -35,6 +37,7 @@ namespace UltrawideOverlays.Models
             base.ImageProperties.OriginalWidth = (int)geo.Bounds.Width;
             base.ImageProperties.Opacity = 0.3;
             base.ImageProperties.IsDraggable = false;
+            base.IsClippingMask = true;
         }
 
         public static ClippingMaskModel GetMaskByType(double positionX = 0, double positionY = 0, ClippingMaskType type = ClippingMaskType.Default)
@@ -69,6 +72,11 @@ namespace UltrawideOverlays.Models
                     break;
             }
             return model;
+        }
+
+        public override ImageModel Clone()
+        {
+            return base.Clone();
         }
     }
 }

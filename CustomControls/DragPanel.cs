@@ -157,14 +157,24 @@ namespace UltrawideOverlays.CustomControls
 
         private void AttachToChild(Control c)
         {
-            var sub = c.GetObservable(PositionProperty).Subscribe(_ => InvalidateArrange());
-            _posSubscriptions[c] = sub;
+            DetachFromChild(c);
+
+            var sub = c.GetObservable(PositionProperty)
+                       .Subscribe(_ => InvalidateArrange());
+            _posSubscriptions.Add(c, sub);
         }
 
         private void DetachFromChild(Control c)
         {
             if (_posSubscriptions.Remove(c, out var sub))
                 sub.Dispose();
+        }
+
+        protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
+        {
+            base.OnAttachedToVisualTree(e);
+            foreach (var c in Children.OfType<Control>())
+                AttachToChild(c);
         }
 
         protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)

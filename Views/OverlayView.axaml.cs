@@ -53,19 +53,28 @@ public partial class OverlayView : Window
         {
             if (change.NewValue is string exists && exists == "True")
             {
-                // If the image source exists, show the window
-                this.Show();
+                ShowWindowAndPosition();
                 Debug.WriteLine("OverlayView Window SHOWN");
             }
             else
             {
-                // If the image source does not exist, hide the window
                 this.Hide();
                 Debug.WriteLine("OverlayView Window HIDDEN!!");
             }
         }
 
         base.OnPropertyChanged(change);
+    }
+
+    private void ShowWindowAndPosition()
+    {
+        this.Show();
+        var platformHandle = this.TryGetPlatformHandle();
+        if (platformHandle?.Handle != null)
+        {
+            var hwnd = platformHandle.Handle;
+            NativeWindowUtils.SetWindowPos(hwnd, NativeWindowUtils.HWND_TOPMOST, 0, 0, 0, 0, NativeWindowUtils.SWP_NOMOVE | NativeWindowUtils.SWP_NOSIZE | NativeWindowUtils.SWP_SHOWWINDOW);
+        }
     }
 
     ///////////////////////////////////////////
@@ -94,6 +103,8 @@ public partial class OverlayView : Window
 
             // Optional: Set layered window attributes
             NativeWindowUtils.SetLayeredWindowAttributes(hwnd, 0, 255, 0x2 /* LWA_ALPHA */);
+
+            NativeWindowUtils.SetWindowPos(hwnd, NativeWindowUtils.HWND_TOPMOST, 0, 0, 0, 0, NativeWindowUtils.SWP_NOMOVE | NativeWindowUtils.SWP_NOSIZE | NativeWindowUtils.SWP_SHOWWINDOW);
         }
     }
 }

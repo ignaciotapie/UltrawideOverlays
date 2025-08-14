@@ -13,6 +13,9 @@ namespace UltrawideOverlays.Models
         public string _imageName;
 
         [ObservableProperty]
+        public bool _isClippingMask = false;
+
+        [ObservableProperty]
         private ImagePropertiesModel _imageProperties;
 
         public ImageModel()
@@ -59,6 +62,7 @@ namespace UltrawideOverlays.Models
             {
                 ImagePath = this.ImagePath,
                 ImageName = this.ImageName,
+                IsClippingMask = this.IsClippingMask,
                 ImageProperties = ImageProperties.Clone()
             };
         }

@@ -4,13 +4,11 @@ using Avalonia.Controls;
 using Avalonia.Data;
 using Avalonia.Input;
 using Avalonia.Platform.Storage;
-using DynamicData;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
-using System.Diagnostics;
 using System.Linq;
 using System.Reactive.Disposables;
 using UltrawideOverlays.CustomControls;
@@ -37,10 +35,10 @@ public partial class OverlayEditorWindowView : Window
         get => GetValue(ItemsSourceProperty);
         set => SetValue(ItemsSourceProperty, value);
     }
-    
+
     private DragGridControl? dragGridControl;
     private Dictionary<ImageWrapper?, SelectableImage> modelImageDictionary;
-    
+
     //Disposables
     private CompositeDisposable disposables;
     private IDisposable? _itemsSourceSub;
@@ -80,7 +78,7 @@ public partial class OverlayEditorWindowView : Window
         {
             Mode = BindingMode.TwoWay
         }));
-        
+
         disposables.Add(ItemsSourceProperty.Changed.Subscribe((args) =>
         {
             HandleItemsSource(args);
@@ -102,15 +100,15 @@ public partial class OverlayEditorWindowView : Window
             Selected = control.DataContext;
         }
     }
- 
+
     protected override void OnClosed(EventArgs e)
     {
         base.OnClosed(e);
 
         foreach (var kv in modelImageDictionary)
         {
-            kv.Key.Dispose();
-            kv.Value.Dispose();
+            kv.Key?.Dispose();
+            kv.Value?.Dispose();
         }
         RemoveHandler(DragDrop.DropEvent, Drop);
         RemoveHandler(DragDrop.DragOverEvent, DragOver);
@@ -129,7 +127,7 @@ public partial class OverlayEditorWindowView : Window
 
         ItemsSource?.Clear();
         ItemsSource = null;
-        
+
         Selected = null;
         dragGridControl = null;
 
@@ -137,7 +135,7 @@ public partial class OverlayEditorWindowView : Window
         {
             disposables.Dispose();
         }
-        
+
         (DataContext as IDisposable)?.Dispose();
 
         modelImageDictionary.Clear();
@@ -256,7 +254,7 @@ public partial class OverlayEditorWindowView : Window
             {
                 parent.Children.Remove(image);
             }
-        
+
             modelImageDictionary.Remove(im);
             image.Dispose();
         }
@@ -270,7 +268,7 @@ public partial class OverlayEditorWindowView : Window
             if (modelImageDictionary.ContainsKey(im)) continue; // Skip if the same exact ImageModel already exists
             var image = new SelectableImage(im);
             modelImageDictionary.Add(im, image);
-        
+
             dragGridControl?.Children.Add(image);
         }
     }

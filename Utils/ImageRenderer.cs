@@ -8,7 +8,7 @@ namespace UltrawideOverlays.Utils;
 
 public static class ImageRenderer
 {
-    public static RenderTargetBitmap RenderImagesToBitmap(IEnumerable<ImageModel> imageModels, IEnumerable<ClippingMaskModel> clippingMaskModels, PixelSize outputSize)
+    public static RenderTargetBitmap RenderImagesToBitmap(IEnumerable<ImageModel> imageModels, IEnumerable<ImageModel> clippingMaskModels, PixelSize outputSize)
     {
         var bitmap = new RenderTargetBitmap(outputSize);
 
@@ -74,7 +74,7 @@ public static class ImageRenderer
         return matrix;
     }
 
-    private static Geometry CreateGeometryFromClippingMasks(IEnumerable<ClippingMaskModel> masks, PixelSize outputSize)
+    private static Geometry CreateGeometryFromClippingMasks(IEnumerable<ImageModel> masks, PixelSize outputSize)
     {
         Geometry geometry = new RectangleGeometry(new Rect(0, 0, outputSize.Width, outputSize.Height));
 

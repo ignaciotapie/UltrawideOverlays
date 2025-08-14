@@ -110,7 +110,7 @@ namespace UltrawideOverlays.ViewModels
 
         public override void Dispose()
         {
-            if (!isDisposed) 
+            if (!isDisposed)
             {
                 isDisposed = true;
                 _activityService.ActivityTriggered -= ActivityTriggeredHandler;

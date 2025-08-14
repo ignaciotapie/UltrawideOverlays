@@ -13,7 +13,7 @@ namespace UltrawideOverlays.Models
         public string Resolution => $"{Width}x{Height}";
         public int NumberOfImages { get; set; }
         public IList<ImageModel>? ImageModels { get; set; }
-        public IList<ClippingMaskModel>? ClippingMaskModels { get; set; }
+        public IList<ImageModel>? ClippingMaskModels { get; set; }
 
         public DateTime LastModified { get; set; }
         public DateTime LastUsed { get; set; }
@@ -23,17 +23,17 @@ namespace UltrawideOverlays.Models
             Name = string.Empty;
             Path = string.Empty;
             ImageModels = new List<ImageModel>();
-            ClippingMaskModels = new List<ClippingMaskModel>();
+            ClippingMaskModels = new List<ImageModel>();
             LastModified = DateTime.Now;
             LastUsed = DateTime.Now;
         }
 
-        public OverlayDataModel(string overlayName, string overlayPath, IList<ImageModel>? imageModels = null, IList<ClippingMaskModel>? masks = null)
+        public OverlayDataModel(string overlayName, string overlayPath, IList<ImageModel>? imageModels = null, IList<ImageModel>? masks = null)
         {
             Name = overlayName;
             Path = overlayPath;
             ImageModels = imageModels ?? new List<ImageModel>();
-            ClippingMaskModels = masks ?? new List<ClippingMaskModel>();
+            ClippingMaskModels = masks ?? new List<ImageModel>();
             NumberOfImages = ImageModels?.Count ?? 0;
             LastModified = DateTime.Now;
             LastUsed = DateTime.Now;

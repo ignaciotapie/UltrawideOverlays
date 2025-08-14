@@ -116,9 +116,9 @@ namespace UltrawideOverlays.ViewModels
             }
             else
             {
-                if (SelectedOverlay != null) 
-                { 
-                    SelectedOverlay.Dispose(); 
+                if (SelectedOverlay != null)
+                {
+                    SelectedOverlay.Dispose();
                     Debug.WriteLine(SelectedOverlay.ToString());
                 }
                 SelectedOverlay = null; // No game found for this file path

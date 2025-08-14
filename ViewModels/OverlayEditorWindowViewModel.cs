@@ -1,4 +1,5 @@
 ﻿using Avalonia;
+using Avalonia.Collections;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using System;
@@ -6,6 +7,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Diagnostics;
+using System.Reactive.Linq;
 using System.Threading.Tasks;
 using UltrawideOverlays.Decorator;
 using UltrawideOverlays.Enums;
@@ -54,6 +56,8 @@ namespace UltrawideOverlays.ViewModels
         private OverlayDataService? _overlayDataService;
         private SettingsDataService? _settingsDataService;
         private ImageWrapperDecorator? _wrapperDecorator;
+
+        private IDisposable imagesSub;
         private bool isDisposed = false;
 
         ///////////////////////////////////////////
@@ -72,7 +76,8 @@ namespace UltrawideOverlays.ViewModels
             _wrapperDecorator = wrapperDecorator;
 
             Images = [];
-            Images.CollectionChanged += ImagesCollectionChanged;
+
+            imagesSub = Images.GetWeakCollectionChangedObservable().Subscribe(ImagesCollectionChanged);
 
             if (args is OverlayDataModel existingModel)
             {
@@ -154,7 +159,7 @@ namespace UltrawideOverlays.ViewModels
             return output;
         }
 
-        private void ImagesCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+        private void ImagesCollectionChanged(NotifyCollectionChangedEventArgs e)
         {
             CanCreateOverlay = Images.Count > 0;
             // Update ZIndex
@@ -235,7 +240,7 @@ namespace UltrawideOverlays.ViewModels
             {
                 Name = name,
                 ImageModels = new List<ImageModel>(),
-                ClippingMaskModels = new List<ClippingMaskModel>(),
+                ClippingMaskModels = new List<ImageModel>(),
                 Width = pixelSize.Width,
                 Height = pixelSize.Height,
                 LastModified = DateTime.Now,
@@ -245,9 +250,9 @@ namespace UltrawideOverlays.ViewModels
 
             for (int i = 0; i < Images.Count; i++)
             {
-                if (Images[i].Model is ClippingMaskModel clippingMask)
+                if (Images[i]?.Model?.IsClippingMask == true)
                 {
-                    overlay.ClippingMaskModels.Add(clippingMask);
+                    overlay.ClippingMaskModels.Add(Images[i].Model);
                 }
                 else
                 {
@@ -367,15 +372,12 @@ namespace UltrawideOverlays.ViewModels
         {
             if (isDisposed) return;
             isDisposed = true;
-            Images.CollectionChanged -= ImagesCollectionChanged;
+
+            imagesSub?.Dispose();
             foreach (var image in Images)
-            {
                 image.Dispose();
-            }
             foreach (var mask in MaskTypes)
-            {
                 mask.Dispose();
-            }
             Images.Clear();
             MaskTypes.Clear();
 
